@@ -1,0 +1,10 @@
+{
+  "name": "ShadowNex Prime™",
+  "short_name": "ShadowNex",
+  "description": "Global Situational Intelligence",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090d",
+  "theme_color": "#07090d",
+  "orientation": "any"
+}

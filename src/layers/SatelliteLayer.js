@@ -1,0 +1,9 @@
+import { BaseLayer } from './BaseLayer.js';
+import { parseTleText, propagate } from '../core/orbit.js';
+export class SatelliteLayer extends BaseLayer{
+ constructor(app){super(app,{id:'satellites',label:'Satellites',source:'CelesTrak',description:'TLE-propagated orbital estimates',interval:120000});this.orbits=[];this.tick=null;}
+ async enable(){await super.enable();if(!this.tick)this.tick=setInterval(()=>this.updatePositions(),5000);}
+ disable(){super.disable();if(this.tick)clearInterval(this.tick);this.tick=null;this.orbits=[];}
+ async refresh(){const r=await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle');if(!r.ok)throw new Error(`CelesTrak HTTP ${r.status}`);const txt=await r.text();this.orbits=parseTleText(txt,this.app.densityLimit(100,250,500));this.clear();const C=window.Cesium;for(const orb of this.orbits){const p=propagate(orb);const meta={type:'SATELLITE',name:orb.name,latitude:p.lat,longitude:p.lon,altitude:p.altKm*1000,source:'CelesTrak',accuracy:'TLE two-body propagated estimate'};const e=this.add({position:C.Cartesian3.fromDegrees(p.lon,p.lat,Math.max(100000,p.altKm*1000)),point:{pixelSize:5,color:C.Color.LIME,outlineColor:C.Color.BLACK,outlineWidth:1},label:{text:orb.name,font:'8px monospace',fillColor:C.Color.LIME,distanceDisplayCondition:new C.DistanceDisplayCondition(0,5000000),pixelOffset:new C.Cartesian2(0,-10)},properties:{snxMeta:meta}});e.__orb=orb;}this.setHealthy(this.orbits.length,'Propagated estimate');}
+ updatePositions(){if(!this.enabled)return;const C=window.Cesium;for(const e of this.entities){if(!e.__orb)continue;const p=propagate(e.__orb);e.position=C.Cartesian3.fromDegrees(p.lon,p.lat,Math.max(100000,p.altKm*1000));const meta=e.properties?.snxMeta?.getValue?.();if(meta){meta.latitude=p.lat;meta.longitude=p.lon;meta.altitude=p.altKm*1000;e.properties.snxMeta=meta;}}}
+}

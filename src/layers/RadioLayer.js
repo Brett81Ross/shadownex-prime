@@ -1,0 +1,5 @@
+import { BaseLayer } from './BaseLayer.js';
+export class RadioLayer extends BaseLayer{
+ constructor(app){super(app,{id:'radio',label:'World Radio',source:'Radio Browser',description:'Popular geolocated radio streams',interval:900000});}
+ async refresh(){const r=await fetch('https://de1.api.radio-browser.info/json/stations/search?limit=250&hidebroken=true&order=clickcount&reverse=true');if(!r.ok)throw new Error(`Radio Browser HTTP ${r.status}`);const d=await r.json();this.clear();const C=window.Cesium;let n=0;for(const s of d){const lat=Number(s.geo_lat),lon=Number(s.geo_long);if(!Number.isFinite(lat)||!Number.isFinite(lon))continue;const meta={type:'RADIO',id:s.stationuuid,name:s.name,country:s.country,language:s.language,tags:s.tags,stream:s.url_resolved||s.url,homepage:s.homepage,latitude:lat,longitude:lon,source:'Radio Browser'};this.add({position:C.Cartesian3.fromDegrees(lon,lat,80),point:{pixelSize:6,color:C.Color.DEEPSKYBLUE,outlineColor:C.Color.BLACK,outlineWidth:1},properties:{snxMeta:meta}});n++;if(n>=this.app.densityLimit(80,160,250))break;}this.setHealthy(n);}
+}

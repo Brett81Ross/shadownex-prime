@@ -1,0 +1,5 @@
+import { BaseLayer } from './BaseLayer.js';
+export class EarthquakeLayer extends BaseLayer{
+ constructor(app){super(app,{id:'earthquakes',label:'Earthquakes',source:'USGS',description:'Past 24 hours',interval:120000});}
+ async refresh(){const r=await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson');if(!r.ok)throw new Error(`USGS HTTP ${r.status}`);const d=await r.json();this.clear();const C=window.Cesium;for(const f of d.features.slice(0,this.app.densityLimit(200,500,1000))){const [lon,lat,depth]=f.geometry.coordinates,mag=Number(f.properties.mag)||0;const meta={type:'EARTHQUAKE',id:f.id,name:f.properties.place||'Earthquake',magnitude:mag,depthKm:depth,time:f.properties.time,url:f.properties.url,longitude:lon,latitude:lat,source:'USGS'};this.add({position:C.Cartesian3.fromDegrees(lon,lat,100),ellipse:{semiMajorAxis:Math.max(25000,mag*18000),semiMinorAxis:Math.max(25000,mag*18000),material:C.Color.ORANGE.withAlpha(.16),outline:true,outlineColor:C.Color.ORANGE},point:{pixelSize:Math.max(5,mag*2.2),color:C.Color.ORANGE,outlineColor:C.Color.BLACK,outlineWidth:1},properties:{snxMeta:meta}});}this.setHealthy(d.features.length);}
+}

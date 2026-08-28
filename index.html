@@ -9,15 +9,27 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <meta name="description" content="ShadowNex Prime — Global Situational Intelligence" />
   <title>ShadowNex Prime™ — Global Situational Intelligence</title>
+  <link rel="icon" href="/brand/shadownex-mark.webp" type="image/webp" />
+  <link rel="apple-touch-icon" href="/brand/shadownex-mark.webp" />
   <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.132/Build/Cesium/Widgets/widgets.css" />
   <link rel="manifest" href="/public/manifest.webmanifest" />
   <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/brand.css" />
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.132/Build/Cesium/Cesium.js" defer></script>
 </head>
 <body>
+  <div id="brandSplash" role="status" aria-label="ShadowNex Prime is initializing">
+    <div class="splash-lockup">
+      <img class="splash-mark" src="/brand/shadownex-mark.webp" alt="ShadowNex Prime eye emblem" />
+      <div class="splash-title">ShadowNex <span>Prime™</span></div>
+      <div class="splash-tag">Global Situational Intelligence</div>
+      <div class="splash-status">INITIALIZING NEXVISION · v2.2.0</div>
+    </div>
+    <div class="splash-studio">ShadowNex Prime™ · Cactus🌵Byte Studios™ · All Rights Reserved</div>
+  </div>
   <div id="app" class="lens-normal">
     <div id="globe"></div><div class="scanlines" aria-hidden="true"></div><div class="vignette" aria-hidden="true"></div>
-    <header class="topbar glass"><button id="menuBtn" class="icon-btn mobile-only" aria-label="Layers">☰</button><div class="brand"><span class="brand-mark">SNX</span><div><strong>ShadowNex Prime™</strong><small>Global Situational Intelligence</small></div></div><div class="top-actions"><span id="utcClock" class="clock"></span><button id="commandBtn" class="hud-btn">NEXCOMMAND</button><button id="shareBtn" class="hud-btn">SHARE</button><button id="settingsBtn" class="hud-btn">SETTINGS</button></div></header>
+    <header class="topbar glass"><button id="menuBtn" class="icon-btn mobile-only" aria-label="Layers">☰</button><div class="brand"><span class="brand-mark"><img src="/brand/shadownex-mark.webp" alt="" aria-hidden="true" /></span><div><strong>ShadowNex Prime™</strong><small>Global Situational Intelligence</small></div></div><div class="top-actions"><span id="utcClock" class="clock"></span><button id="commandBtn" class="hud-btn">NEXCOMMAND</button><button id="shareBtn" class="hud-btn">SHARE</button><button id="settingsBtn" class="hud-btn">SETTINGS</button></div></header>
     <aside id="layerPanel" class="side-panel left glass"><div class="panel-title"><span>NEXVISION™</span><small>INTELLIGENCE LAYERS</small></div><div id="layerList" class="layer-list"></div><div class="lens-block"><div class="section-label">SHADOWLENS™</div><div id="lensButtons" class="segmented"><button data-lens="normal" class="active">NORMAL</button><button data-lens="nvg">NVG</button><button data-lens="thermal">THERMAL</button><button data-lens="crt">CRT</button></div></div><div class="section-label">NEXDRAW™</div><div class="annotation-grid"><button id="markBtn" class="ghost-btn">MARK</button><button id="routeBtn" class="ghost-btn">ROUTE</button><button id="areaBtn" class="ghost-btn">AREA</button><button id="measureBtn" class="ghost-btn">MEASURE</button><button id="finishAnnoBtn" class="hud-btn">FINISH</button><button id="clearMarksBtn" class="ghost-btn">CLEAR</button></div><div id="annotationStatus" class="tool-status">READY</div><div class="section-label">SCENEDIRECTOR™</div><div class="scene-grid"><button id="orbitSceneBtn" class="ghost-btn">ORBIT</button><button id="worldSceneBtn" class="ghost-btn">WORLD SWEEP</button><button id="routeSceneBtn" class="ghost-btn">PLAY ROUTE</button><button id="stopSceneBtn" class="ghost-btn">STOP</button></div></aside>
     <aside id="scopePanel" class="side-panel right glass"><div class="panel-title"><span>PRIMESCOPE™</span><small>SELECTED CONTACT</small></div><div id="scopeEmpty" class="empty-state">Select a contact on the globe.</div><div id="scopeContent" class="scope-content hidden"></div><div id="scopeActions" class="scope-actions hidden"><button id="trackBtn" class="hud-btn wide">TRACK</button><button id="cockpitBtn" class="hud-btn wide">COCKPIT</button></div></aside>
     <section id="pulseTray" class="pulse-tray glass collapsed"><button id="pulseToggle" class="pulse-head"><span><b>NEXPULSE™</b> <small>FEED HEALTH</small></span><span id="pulseSummary">INITIALIZING</span></button><div id="pulseGrid" class="pulse-grid"></div></section>

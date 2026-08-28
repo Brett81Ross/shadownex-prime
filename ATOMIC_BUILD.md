@@ -2,12 +2,13 @@
 
 ## v2.2.1+ — Stability, clarity, globe reliability
 
-### TOP PRIORITY — pending
+### TOP PRIORITY — IMPLEMENTED IN STAGING
 1. **Always-visible 3D Earth / keyless default basemap**
    - The globe must render even when no Cesium Ion token is configured.
    - Live contacts must appear on top of a recognizable Earth, never on an empty dark field.
    - Enhanced Cesium Ion terrain/imagery remains optional.
    - Add a clear globe-loading/fallback state instead of silently showing dots only.
+   - **IMPLEMENTED:** bundled Natural Earth II imagery is now the default keyless basemap, Ion is optional terrain enhancement, the globe has a visible colored fallback sphere, and first-open framing points directly at Earth.
 
 ### Already implemented in the v2.2.1 stability branch
 - Fix unbounded aircraft entity growth on repeated refreshes.
@@ -92,7 +93,7 @@
    - Show source, last update age, and confidence/quality when applicable.
    - Heuristics such as military-likely classification must never be presented as confirmed fact.
 
-Status: atomic batch OPEN — no production deployment until the globe fix and stability/clarity items are integrated and validated.
+Status: atomic batch OPEN — globe fix is now integrated in staging; continue remaining clarity/recovery work before production deployment.
 
 ### Next UX + intelligence upgrades approved for the ABL
 16. **“What’s happening here?” primary action**

@@ -12,6 +12,10 @@
 - Added a collapsible plain-language map legend.
 - Added API-key explanations and provider links in Settings.
 - Added visible `KEY REQUIRED` badges for Traffic and Live Vessels, with dead-end activation prevented.
+- Added one-tap HOME view reset, live Earth/feed status strip, adaptive low-power map mode, and larger mobile tap targets.
+- Added plain-English contact summaries with primary metrics and collapsible technical data.
+- Added exponential feed retry/backoff so individual source failures recover independently.
+- Refocused Quick Start on move globe → choose layers → tap a contact.
 
 ## 2.2.0
 - Independent ShadowNex Prime production candidate.

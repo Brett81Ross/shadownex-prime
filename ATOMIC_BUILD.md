@@ -33,38 +33,38 @@
 - Needs final wording/behavior QA before merge so every Quick Look accurately describes what it actually does.
 - Needs targeted tests for scenario switching and rate-limit behavior.
 
-### Current atomic build — pending
-2. **Simple HOME / RESET VIEW button**
+### Current atomic build — clarity/recovery pass implemented in staging
+2. **Simple HOME / RESET VIEW button — IMPLEMENTED IN STAGING**
    - One tap returns to a useful full-Earth view and exits tracking/cockpit/tool modes.
 
 3. **Plain-language map legend — IMPLEMENTED IN STAGING**
    - Explain what the main dot/icon colors mean without requiring branded subsystem knowledge.
 
-4. **Globe + feed status strip**
+4. **Globe + feed status strip — IMPLEMENTED IN STAGING**
    - Small readable status such as `MAP READY · AIRCRAFT LIVE · EARTHQUAKES LIVE`.
    - Errors must explain what failed.
 
-5. **Automatic low-power fallback**
+5. **Automatic low-power fallback — IMPLEMENTED IN STAGING**
    - If mobile rendering struggles, lower contact density/trails before the app freezes.
    - Show a visible `LOW POWER` state instead of silently degrading.
 
-6. **Cleaner first-open defaults**
+6. **Cleaner first-open defaults — IMPLEMENTED IN STAGING**
    - Open on a recognizable full-Earth view.
    - Keep only the most useful live layers enabled initially.
    - No advanced panels open by default.
 
-7. **Tap-target clarity**
+7. **Tap-target clarity — IMPLEMENTED IN STAGING**
    - Make selectable contacts and primary controls easier to hit on Android phones/Fold devices.
 
-8. **Selected-contact focus cleanup**
+8. **Selected-contact focus cleanup — IMPLEMENTED IN STAGING**
    - Tap a contact → clearly highlight it → show the important details first.
    - Put deeper metadata behind `MORE DETAILS`.
 
-9. **Feed retry + recovery**
+9. **Feed retry + recovery — IMPLEMENTED IN STAGING**
    - Failed public feeds retry safely with backoff and recover automatically.
    - One failed source must never make the whole app feel frozen.
 
-10. **Quick Guide refresh**
+10. **Quick Guide refresh — IMPLEMENTED IN STAGING**
    - Center onboarding on `MOVE THE GLOBE → CHOOSE WHAT TO SEE → TAP A CONTACT`.
    - Keep ShadowNex terminology secondary until the basics are clear.
 
@@ -93,7 +93,7 @@
    - Show source, last update age, and confidence/quality when applicable.
    - Heuristics such as military-likely classification must never be presented as confirmed fact.
 
-Status: atomic batch OPEN — globe fix is now integrated in staging; continue remaining clarity/recovery work before production deployment.
+Status: atomic batch OPEN — items 1–10 are now integrated in staging. Next implementation focus is Universal Search, Mission Presets, Recovery Watchdog, Smart Clustering, and Contact Confidence + Provenance.
 
 ### Next UX + intelligence upgrades approved for the ABL
 16. **“What’s happening here?” primary action**

@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.132/Build/Cesium/Widgets/widgets.css" />
   <link rel="manifest" href="/public/manifest.webmanifest" />
   <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/src/ui/abl.css" />
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.132/Build/Cesium/Cesium.js" defer></script>
 </head>
 <body>
@@ -22,6 +23,7 @@
 
     <header class="topbar glass">
       <button id="menuBtn" class="icon-btn mobile-only" aria-label="Layers">☰</button>
+      <button id="homeBtn" class="home-btn" type="button" aria-label="Reset to full Earth view">HOME</button>
       <div class="brand">
         <span class="brand-mark">SNX</span>
         <div>
@@ -36,6 +38,10 @@
         <button id="settingsBtn" class="hud-btn">SETTINGS</button>
       </div>
     </header>
+
+    <div id="mapStatusStrip" class="map-status-strip glass" aria-live="polite">
+      <span id="mapStatusMap">MAP LOADING</span><span id="mapStatusAircraft">AIRCRAFT STARTING</span><span id="mapStatusQuakes">QUAKES STARTING</span><b id="performanceBadge" class="hidden">LOW POWER</b>
+    </div>
 
     <aside id="layerPanel" class="side-panel left glass">
       <div class="panel-title"><span>LIVE MAP LAYERS</span><small>NexVision™ · TURN DATA ON OR OFF</small></div>
@@ -127,11 +133,11 @@
       <div class="modal-card">
         <div class="modal-head"><div><b>ShadowNex Quick Start</b><small>THE BASICS — NOTHING ELSE REQUIRED</small></div></div>
         <div class="guide-steps">
-          <div><b>1</b><span><strong>Choose what you want to see</strong><small>Tap ☰ and switch map layers on or off.</small></span></div>
-          <div><b>2</b><span><strong>Tap any dot or marker</strong><small>Its details open at the bottom or right.</small></span></div>
-          <div><b>3</b><span><strong>Track only when you need it</strong><small>Drawing and cinematic tools stay hidden under Advanced Tools.</small></span></div>
+          <div><b>1</b><span><strong>Move the globe</strong><small>Drag to rotate Earth. Pinch or scroll to zoom. HOME always brings you back.</small></span></div>
+          <div><b>2</b><span><strong>Choose what you want to see</strong><small>Open Layers and turn live data on or off. Aircraft and earthquakes start automatically.</small></span></div>
+          <div><b>3</b><span><strong>Tap a contact</strong><small>Tap any marker for a plain-English summary. Open More Details only when you want technical data.</small></span></div>
         </div>
-        <p class="guide-note">Aircraft and earthquakes start automatically. On phones, ShadowNex uses a lighter rendering mode to stay responsive.</p>
+        <p class="guide-note">That is enough to use ShadowNex. Advanced tools stay out of the way until you open them.</p>
         <button id="welcomeStartBtn" class="hud-btn wide">START LIVE MAP</button>
       </div>
     </dialog>

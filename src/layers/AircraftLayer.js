@@ -23,7 +23,7 @@ export class AircraftLayer extends BaseLayer{
     }
     candidates.sort((a,b)=>Number(b.selected)-Number(a.selected)||a.distance-b.distance||a.id.localeCompare(b.id));
     const chosen=candidates.slice(0,limit),seen=new Set();let n=0;
-    const compact=this.app.compact;
+    const compact=this.app.compact,pointSize=compact?9:6,militaryPointSize=compact?11:8;
     for(const row of chosen){
       const {s,id,lon,lat,alt}=row;seen.add(id);
       const callsign=(s[1]||id||'UNKNOWN').trim(),heading=Number(s[10])||0,velocity=Number(s[9])||0;
@@ -31,7 +31,7 @@ export class AircraftLayer extends BaseLayer{
       const meta={type:'AIRCRAFT',id,name:callsign,country:s[2],longitude:lon,latitude:lat,altitude:alt,velocity,heading,verticalRate:s[11],onGround:!!s[8],source:'OpenSky Network',militaryLikely,cohort:militaryLikely?'MILITARY-LIKELY HEURISTIC':s[8]?'GROUND':'AIRBORNE CIVIL',accuracy:'PUBLIC ADS-B / heuristic military flag'};
       const cart=C.Cartesian3.fromDegrees(lon,lat,Math.max(Number(alt)||0,50));let rec=this.byId.get(id);
       if(!rec){
-        const entity=this.add({position:cart,point:{pixelSize:militaryLikely?8:6,color:militaryLikely?C.Color.ORANGE:C.Color.CYAN,outlineColor:C.Color.BLACK,outlineWidth:1,distanceDisplayCondition:new C.DistanceDisplayCondition(0,6500000)},label:{text:callsign,show:!compact,font:'9px monospace',fillColor:C.Color.WHITE,showBackground:true,backgroundColor:new C.Color(0,0,0,.55),pixelOffset:new C.Cartesian2(0,-13),distanceDisplayCondition:new C.DistanceDisplayCondition(0,900000)},properties:{snxMeta:meta}});
+        const entity=this.add({position:cart,point:{pixelSize:militaryLikely?militaryPointSize:pointSize,color:militaryLikely?C.Color.ORANGE:C.Color.CYAN,outlineColor:C.Color.BLACK,outlineWidth:1,distanceDisplayCondition:new C.DistanceDisplayCondition(0,6500000)},label:{text:callsign,show:!compact,font:'9px monospace',fillColor:C.Color.WHITE,showBackground:true,backgroundColor:new C.Color(0,0,0,.55),pixelOffset:new C.Cartesian2(0,-13),distanceDisplayCondition:new C.DistanceDisplayCondition(0,900000)},properties:{snxMeta:meta}});
         const trailEntity=this.add({polyline:{positions:[],width:1.25,material:(militaryLikely?C.Color.ORANGE:C.Color.CYAN).withAlpha(.36),distanceDisplayCondition:new C.DistanceDisplayCondition(0,2200000)}});
         rec={entity,trailEntity,lastSeen:Date.now()};this.byId.set(id,rec);
       }else{
@@ -53,5 +53,6 @@ export class AircraftLayer extends BaseLayer{
     for(const [id,rec] of stale){if(this.byId.size<=limit)break;this.removeRecord(id,rec);}
     if(this.byId.size>limit){const all=[...this.byId.entries()].sort((a,b)=>a[1].lastSeen-b[1].lastSeen);for(const [id,rec] of all){if(this.byId.size<=limit)break;if(id===this.app.globe.selected?.meta?.id)continue;this.removeRecord(id,rec);}}
   }
+  applyPerformanceMode(low){for(const rec of this.byId.values()){if(rec.entity?.label)rec.entity.label.show=!low&&!this.app.compact;if(rec.trailEntity?.polyline)rec.trailEntity.polyline.show=!low;}if(low)this.enforceCap(this.app.densityLimit(140,260,440));this.app.globe.requestRender?.();}
   clear(){super.clear();this.byId.clear();this.trails.clear();}
 }

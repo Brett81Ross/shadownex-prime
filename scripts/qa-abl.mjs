@@ -1,0 +1,14 @@
+import {readFile} from 'node:fs/promises';
+let pass=0,fail=0;const check=(ok,msg)=>{if(ok){console.log('✓',msg);pass++;}else{console.error('✗',msg);fail++;}};
+const read=p=>readFile(new URL(`../${p}`,import.meta.url),'utf8');
+const html=await read('index.html'),globe=await read('src/globe/GlobeController.js'),base=await read('src/layers/BaseLayer.js'),ux=await read('src/ui/ablEnhancements.js'),css=await read('src/ui/abl.css'),main=await read('src/main.js');
+check(html.includes('id="homeBtn"')&&html.includes('id="mapStatusStrip"')&&html.includes('id="performanceBadge"'),'HOME, live status strip, and low-power indicator are present');
+check(globe.includes('baseLayer:false')&&globe.includes('NaturalEarthII')&&globe.includes('GeographicTilingScheme'),'keyless Natural Earth II basemap is explicit and Ion-independent');
+check(globe.includes("baseColor=C.Color.fromCssColorString('#0d3242')")&&globe.includes("baseMapStatus='FALLBACK'"),'visible fallback Earth remains available if imagery fails');
+check(globe.includes('home(animate=true)')&&globe.includes('setSelectionMarker(entity)'),'full-Earth HOME reset and selected-contact highlight are implemented');
+check(base.includes('this.failureCount')&&base.includes('retrying in')&&base.includes('Math.min(300000'),'feeds use bounded exponential retry/backoff after failures');
+check(ux.includes('humanSummary=function')&&ux.includes('technical-data')&&ux.includes('primaryContactRows=function'),'contact panel uses plain-English summary plus progressive technical disclosure');
+check(ux.includes('watchPerformance=function')&&ux.includes('setLowPower=function')&&css.includes('.low-power'),'adaptive low-power map governor is implemented');
+check(html.includes('Move the globe')&&html.includes('Choose what you want to see')&&html.includes('Tap a contact'),'Quick Guide follows move globe → choose layers → tap contact');
+check(main.includes('installAblEnhancements(app)'),'ABL enhancement module is installed before app initialization');
+console.log(`\nABL QA: ${pass} passed, ${fail} failed`);process.exitCode=fail?1:0;

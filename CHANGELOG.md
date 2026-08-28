@@ -1,10 +1,17 @@
 # Changelog
 
-## 2.2.0
-- Added multi-source public CCTV and OpenStreetMap subsea communications layer.
-- Added cockpit HUD and reconstructed launch cinematic mode.
-- Added NexDraw annotations, PrimeCorrelate contact analysis, target trails and SceneDirector cinematics.
-- Preserved independent proprietary implementation and Node 22 runtime.
+## 2.2.1 — Stability + clarity hotfix
+- Hard-capped aircraft entities and reduced mobile aircraft/trail load.
+- Prioritized aircraft nearest the current view instead of allowing global entity accumulation.
+- Replaced overlapping layer intervals with non-overlapping, background-aware refresh scheduling.
+- Switched Cesium to on-demand rendering and reduced mobile render resolution.
+- Added WebGL pause/recovery messaging and a reload action.
+- Simplified the primary UI into Live Map Layers, Contact Details, Source Status, Map View, More Data Sources, and collapsed Advanced Tools.
+- Added a one-time plain-language Quick Start guide.
+- Added empty-globe deselection and an explicit Contact Details close button.
+- Added a collapsible plain-language map legend.
+- Added API-key explanations and provider links in Settings.
+- Added visible `KEY REQUIRED` badges for Traffic and Live Vessels, with dead-end activation prevented.
 
-## 2.0.0
-- Established the independent ShadowNex Prime™ application architecture.
+## 2.2.0
+- Independent ShadowNex Prime production candidate.

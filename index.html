@@ -16,15 +16,161 @@
 </head>
 <body>
   <div id="app" class="lens-normal">
-    <div id="globe"></div><div class="scanlines" aria-hidden="true"></div><div class="vignette" aria-hidden="true"></div>
-    <header class="topbar glass"><button id="menuBtn" class="icon-btn mobile-only" aria-label="Layers">☰</button><div class="brand"><span class="brand-mark">SNX</span><div><strong>ShadowNex Prime™</strong><small>Global Situational Intelligence</small></div></div><div class="top-actions"><span id="utcClock" class="clock"></span><button id="commandBtn" class="hud-btn">NEXCOMMAND</button><button id="shareBtn" class="hud-btn">SHARE</button><button id="settingsBtn" class="hud-btn">SETTINGS</button></div></header>
-    <aside id="layerPanel" class="side-panel left glass"><div class="panel-title"><span>NEXVISION™</span><small>INTELLIGENCE LAYERS</small></div><div id="layerList" class="layer-list"></div><div class="lens-block"><div class="section-label">SHADOWLENS™</div><div id="lensButtons" class="segmented"><button data-lens="normal" class="active">NORMAL</button><button data-lens="nvg">NVG</button><button data-lens="thermal">THERMAL</button><button data-lens="crt">CRT</button></div></div><div class="section-label">NEXDRAW™</div><div class="annotation-grid"><button id="markBtn" class="ghost-btn">MARK</button><button id="routeBtn" class="ghost-btn">ROUTE</button><button id="areaBtn" class="ghost-btn">AREA</button><button id="measureBtn" class="ghost-btn">MEASURE</button><button id="finishAnnoBtn" class="hud-btn">FINISH</button><button id="clearMarksBtn" class="ghost-btn">CLEAR</button></div><div id="annotationStatus" class="tool-status">READY</div><div class="section-label">SCENEDIRECTOR™</div><div class="scene-grid"><button id="orbitSceneBtn" class="ghost-btn">ORBIT</button><button id="worldSceneBtn" class="ghost-btn">WORLD SWEEP</button><button id="routeSceneBtn" class="ghost-btn">PLAY ROUTE</button><button id="stopSceneBtn" class="ghost-btn">STOP</button></div></aside>
-    <aside id="scopePanel" class="side-panel right glass"><div class="panel-title"><span>PRIMESCOPE™</span><small>SELECTED CONTACT</small></div><div id="scopeEmpty" class="empty-state">Select a contact on the globe.</div><div id="scopeContent" class="scope-content hidden"></div><div id="scopeActions" class="scope-actions hidden"><button id="trackBtn" class="hud-btn wide">TRACK</button><button id="cockpitBtn" class="hud-btn wide">COCKPIT</button></div></aside>
-    <section id="pulseTray" class="pulse-tray glass collapsed"><button id="pulseToggle" class="pulse-head"><span><b>NEXPULSE™</b> <small>FEED HEALTH</small></span><span id="pulseSummary">INITIALIZING</span></button><div id="pulseGrid" class="pulse-grid"></div></section>
-    <div id="cockpitOverlay" class="cockpit-overlay hidden" aria-hidden="true"><div class="cockpit-reticle" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="cockpit-readout left-readout"><small>TARGET</small><b id="cockpitTarget">—</b><span id="cockpitCohort">CONTACT</span></div><div class="cockpit-readout right-readout"><small>VECTOR</small><b id="cockpitHeading">000°</b><span id="cockpitSpeed">SPD —</span></div><div class="cockpit-readout bottom-readout"><small>ALTITUDE</small><b id="cockpitAltitude">—</b><span id="cockpitSource">PUBLIC SOURCE</span></div><div class="cockpit-horizon"><span></span></div></div>
-    <div id="toast" class="toast hidden"></div><footer class="footer glass"><span>ShadowNex Prime™ · v2.2.0</span><span>Cactus🌵Byte Studios™ · All Rights Reserved</span></footer>
-    <dialog id="settingsDialog" class="modal glass"><form method="dialog" class="modal-card"><div class="modal-head"><div><b>ShadowNex Settings</b><small>LOCAL DEVICE PREFERENCES</small></div><button value="cancel" class="icon-btn">✕</button></div><label>Cesium Ion public token <input id="cesiumToken" autocomplete="off" placeholder="Optional" /></label><label>TomTom traffic key <input id="tomtomKey" autocomplete="off" placeholder="Optional — stored on this device" /></label><label>AISStream key <input id="aisKey" autocomplete="off" placeholder="Optional — stored on this device" /></label><label class="toggle-row"><input id="reduceMotion" type="checkbox" /> Reduce interface motion</label><label>Marker density<select id="markerDensity"><option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option></select></label><div class="diagnostic-box"><b>SYSTEM DIAGNOSTICS</b><div id="diagnostics"></div></div><div class="modal-actions"><button id="resetSettingsBtn" type="button" class="ghost-btn">RESET</button><button id="saveSettingsBtn" value="default" class="hud-btn">SAVE</button></div></form></dialog>
-    <dialog id="shareDialog" class="modal glass"><form method="dialog" class="modal-card compact"><div class="modal-head"><div><b>Signal Share™</b><small>SHADOWNEX APP LINK</small></div><button value="cancel" class="icon-btn">✕</button></div><canvas id="qrCanvas" width="290" height="290"></canvas><div class="share-link" id="shareLink"></div><div class="modal-actions"><button id="copyLinkBtn" type="button" class="ghost-btn">COPY LINK</button><button value="default" class="hud-btn">DONE</button></div></form></dialog>
-    <dialog id="commandDialog" class="modal glass"><form method="dialog" class="modal-card command-card"><div class="modal-head"><div><b>NexCommand™</b><small>COMMAND + INTELLIGENCE BRIEFING</small></div><button value="cancel" class="icon-btn">✕</button></div><div id="commandLog" class="command-log"><p>Try: “show aircraft”, “go to Tokyo”, “thermal mode”, “brief me”.</p></div><div class="command-input-row"><input id="commandInput" placeholder="Enter command…" autocomplete="off" /><button id="micBtn" type="button" class="icon-btn" aria-label="Voice command">◉</button><button id="runCommandBtn" type="button" class="hud-btn">RUN</button></div></form></dialog>
-  </div><script type="module" src="/src/main.js"></script>
-</body></html>
+    <div id="globe"></div>
+    <div class="scanlines" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <header class="topbar glass">
+      <button id="menuBtn" class="icon-btn mobile-only" aria-label="Layers">☰</button>
+      <div class="brand">
+        <span class="brand-mark">SNX</span>
+        <div>
+          <strong>ShadowNex Prime™</strong>
+          <small>Global Situational Intelligence</small>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span id="utcClock" class="clock"></span>
+        <button id="commandBtn" class="hud-btn">AI COMMAND</button>
+        <button id="shareBtn" class="hud-btn">SHARE</button>
+        <button id="settingsBtn" class="hud-btn">SETTINGS</button>
+      </div>
+    </header>
+
+    <aside id="layerPanel" class="side-panel left glass">
+      <div class="panel-title"><span>LIVE MAP LAYERS</span><small>NexVision™ · TURN DATA ON OR OFF</small></div>
+      <div id="layerList" class="layer-list"></div>
+      <details class="tool-group">
+        <summary>MORE DATA SOURCES</summary>
+        <div id="moreLayerList" class="layer-list"></div>
+      </details>
+      <details class="tool-group legend">
+        <summary>MAP LEGEND</summary>
+        <div class="legend-list" aria-label="Map symbol legend">
+          <div><i class="legend-dot aircraft"></i><span>Aircraft</span></div>
+          <div><i class="legend-dot military"></i><span>Military-likely aircraft <small>heuristic</small></span></div>
+          <div><i class="legend-dot quake"></i><span>Earthquake</span></div>
+          <div><i class="legend-dot fire"></i><span>Active fire</span></div>
+          <div><i class="legend-dot satellite"></i><span>Satellite estimate</span></div>
+          <div><i class="legend-dot vessel"></i><span>Live vessel <small>key required</small></span></div>
+          <div><i class="legend-dot launch"></i><span>Launch site/event</span></div>
+          <div><i class="legend-line subsea"></i><span>Mapped subsea cable</span></div>
+        </div>
+      </details>
+      <div class="lens-block">
+        <div class="section-label">MAP VIEW <small>ShadowLens™</small></div>
+        <div id="lensButtons" class="segmented">
+          <button data-lens="normal" class="active">NORMAL</button>
+          <button data-lens="nvg">NVG</button>
+          <button data-lens="thermal">THERMAL</button>
+          <button data-lens="crt">CRT</button>
+        </div>
+      </div>
+      <details class="tool-group advanced-tools">
+        <summary>ADVANCED TOOLS</summary>
+        <div class="section-label">DRAW / MEASURE <small>NexDraw™</small></div>
+        <div class="annotation-grid">
+          <button id="markBtn" class="ghost-btn">MARK</button>
+          <button id="routeBtn" class="ghost-btn">ROUTE</button>
+          <button id="areaBtn" class="ghost-btn">AREA</button>
+          <button id="measureBtn" class="ghost-btn">MEASURE</button>
+          <button id="finishAnnoBtn" class="hud-btn">FINISH</button>
+          <button id="clearMarksBtn" class="ghost-btn">CLEAR</button>
+        </div>
+        <div id="annotationStatus" class="tool-status">READY</div>
+        <div class="section-label">CAMERA SCENES <small>SceneDirector™</small></div>
+        <div class="scene-grid">
+          <button id="orbitSceneBtn" class="ghost-btn">ORBIT</button>
+          <button id="worldSceneBtn" class="ghost-btn">WORLD SWEEP</button>
+          <button id="routeSceneBtn" class="ghost-btn">PLAY ROUTE</button>
+          <button id="stopSceneBtn" class="ghost-btn">STOP</button>
+        </div>
+      </details>
+    </aside>
+
+    <aside id="scopePanel" class="side-panel right glass">
+      <div class="panel-title scope-title"><span>CONTACT DETAILS</span><small>PrimeScope™ · TAP A DOT ON THE MAP</small><button id="scopeCloseBtn" class="icon-btn scope-close hidden" type="button" aria-label="Close contact details">✕</button></div>
+      <div id="scopeEmpty" class="empty-state">Tap any marker for details. Tap empty globe space to clear a selection.</div>
+      <div id="scopeContent" class="scope-content hidden"></div>
+      <div id="scopeActions" class="scope-actions hidden">
+        <button id="trackBtn" class="hud-btn wide">TRACK</button>
+        <button id="cockpitBtn" class="hud-btn wide">COCKPIT</button>
+      </div>
+    </aside>
+
+    <section id="pulseTray" class="pulse-tray glass collapsed">
+      <button id="pulseToggle" class="pulse-head">
+        <span><b>SOURCE STATUS</b> <small>NexPulse™</small></span>
+        <span id="pulseSummary">INITIALIZING</span>
+      </button>
+      <div id="pulseGrid" class="pulse-grid"></div>
+    </section>
+
+
+    <div id="cockpitOverlay" class="cockpit-overlay hidden" aria-hidden="true">
+      <div class="cockpit-reticle" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="cockpit-readout left-readout"><small>TARGET</small><b id="cockpitTarget">—</b><span id="cockpitCohort">CONTACT</span></div>
+      <div class="cockpit-readout right-readout"><small>VECTOR</small><b id="cockpitHeading">000°</b><span id="cockpitSpeed">SPD —</span></div>
+      <div class="cockpit-readout bottom-readout"><small>ALTITUDE</small><b id="cockpitAltitude">—</b><span id="cockpitSource">PUBLIC SOURCE</span></div>
+      <div class="cockpit-horizon"><span></span></div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+    <div id="stabilityBanner" class="stability-banner hidden"><span>Map renderer paused.</span><button id="reloadAppBtn" class="hud-btn">RELOAD</button></div>
+
+    <footer class="footer glass">
+      <span>ShadowNex Prime™ · v2.2.1</span>
+      <span>Cactus🌵Byte Studios™ · All Rights Reserved</span>
+    </footer>
+
+    <dialog id="welcomeDialog" class="modal glass quick-guide">
+      <div class="modal-card">
+        <div class="modal-head"><div><b>ShadowNex Quick Start</b><small>THE BASICS — NOTHING ELSE REQUIRED</small></div></div>
+        <div class="guide-steps">
+          <div><b>1</b><span><strong>Choose what you want to see</strong><small>Tap ☰ and switch map layers on or off.</small></span></div>
+          <div><b>2</b><span><strong>Tap any dot or marker</strong><small>Its details open at the bottom or right.</small></span></div>
+          <div><b>3</b><span><strong>Track only when you need it</strong><small>Drawing and cinematic tools stay hidden under Advanced Tools.</small></span></div>
+        </div>
+        <p class="guide-note">Aircraft and earthquakes start automatically. On phones, ShadowNex uses a lighter rendering mode to stay responsive.</p>
+        <button id="welcomeStartBtn" class="hud-btn wide">START LIVE MAP</button>
+      </div>
+    </dialog>
+
+    <dialog id="settingsDialog" class="modal glass">
+      <form method="dialog" class="modal-card">
+        <div class="modal-head"><div><b>ShadowNex Settings</b><small>LOCAL DEVICE PREFERENCES</small></div><button value="cancel" class="icon-btn">✕</button></div>
+        <div class="key-setting"><label>Cesium Ion public token <input id="cesiumToken" autocomplete="off" placeholder="Optional" /></label><small>Used for optional Cesium Ion terrain/imagery. <a href="https://ion.cesium.com/tokens" target="_blank" rel="noopener">Get a Cesium token ↗</a></small></div>
+        <div class="key-setting"><label>TomTom traffic key <input id="tomtomKey" autocomplete="off" placeholder="Optional — stored on this device" /></label><small>Unlocks live traffic-flow tiles. <a href="https://developer.tomtom.com/" target="_blank" rel="noopener">Get a TomTom key ↗</a></small></div>
+        <div class="key-setting"><label>AISStream key <input id="aisKey" autocomplete="off" placeholder="Optional — stored on this device" /></label><small>Unlocks live vessel positions and trails. <a href="https://aisstream.io/" target="_blank" rel="noopener">Get an AISStream key ↗</a></small></div>
+        <label class="toggle-row"><input id="reduceMotion" type="checkbox" /> Reduce interface motion</label>
+        <label>Marker density
+          <select id="markerDensity"><option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option></select>
+        </label>
+        <div class="diagnostic-box">
+          <b>SYSTEM DIAGNOSTICS</b>
+          <div id="diagnostics"></div>
+        </div>
+        <div class="modal-actions"><button id="showGuideBtn" type="button" class="ghost-btn">QUICK GUIDE</button><button id="resetSettingsBtn" type="button" class="ghost-btn">RESET</button><button id="saveSettingsBtn" value="default" class="hud-btn">SAVE</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="shareDialog" class="modal glass">
+      <form method="dialog" class="modal-card compact">
+        <div class="modal-head"><div><b>Signal Share™</b><small>SHADOWNEX APP LINK</small></div><button value="cancel" class="icon-btn">✕</button></div>
+        <canvas id="qrCanvas" width="290" height="290"></canvas>
+        <div class="share-link" id="shareLink"></div>
+        <div class="modal-actions"><button id="copyLinkBtn" type="button" class="ghost-btn">COPY LINK</button><button value="default" class="hud-btn">DONE</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="commandDialog" class="modal glass">
+      <form method="dialog" class="modal-card command-card">
+        <div class="modal-head"><div><b>AI Command</b><small>NexCommand™ · TYPE WHAT YOU WANT THE MAP TO DO</small></div><button value="cancel" class="icon-btn">✕</button></div>
+        <div id="commandLog" class="command-log"><p>Try: “show aircraft”, “go to Tokyo”, “thermal mode”, “brief me”.</p></div>
+        <div class="command-input-row"><input id="commandInput" placeholder="Enter command…" autocomplete="off" /><button id="micBtn" type="button" class="icon-btn" aria-label="Voice command">◉</button><button id="runCommandBtn" type="button" class="hud-btn">RUN</button></div>
+      </form>
+    </dialog>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

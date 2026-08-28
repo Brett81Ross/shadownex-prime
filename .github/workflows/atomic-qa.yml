@@ -1,0 +1,22 @@
+name: ShadowNex Atomic QA
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Run ShadowNex QA
+        run: npm test
+      - name: Verify production build
+        run: npm run build

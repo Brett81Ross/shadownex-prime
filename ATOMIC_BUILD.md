@@ -10,5 +10,10 @@
 - Bounded aircraft/vessel trails
 - Mobile Android/iOS responsive interface
 - Launch reconstruction permanently labeled as an estimate, not live telemetry
+- Approved cyan metallic eye branding integrated
+- Approved eye mark replaces temporary SNX top-bar mark
+- Branded initialization splash added
+- PWA/browser icon references use approved ShadowNex eye mark
+- Cactus🌵Byte Studios™ lineup uses the approved ShadowNex eye mark
 
-Status: atomic batch full and approved for production deployment.
+Status: atomic batch full. Git-triggered Vercel deployment remains disabled. Awaiting explicit production deployment approval.

@@ -7,10 +7,18 @@ export class GlobeController extends EventTarget {
     if(!window.Cesium) throw new Error('Cesium runtime did not load.');
     const C=window.Cesium;
     if(this.settings.cesiumToken) C.Ion.defaultAccessToken=this.settings.cesiumToken;
-    this.viewer=new C.Viewer(this.container,{animation:false,timeline:false,baseLayerPicker:false,geocoder:false,homeButton:false,sceneModePicker:false,navigationHelpButton:false,fullscreenButton:false,infoBox:false,selectionIndicator:false,shouldAnimate:true});
+    this.viewer=new C.Viewer(this.container,{animation:false,timeline:false,baseLayer:false,baseLayerPicker:false,geocoder:false,homeButton:false,sceneModePicker:false,navigationHelpButton:false,fullscreenButton:false,infoBox:false,selectionIndicator:false,shouldAnimate:true});
+    this.viewer.scene.globe.show=true;
+    this.viewer.scene.globe.baseColor=C.Color.fromCssColorString('#07151d');
+    try{
+      const provider=new C.UrlTemplateImageryProvider({url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',maximumLevel:19,credit:'© OpenStreetMap contributors'});
+      const layer=this.viewer.imageryLayers.addImageryProvider(provider);
+      layer.brightness=.72;layer.contrast=1.08;layer.saturation=.72;layer.gamma=.96;
+    }catch(e){console.warn('[basemap] OpenStreetMap imagery unavailable; using globe fallback.',e);}
     this.viewer.scene.globe.depthTestAgainstTerrain=true; this.viewer.scene.fxaa=true; this.viewer.scene.requestRenderMode=false;
-    try { if(this.settings.cesiumToken) this.viewer.terrainProvider=await C.createWorldTerrainAsync(); } catch {}
+    try { if(this.settings.cesiumToken) this.viewer.terrainProvider=await C.createWorldTerrainAsync(); } catch(e) { console.warn('[terrain] Cesium terrain unavailable; using ellipsoid.',e); }
     this.viewer.camera.setView({destination:C.Cartesian3.fromDegrees(-98.5,38.4,11500000),orientation:{heading:0,pitch:C.Math.toRadians(-62),roll:0}});
+    this.viewer.scene.requestRender();
     this.annotation=new AnnotationController(this);this.sceneDirector=new SceneDirector(this,this.annotation);
     const handler=new C.ScreenSpaceEventHandler(this.viewer.scene.canvas);
     handler.setInputAction(m=>this.onClick(m.position),C.ScreenSpaceEventType.LEFT_CLICK);

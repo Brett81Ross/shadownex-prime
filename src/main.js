@@ -6,9 +6,16 @@ function dismissSplash(){
   window.setTimeout(()=>splash.remove(),450);
 }
 function boot(){
+  const started=Date.now();
   const wait=()=>{
-    if(window.Cesium){new ShadowNexPrime().init().then(dismissSplash).catch(fatal);}
-    else setTimeout(wait,60);
+    if(window.Cesium){
+      const app=new ShadowNexPrime();
+      const init=app.init();
+      window.setTimeout(()=>{if(app.globe?.viewer)dismissSplash();},900);
+      init.then(dismissSplash).catch(fatal);
+    }else if(Date.now()-started>12000){
+      fatal(new Error('Cesium runtime did not load within 12 seconds. Check network access and reload.'));
+    }else setTimeout(wait,60);
   };
   wait();
 }

@@ -1,0 +1,11 @@
+import {readFile} from 'node:fs/promises';
+let pass=0,fail=0;const check=(ok,msg)=>{if(ok){console.log('✓',msg);pass++;}else{console.error('✗',msg);fail++;}};const read=p=>readFile(new URL(`../${p}`,import.meta.url),'utf8');
+const intel=await read('src/ui/intelligenceEnhancements.js'),air=await read('src/layers/AircraftLayer.js'),globe=await read('src/globe/GlobeController.js'),css=await read('src/ui/intelligence.css'),main=await read('src/main.js');
+check(intel.includes('ensureIntelligenceUi')&&intel.includes("search.id='searchBtn'")&&intel.includes('id="searchDialog"'),'Universal Search UI is created at runtime');
+check(intel.includes('/api/boundary?q=')&&intel.includes('searchActiveContacts'),'search handles places and active live contacts');
+check(intel.includes('data-preset="emergency"')&&intel.includes('data-preset="aviation"')&&intel.includes('data-preset="space"'),'guided mission presets are present');
+check(intel.includes('startRecoveryWatchdog')&&intel.includes('recoverLayer')&&intel.includes('300000'),'automatic recovery watchdog has cooldown and targeted recovery');
+check(air.includes('clusterEntities')&&air.includes("type:'CLUSTER'")&&globe.includes("meta?.type==='CLUSTER'"),'smart aircraft clustering and cluster drill-down are implemented');
+check(intel.includes('confidenceInfo')&&intel.includes('MILITARY-LIKELY IS HEURISTIC')&&css.includes('.provenance-strip'),'confidence/provenance UI labels live, estimated, reported, and heuristic data');
+check(main.includes('installIntelligenceEnhancements(app)'),'intelligence enhancement module is installed before app initialization');
+console.log(`\nIntelligence QA: ${pass} passed, ${fail} failed`);process.exitCode=fail?1:0;

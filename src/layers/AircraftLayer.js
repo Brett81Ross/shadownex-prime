@@ -5,9 +5,11 @@ import { haversineKm } from '../core/geo.js';
 export class AircraftLayer extends BaseLayer{
   constructor(app){
     super(app,{id:'aircraft',label:'Aircraft',source:'OpenSky Network',description:'Live public aircraft positions',interval:22000});
-    this.byId=new Map();
+    this.byId=new Map();this.clusterEntities=[];this.clusterMoveHandler=null;
     this.trails=new TrailStore({maxPoints:16,maxAgeMs:10*60*1000,minMoveKm:.45});
   }
+  async enable(){if(this.enabled)return;await super.enable();if(!this.clusterMoveHandler){this.clusterMoveHandler=()=>{clearTimeout(this._clusterDelay);this._clusterDelay=setTimeout(()=>this.updateClusters(),120)};this.app.globe.viewer.camera.moveEnd.addEventListener(this.clusterMoveHandler);}this.updateClusters();}
+  disable(){if(this.clusterMoveHandler)this.app.globe.viewer.camera.moveEnd.removeEventListener(this.clusterMoveHandler);this.clusterMoveHandler=null;clearTimeout(this._clusterDelay);this.clearClusters();super.disable();}
   async refresh(){
     const r=await fetch('/api/aircraft');if(!r.ok)throw new Error(`Aircraft HTTP ${r.status}`);
     const data=await r.json(),rows=data.states||[],C=window.Cesium;
@@ -28,7 +30,7 @@ export class AircraftLayer extends BaseLayer{
       const {s,id,lon,lat,alt}=row;seen.add(id);
       const callsign=(s[1]||id||'UNKNOWN').trim(),heading=Number(s[10])||0,velocity=Number(s[9])||0;
       const militaryLikely=/^(RCH|CNV|EVAC|REACH|NATO|FORTE|DUKE|VIPER|HOSS|PAT|NAVY|ARMY)/i.test(callsign);
-      const meta={type:'AIRCRAFT',id,name:callsign,country:s[2],longitude:lon,latitude:lat,altitude:alt,velocity,heading,verticalRate:s[11],onGround:!!s[8],source:'OpenSky Network',militaryLikely,cohort:militaryLikely?'MILITARY-LIKELY HEURISTIC':s[8]?'GROUND':'AIRBORNE CIVIL',accuracy:'PUBLIC ADS-B / heuristic military flag'};
+      const meta={type:'AIRCRAFT',id,name:callsign,country:s[2],longitude:lon,latitude:lat,altitude:alt,velocity,heading,verticalRate:s[11],onGround:!!s[8],updatedAt:Number(s[4]||s[3])?Number(s[4]||s[3])*1000:Date.now(),source:'OpenSky Network',militaryLikely,cohort:militaryLikely?'MILITARY-LIKELY HEURISTIC':s[8]?'GROUND':'AIRBORNE CIVIL',accuracy:'PUBLIC ADS-B / heuristic military flag'};
       const cart=C.Cartesian3.fromDegrees(lon,lat,Math.max(Number(alt)||0,50));let rec=this.byId.get(id);
       if(!rec){
         const entity=this.add({position:cart,point:{pixelSize:militaryLikely?militaryPointSize:pointSize,color:militaryLikely?C.Color.ORANGE:C.Color.CYAN,outlineColor:C.Color.BLACK,outlineWidth:1,distanceDisplayCondition:new C.DistanceDisplayCondition(0,6500000)},label:{text:callsign,show:!compact,font:'9px monospace',fillColor:C.Color.WHITE,showBackground:true,backgroundColor:new C.Color(0,0,0,.55),pixelOffset:new C.Cartesian2(0,-13),distanceDisplayCondition:new C.DistanceDisplayCondition(0,900000)},properties:{snxMeta:meta}});
@@ -42,7 +44,7 @@ export class AircraftLayer extends BaseLayer{
     }
     this.enforceCap(limit,seen);
     this.trails.prune(this.byId.keys(),Date.now());
-    this.setHealthy(n,`${rows.length} states received · ${this.byId.size} rendered near view`);
+    this.setHealthy(n,`${rows.length} states received · ${this.byId.size} rendered near view`);this.updateClusters();
   }
   removeRecord(id,rec){
     this.app.globe.viewer.entities.remove(rec.entity);this.app.globe.viewer.entities.remove(rec.trailEntity);
@@ -53,6 +55,8 @@ export class AircraftLayer extends BaseLayer{
     for(const [id,rec] of stale){if(this.byId.size<=limit)break;this.removeRecord(id,rec);}
     if(this.byId.size>limit){const all=[...this.byId.entries()].sort((a,b)=>a[1].lastSeen-b[1].lastSeen);for(const [id,rec] of all){if(this.byId.size<=limit)break;if(id===this.app.globe.selected?.meta?.id)continue;this.removeRecord(id,rec);}}
   }
-  applyPerformanceMode(low){for(const rec of this.byId.values()){if(rec.entity?.label)rec.entity.label.show=!low&&!this.app.compact;if(rec.trailEntity?.polyline)rec.trailEntity.polyline.show=!low;}if(low)this.enforceCap(this.app.densityLimit(140,260,440));this.app.globe.requestRender?.();}
-  clear(){super.clear();this.byId.clear();this.trails.clear();}
+  clearClusters(){for(const e of this.clusterEntities){try{this.app.globe.viewer.entities.remove(e)}catch{}}this.clusterEntities=[];document.getElementById('app')?.classList.remove('cluster-mode');}
+  updateClusters(){if(!this.enabled||!this.app.globe?.viewer)return;const C=window.Cesium,alt=this.app.globe.state().alt||0,cluster=alt>3500000&&this.byId.size>60;this.clearClusters();if(!cluster){for(const rec of this.byId.values()){rec.entity.show=true;if(rec.trailEntity?.polyline)rec.trailEntity.polyline.show=!this.app.lowPower;}this.app.globe.requestRender?.();return;}document.getElementById('app')?.classList.add('cluster-mode');const size=alt>11000000?12:alt>6500000?7:4,buckets=new Map(),selected=this.app.globe.selected?.entity;for(const rec of this.byId.values()){if(rec.entity===selected){rec.entity.show=true;if(rec.trailEntity?.polyline)rec.trailEntity.polyline.show=false;continue;}const m=rec.entity.properties?.snxMeta?.getValue?.();if(!m)continue;rec.entity.show=false;if(rec.trailEntity?.polyline)rec.trailEntity.polyline.show=false;const key=`${Math.floor((Number(m.latitude)+90)/size)}:${Math.floor((Number(m.longitude)+180)/size)}`,b=buckets.get(key)||{lat:0,lon:0,count:0,military:0};b.lat+=Number(m.latitude);b.lon+=Number(m.longitude);b.count++;if(m.militaryLikely)b.military++;buckets.set(key,b);}for(const b of buckets.values()){if(!b.count)continue;const lat=b.lat/b.count,lon=b.lon/b.count,color=b.military>b.count*.35?C.Color.ORANGE:C.Color.CYAN;const e=this.app.globe.viewer.entities.add({position:C.Cartesian3.fromDegrees(lon,lat,120),point:{pixelSize:Math.min(28,12+Math.log2(b.count+1)*3),color:color.withAlpha(.82),outlineColor:C.Color.BLACK,outlineWidth:2,disableDepthTestDistance:Number.POSITIVE_INFINITY},label:{text:String(b.count),font:'bold 11px monospace',fillColor:C.Color.WHITE,showBackground:true,backgroundColor:new C.Color(0,0,0,.68),pixelOffset:new C.Cartesian2(0,-17),disableDepthTestDistance:Number.POSITIVE_INFINITY},properties:{snxMeta:{type:'CLUSTER',name:`${b.count} AIRCRAFT`,count:b.count,latitude:lat,longitude:lon,source:'ShadowNex aggregation'}}});this.clusterEntities.push(e);}this.app.globe.requestRender?.();}
+  applyPerformanceMode(low){for(const rec of this.byId.values()){if(rec.entity?.label)rec.entity.label.show=!low&&!this.app.compact;if(rec.trailEntity?.polyline)rec.trailEntity.polyline.show=!low;}if(low)this.enforceCap(this.app.densityLimit(140,260,440));this.updateClusters();this.app.globe.requestRender?.();}
+  clear(){this.clearClusters();super.clear();this.byId.clear();this.trails.clear();}
 }

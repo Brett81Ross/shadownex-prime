@@ -12,7 +12,7 @@ ShadowNex Prime is a proprietary, browser-based OSINT/GEOINT command center buil
 - **Signal Share™** — native mobile sharing and a ShadowNex QR app-link panel
 
 ### Everyday-use improvements
-The v2.2.1 staging build includes a keyless visible Earth, one-tap HOME reset, live map/feed status, mobile-safe low-power fallback, plain-English contact summaries, progressive technical details, and independent feed retry/backoff.
+The v2.2.1 staging build includes a keyless visible Earth, one-tap HOME reset, live map/feed status, mobile-safe low-power fallback, plain-English contact summaries, progressive technical details, and independent feed retry/backoff. It also adds Universal Search, guided modes, a targeted recovery watchdog, zoom-aware aircraft clustering, and source/confidence provenance labels.
 
 ### Live / public-source layers
 Aircraft, earthquakes, fires, satellites, launches, military/infrastructure context, public CCTV catalog data, radio stations, bike-share networks, optional TomTom traffic, and optional AISStream vessel positions.
@@ -36,7 +36,6 @@ This app is static-first. Serverless functions under `/api` proxy aircraft/fire 
 
 ### Ownership
 Copyright © 2026 Cactus🌵Byte Studios™. All Rights Reserved. See `LICENSE.txt` and `THIRD_PARTY_NOTICES.md`.
-
 
 ## v2.1 command systems
 - **NexDraw™**: marks, routes, measurements, areas, and resolved geographic boundaries.

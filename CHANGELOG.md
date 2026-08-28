@@ -16,6 +16,11 @@
 - Added plain-English contact summaries with primary metrics and collapsible technical data.
 - Added exponential feed retry/backoff so individual source failures recover independently.
 - Refocused Quick Start on move globe → choose layers → tap a contact.
+- Added Universal Search for active contacts, coordinates, and OpenStreetMap place/landmark lookup.
+- Added guided Global Overview, Disaster & Emergency, Aviation & Maritime, Space & Exploration, and Infrastructure modes.
+- Added a targeted feed recovery watchdog with cooldown protection.
+- Added zoom-aware aircraft clustering to reduce dot overload at world/regional scale.
+- Added contact confidence/provenance badges with source, age, and explicit heuristic/estimated labeling.
 
 ## 2.2.0
 - Independent ShadowNex Prime production candidate.

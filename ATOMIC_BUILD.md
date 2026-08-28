@@ -69,31 +69,31 @@
    - Keep ShadowNex terminology secondary until the basics are clear.
 
 ### Five priority upgrades approved for this atomic build
-11. **Universal Search**
+11. **Universal Search — IMPLEMENTED IN STAGING**
    - One obvious search box for cities, countries, airports, callsigns, satellites, vessels, landmarks, and coordinates.
    - Search result flies the globe to the target and exposes relevant nearby contacts.
 
-12. **Mission Presets / Quick Looks**
+12. **Mission Presets / Quick Looks — IMPLEMENTED IN STAGING**
    - Curated one-tap modes such as Global Overview, Air Traffic, Space, Natural Events, Infrastructure, and Maritime.
    - Claude's Quick Looks implementation is the current candidate foundation.
    - Presets must use truthful labels and clearly state when a key/data source is required.
 
-13. **Automatic Recovery Watchdog**
+13. **Automatic Recovery Watchdog — IMPLEMENTED IN STAGING**
    - Detect WebGL pressure, excessive entity counts, stalled feeds, repeated provider failures, and unhealthy refresh loops.
    - Automatically reduce density, clear stale objects, restart only the affected feed, and preserve the user's view.
    - Escalate to a simple recovery action only when automatic repair fails.
 
-14. **Smart Clustering**
+14. **Smart Clustering — IMPLEMENTED FOR PRIMARY AIRCRAFT FEED**
    - Cluster dense contacts while zoomed out instead of rendering a wall of dots.
    - Expand naturally as the user zooms in.
    - Prioritize selected/watched/high-importance contacts so they never disappear inside a cluster.
 
-15. **Contact Confidence + Provenance**
+15. **Contact Confidence + Provenance — IMPLEMENTED IN STAGING**
    - Every selected contact should clearly show `LIVE`, `ESTIMATED`, or `INFERRED`.
    - Show source, last update age, and confidence/quality when applicable.
    - Heuristics such as military-likely classification must never be presented as confirmed fact.
 
-Status: atomic batch OPEN — items 1–10 are now integrated in staging. Next implementation focus is Universal Search, Mission Presets, Recovery Watchdog, Smart Clustering, and Contact Confidence + Provenance.
+Status: atomic batch OPEN — items 1–15 are now integrated in staging, with smart clustering currently applied to the primary high-density aircraft feed. Next focus moves to the approved UX + intelligence upgrades starting at item 16.
 
 ### Next UX + intelligence upgrades approved for the ABL
 16. **“What’s happening here?” primary action**

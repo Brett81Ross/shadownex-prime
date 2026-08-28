@@ -18,5 +18,7 @@ jobs:
           node-version: '22'
       - name: Run ShadowNex QA
         run: npm test
+      - name: Run globe hotfix assertions
+        run: node scripts/qa-globe-hotfix.mjs
       - name: Verify production build
         run: npm run build

@@ -10,6 +10,7 @@ await mkdir(out, { recursive: true });
 await cp(resolve(root, 'index.html'), resolve(out, 'index.html'));
 await cp(resolve(root, 'style.css'), resolve(out, 'style.css'));
 await cp(resolve(root, 'brand.css'), resolve(out, 'brand.css'));
+await cp(resolve(root, 'native-install.js'), resolve(out, 'native-install.js'));
 await cp(resolve(root, 'brand'), resolve(out, 'brand'), { recursive: true });
 await cp(resolve(root, 'src'), resolve(out, 'src'), { recursive: true });
 await cp(resolve(root, 'public'), resolve(out, 'public'), { recursive: true });

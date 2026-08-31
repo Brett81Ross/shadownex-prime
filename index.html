@@ -39,6 +39,7 @@
     <dialog id="shareDialog" class="modal glass"><form method="dialog" class="modal-card compact"><div class="modal-head"><div><b>Signal Share™</b><small>SHADOWNEX APP LINK</small></div><button value="cancel" class="icon-btn">✕</button></div><canvas id="qrCanvas" width="290" height="290"></canvas><div class="share-link" id="shareLink"></div><div class="modal-actions"><button id="copyLinkBtn" type="button" class="ghost-btn">COPY LINK</button><button value="default" class="hud-btn">DONE</button></div></form></dialog>
     <dialog id="commandDialog" class="modal glass"><form method="dialog" class="modal-card command-card"><div class="modal-head"><div><b>NexCommand™</b><small>COMMAND + INTELLIGENCE BRIEFING</small></div><button value="cancel" class="icon-btn">✕</button></div><div id="commandLog" class="command-log"><p>Try: “show aircraft”, “go to Tokyo”, “thermal mode”, “brief me”.</p></div><div class="command-input-row"><input id="commandInput" placeholder="Enter command…" autocomplete="off" /><button id="micBtn" type="button" class="icon-btn" aria-label="Voice command">◉</button><button id="runCommandBtn" type="button" class="hud-btn">RUN</button></div></form></dialog>
   </div>
+  <script src="/native-install.js" defer></script>
   <script src="/src/demo-help.js" defer></script>
   <script type="module" src="/src/main.js"></script>
 </body></html>

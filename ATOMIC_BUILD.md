@@ -218,5 +218,40 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Combine currently available public sources with freshness, proximity, severity, confidence, and correlations.
    - Keep claims source-linked and explicitly distinguish known facts from estimates/inferences.
 
+### New priority block — everyday usability + richer subjects
+45. **Expanded camera coverage + viewport-aware camera results — IMPLEMENTED FOUNDATION IN STAGING**
+   - Fix Caltrans pagination so statewide cameras are not truncated to the first 2,000.
+   - Add vetted no-key public camera catalogs where endpoints and terms permit.
+   - **IMPLEMENTED:** Caltrans statewide pagination plus London, Austin, Seattle DOT, and Maryland CHART; camera markers are prioritized nearest the current view instead of by provider order.
+   - Continue adding vetted providers rather than implying unsupported global coverage.
+
+46. **Imperial / U.S. customary presentation — IMPLEMENTED IN STAGING**
+   - User-facing altitude, distance, depth, and area values use feet, miles, and square miles.
+   - Aviation and vessel speed remains knots.
+   - Internal geospatial math may remain metric where appropriate.
+
+47. **English-first globe/search presentation — IMPLEMENTED FOUNDATION IN STAGING**
+   - Keep the low-dependency globe and ensure app-generated geographic names prefer English.
+   - Nominatim requests English results; OpenStreetMap context/subsea names prefer `name:en`.
+   - If only non-Latin local text is available for contextual map objects, use a neutral English object label instead.
+   - Actual callsigns, aircraft registrations, satellite names, and source-native identifiers are not mistranslated.
+
+48. **Rich subject profiles — IMPLEMENTED FOUNDATION IN STAGING**
+   - Aircraft: image when available, registration, manufacturer/type, registered owner, published route match, origin/destination airport names when available, and explicit mission/purpose caveats.
+   - Satellites: English reference image, English description, and public mission/purpose summary when a reliable match exists.
+   - CCTV: current image when a provider publishes a direct snapshot URL.
+   - Never invent route, mission, operator, or imagery when a public source does not provide it.
+
+49. **Simple Mode layout — IMPLEMENTED FOUNDATION IN STAGING**
+   - Everyday interface is the default and hides advanced tactical controls.
+   - Mobile bottom navigation: `HOME · SEARCH · WHAT'S HERE · LAYERS · MORE`.
+   - Advanced Controls remains one tap away and does not remove underlying capability.
+
+50. **Search subject shortcuts — IMPLEMENTED FOUNDATION IN STAGING**
+   - Search provides direct layer shortcuts for Aircraft, Cameras, Satellites, Fires, and Quakes around the current searched/viewed area.
+   - Search should guide users into useful data instead of requiring feed-architecture knowledge.
+
+Status: atomic batch OPEN — everyday usability/data coverage is currently prioritized. Items 21–44 remain valid and will be resumed after this foundation is QA-stable.
+
 ### Product rule
 **Simple by default. Powerful by choice. The user asks a simple question; ShadowNex handles the complicated part.**

@@ -26,6 +26,13 @@
 - Added ranked regional briefing cards with source/freshness context and clear empty/degraded-data wording.
 - Added deterministic importance scoring and restrained visual emphasis for notable point contacts.
 - Added explainable notable/high-priority cards with WHY SHOWN reasoning and explicit heuristic caveats.
+- Expanded public CCTV catalogs with Caltrans pagination plus Seattle DOT and Maryland CHART, while prioritizing cameras nearest the current view.
+- Added imperial-first user presentation for feet, miles, square miles, knots, and feet-per-minute where appropriate.
+- Made public map/search context English-first where source metadata supports an English name.
+- Added rich aircraft profiles with public HexDB aircraft/image/route lookups and explicit mission caveats.
+- Added English satellite profile images/summaries from public English Wikipedia/Wikimedia when a match exists.
+- Added Simple Mode and one-thumb mobile navigation: Home / Search / What's Here / Layers / More.
+- Added search subject shortcuts for Aircraft, Cameras, Satellites, Fires, and Quakes.
 
 ## 2.2.0
 - Independent ShadowNex Prime production candidate.

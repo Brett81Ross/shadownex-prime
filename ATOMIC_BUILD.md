@@ -121,11 +121,11 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Clearly label heuristic/inferred classifications and why an alert was surfaced.
    - **IMPLEMENTED:** notable/high-priority cards include `WHY SHOWN`, source, age, and explicit language that military-likely callsign matching is heuristic rather than confirmed status.
 
-21. **Distinct map icon language**
+21. **Distinct map icon language — IMPLEMENTED IN SBL STAGING**
    - Use recognizable icons for aircraft, vessels, satellites, fires, earthquakes, launches, cameras, and infrastructure.
    - Color supplements meaning but is never the only differentiator.
 
-22. **Auto-zoom intelligence**
+22. **Auto-zoom intelligence — IMPLEMENTED IN SBL STAGING**
    - Selected contacts/events automatically use a useful camera distance and orientation.
    - Prevent camera states that leave the user inside the globe, too far away, or unable to see the selected target.
 
@@ -149,11 +149,11 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Chronological plain-English stream of notable changes, detections, watch-area events, and tracked-item updates.
    - Avoid turning routine feed refreshes into noisy notifications.
 
-28. **Automatic stale-data fading**
+28. **Automatic stale-data fading — IMPLEMENTED FOUNDATION IN SBL STAGING**
    - Fresh contacts render strongly; aging contacts fade and receive `STALE` status before removal.
    - Old data must never visually appear equally current with live data.
 
-29. **Simple connection-quality indicator**
+29. **Simple connection-quality indicator — IMPLEMENTED IN SBL STAGING**
    - Primary state: `LIVE`, `PARTIAL`, or `OFFLINE`.
    - Detailed source diagnostics remain available behind a secondary view.
 
@@ -165,7 +165,7 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Dynamically tune contact caps, trails, labels, refresh cadence, clustering detail, and render resolution based on device pressure.
    - Restore quality gradually after performance recovers.
 
-32. **One-thumb mobile navigation**
+32. **One-thumb mobile navigation — IMPLEMENTED FOUNDATION IN STAGING**
    - Target bottom navigation: `HOME · SEARCH · GLOBE · WATCH · MORE`.
    - Keep high-frequency actions reachable without opening tactical side panels.
 
@@ -185,7 +185,7 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Show only significant events and meaningful/watchlisted activity instead of enabling every feed.
    - Use clustering/importance scoring to preserve a readable world view.
 
-37. **Natural-language unified Search + NexCommand**
+37. **Natural-language unified Search + NexCommand — IMPLEMENTED FOUNDATION IN SBL STAGING**
    - Accept phrases such as “take me to Oklahoma City,” “show fires near Los Angeles,” or “aircraft around Dallas.”
    - Search and command behavior should feel like one intelligence system, not two unrelated interfaces.
 
@@ -205,7 +205,7 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Introduce NexDraw, SceneDirector, PrimeCorrelate, ShadowLens, subsea data, and reconstruction tools only as users explore deeper.
    - Avoid explaining advanced systems during first-run onboarding.
 
-42. **Simple / Advanced interface toggle**
+42. **Simple / Advanced interface toggle — IMPLEMENTED IN STAGING**
    - Simple mode is the default and changes presentation, not capability.
    - Advanced mode exposes raw telemetry, full feed controls, drawing, scenes, correlation, and diagnostics.
 
@@ -264,9 +264,51 @@ Status: atomic batch OPEN — everyday usability/data coverage is currently prio
    - Add a simple `SATELLITE / BASIC` Earth-view switch.
    - Clearly state that basemap imagery is not live satellite video and varies by place/date/resolution.
 
-53. **Imagery source/date inspector — NEXT**
+53. **Imagery source/date inspector — IMPLEMENTED IN SBL STAGING**
    - Expose source/date/resolution for the viewed point when the provider makes that metadata available.
    - Never call imagery live unless a provider explicitly supplies live imagery.
+
+### SBL-01 — Core loop usability (54–60)
+
+54. **Lock Simple Mode UX — IMPLEMENTED IN SBL STAGING**
+   - Simple Mode is now the dominant everyday presentation instead of a lightly modified tactical layout.
+   - Primary surface: world-query search, guided mode chips, live/partial/offline coverage state, globe, and bottom navigation.
+   - Layer/source/tactical panels remain available but stay out of the way until explicitly opened.
+
+55. **Rich Contact Cards v2 — IMPLEMENTED FOUNDATION IN SBL STAGING**
+   - Aircraft/satellite profiles remain picture-first when public imagery exists.
+   - Aircraft cards preserve public registration/type/owner/published-route enrichment and the strict no-invented-mission rule.
+   - Launch cards now capture rocket, provider, pad/location, mission description/type, orbit, imagery, status, and time when supplied by Launch Library 2.
+   - Earthquake cards add felt reports, significance, alert/tsunami flags, and USGS context.
+   - Fire cards explicitly avoid inventing size/containment/evacuation facts.
+   - Vessel cards expose current AIS basics and clearly state when destination/purpose is unavailable.
+
+56. **Unified World Search — IMPLEMENTED FOUNDATION IN SBL STAGING**
+   - Understand common intent phrases such as `cameras in Oklahoma City`, `aircraft near Dallas`, `find the ISS`, `biggest earthquake today`, and military-likely aircraft queries.
+   - Place + subject queries fly to the area and enable the relevant layer automatically.
+   - Unmatched searches still fall through to the existing universal contact/place search.
+
+57. **“What’s Here?” v2 — IMPLEMENTED IN SBL STAGING**
+   - Briefing starts with per-subject coverage/status for Air Traffic, Cameras, Earthquakes, Fires, Satellites, and Vessels.
+   - Uses a primary `LIVE / PARTIAL / OFFLINE` state.
+   - Explicitly says that zero loaded items does not prove zero real-world activity.
+
+58. **Imagery Inspector — IMPLEMENTED IN SBL STAGING**
+   - Query Esri World Imagery metadata at the center of the current view.
+   - Show imagery provider/source, capture date, ground resolution, and positional accuracy when Esri provides them.
+   - Display resolution/accuracy in U.S. customary units.
+   - Always state that basemap imagery is not live video.
+
+59. **Distinct icons + smart selection camera — IMPLEMENTED IN SBL STAGING**
+   - Aircraft, vessels, satellites, earthquakes, fires, launches, cameras, and infrastructure receive visually distinct map symbols rather than relying on color alone.
+   - Tapping a subject automatically chooses a useful subject-specific camera distance.
+
+60. **Simple connection state + stale fading — IMPLEMENTED FOUNDATION IN SBL STAGING**
+   - Everyday connection state collapses source health into `LIVE / PARTIAL / OFFLINE`.
+   - Aging aircraft/vessels and old event markers visually fade; degraded/stale source state also lowers visual prominence.
+   - Detailed source diagnostics remain available behind Source Status.
+
+**SBL-01 deployment state:** STAGING ONLY. Do not merge/deploy until reconciliation with current `main` and full QA are complete.
 
 ### Product rule
 **Simple by default. Powerful by choice. The user asks a simple question; ShadowNex handles the complicated part.**

@@ -38,5 +38,14 @@
 - Added much closer globe zoom for neighborhood/house-scale imagery where source resolution supports it.
 - Added a Satellite / Basic Earth-view switch with explicit non-live imagery wording.
 
+### SBL-01 — core-loop usability staging
+- Locked Simple Mode around a world-query search bar, Guided Modes, What’s Here, connection state, globe, and bottom navigation.
+- Added common natural-language subject queries such as cameras in Oklahoma City, aircraft near Dallas, ISS lookup, strongest-loaded earthquake, and military-likely aircraft.
+- Added What’s Here v2 with per-subject coverage and explicit partial-data wording.
+- Added World Imagery metadata inspection for source, capture date, resolution, and positional accuracy when supplied by Esri.
+- Added distinct subject symbols and subject-specific automatic selection zoom.
+- Added stale/source-degraded visual fading.
+- Expanded rich profiles for launches, earthquakes, fires, and vessels while preserving the no-invented-mission rule.
+
 ## 2.2.0
 - Independent ShadowNex Prime production candidate.

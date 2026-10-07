@@ -68,5 +68,17 @@
 - Watch Area PRIME actions now generate Prime Brief after flying to the area.
 - Formalized graceful degraded-data behavior on top of independent feed retry/recovery, local Watch Center state, and healthy-source continuity.
 
+### SBL-04 — learn, discover, and release-gate staging
+- Added Show Me ShadowNex: an approximately 35-second six-step guided tour with pause/next/stop controls.
+- Demo Mode snapshots and restores the user's current map state instead of leaving the app rearranged.
+- Replaced first-run instructional overload with a three-screen Quick Start v2: Search → Understand → Brief/Watch.
+- Preserved the opt-in location-start flow and kept location permission out of onboarding.
+- Added progressive one-time hints after Search, contact selection, Prime Brief, and Watch usage.
+- Added local learning progress, hint on/off controls, and resettable contextual tips.
+- Added a first-use Advanced Controls explainer before exposing drawing, scenes, map lenses, and raw controls.
+- Added a Help & Guide center under More.
+- Added a documented pre-reconciliation checkpoint and automated reconciliation-safety QA.
+- Kept all discovery/tour state local to the device; no service worker or background process was added.
+
 ## 2.2.0
 - Independent ShadowNex Prime production candidate.

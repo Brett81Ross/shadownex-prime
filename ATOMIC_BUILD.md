@@ -197,11 +197,11 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Restore safe camera, layer, modal, tracking, cinematic, filter, and tool defaults in one action.
    - Reset must always recover the app to a known usable state.
 
-40. **Demo Mode / “Show Me ShadowNex”**
+40. **Demo Mode / “Show Me ShadowNex” — IMPLEMENTED IN SBL-04 STAGING**
    - Optional 30–45 second guided tour using current live data.
    - Demonstrate search, presets, contact selection, briefing, and map movement without requiring documentation.
 
-41. **Progressive feature discovery**
+41. **Progressive feature discovery — IMPLEMENTED FOUNDATION IN SBL-04 STAGING**
    - Introduce NexDraw, SceneDirector, PrimeCorrelate, ShadowLens, subsea data, and reconstruction tools only as users explore deeper.
    - Avoid explaining advanced systems during first-run onboarding.
 
@@ -336,7 +336,7 @@ Status: atomic batch OPEN — everyday usability/data coverage is currently prio
 
 65. **Recent Activity + event-window ribbon — IMPLEMENTED FOUNDATION IN SBL-02 STAGING**
    - Keep a local recent history of views, searches, modes, watch actions, favorites, timeline changes, and resets.
-   - Add a simple `15 MIN · 1 HR · 6 HR · 24 HR` event window for loaded earthquake/fire events.
+   - Add a simple `NOW · 15 MIN · 1 HR · 6 HR · 24 HR` event window for loaded earthquake/fire events.
    - This is a presentation/history filter, not fabricated historical telemetry.
 
 66. **Predictable Back / Undo View — IMPLEMENTED FOUNDATION IN SBL-02 STAGING**
@@ -391,6 +391,54 @@ Status: atomic batch OPEN — everyday usability/data coverage is currently prio
    - Optional AI briefing remains a secondary enhancement; Prime Brief itself never depends on it.
 
 **SBL-03 deployment state:** STAGING ONLY. No production deployment, no new runtime dependencies, no service worker.
+
+### SBL-04 — Learn, discover, and release-gate (74–80)
+
+74. **Show Me ShadowNex — IMPLEMENTED IN SBL-04 STAGING**
+   - Add an optional approximately 35-second guided tour of the actual Simple Mode workflow.
+   - Six steps: Earth → Search → Contact understanding → Prime Brief → Watch → Advanced.
+   - Tour controls: `PAUSE · NEXT · STOP`.
+   - Demo Mode snapshots the user's current view/layers before starting and restores them when the tour ends or is stopped.
+   - The tour does not require a specific provider to be healthy and does not pretend demo callouts are live data.
+
+75. **Quick Start v2 — IMPLEMENTED IN SBL-04 STAGING**
+   - Replace the old instruction-heavy onboarding with a maximum three-screen flow:
+     1. `Search the world`
+     2. `Tap → understand`
+     3. `Brief, save, and return`
+   - Keep onboarding skippable.
+   - Preserve the separate opt-in location-start choice; no location permission is required by the guide.
+   - Settings → Quick Guide now opens the v2 guide.
+
+76. **Progressive feature discovery — IMPLEMENTED FOUNDATION IN SBL-04 STAGING**
+   - Learn from real usage milestones rather than dumping feature explanations on first launch.
+   - Milestones: Search, subject selection, Prime Brief, Watch, and Advanced.
+   - One-time contextual hints introduce the next useful capability after the user demonstrates the previous one.
+   - Hints can be turned off or reset locally.
+
+77. **Smarter Advanced-mode reveal — IMPLEMENTED IN SBL-04 STAGING**
+   - First entry into Advanced Controls explains drawing/measurement, scenes, map lenses, and raw controls before opening them.
+   - The explanation explicitly states that Advanced Mode changes control depth, not certainty of the underlying data.
+   - After the first introduction, Advanced/Simple switching remains one tap.
+
+78. **Help & Guide Center — IMPLEMENTED IN SBL-04 STAGING**
+   - Add one place under `More` for Quick Start, the guided tour, feature-map explanations, contextual-hint controls, and learning progress.
+   - Explain the product in four plain groups: Search & Explore, Understand, Brief & Watch, Advanced.
+   - Avoid branded subsystem names until the user asks for deeper capability.
+
+79. **Non-destructive teaching + contextual coaching — IMPLEMENTED FOUNDATION IN SBL-04 STAGING**
+   - Demo Mode restores the user's pre-tour map state.
+   - Contextual tips highlight the actual control being introduced and dismiss cleanly.
+   - Tips are suppressed while the guided tour is running so competing guidance never stacks.
+   - First-run teaching remains local-device state only.
+
+80. **Pre-reconciliation release gate — IMPLEMENTED IN SBL-04 STAGING**
+   - Add a written reconciliation checkpoint before any merge to `main`.
+   - Gate requirements include: Node 22, zero npm dependencies, no service worker, Vercel Git deployment locked, deterministic `dist` output, all SBL installers wired, and all SBL QA suites in the test chain.
+   - Reconciliation must preserve newer `main` work deliberately; no blind force merge or overwrite.
+   - Production deployment remains a separate explicit approval step after reconciliation and QA.
+
+**SBL-04 deployment state:** STAGING ONLY. This is the planned usability/polish checkpoint before branch reconciliation.
 
 ### Product rule
 **Simple by default. Powerful by choice. The user asks a simple question; ShadowNex handles the complicated part.**

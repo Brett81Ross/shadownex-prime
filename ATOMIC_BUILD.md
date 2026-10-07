@@ -93,28 +93,33 @@
    - Show source, last update age, and confidence/quality when applicable.
    - Heuristics such as military-likely classification must never be presented as confirmed fact.
 
-Status: atomic batch OPEN — items 1–15 are now integrated in staging, with smart clustering currently applied to the primary high-density aircraft feed. Next focus moves to the approved UX + intelligence upgrades starting at item 16.
+Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart clustering is currently applied to the primary high-density aircraft feed. Next focus starts at item 21: distinct map icon language.
 
 ### Next UX + intelligence upgrades approved for the ABL
-16. **“What’s happening here?” primary action**
+16. **“What’s happening here?” primary action — IMPLEMENTED IN STAGING**
    - Analyze the current viewport and summarize the most relevant nearby events/contacts in plain English.
    - Link every statement back to the underlying live source/contact when possible.
+   - **IMPLEMENTED:** a primary `WHAT’S HAPPENING HERE?` action analyzes the current viewport and opens a source-aware regional brief.
 
-17. **Location-first opening experience**
+17. **Location-first opening experience — IMPLEMENTED IN STAGING**
    - First-open choices: `NEAR ME`, `SEARCH A PLACE`, or `EXPLORE THE WORLD`.
    - Never require location permission unless the user explicitly chooses a location-aware action.
+   - **IMPLEMENTED:** first-open choices are `NEAR ME`, `SEARCH A PLACE`, and `EXPLORE THE WORLD`; browser geolocation is requested only after `NEAR ME` is tapped.
 
-18. **Regional / Daily Briefing cards**
+18. **Regional / Daily Briefing cards — IMPLEMENTED IN STAGING**
    - Surface the 3–5 most consequential items for the current area or a saved watch area.
    - Prefer relevance and significance over raw feed volume.
+   - **IMPLEMENTED:** the brief shows the top 3–5 ranked contacts/events plus plain-language counts and source/freshness context.
 
-19. **Importance scoring + visual hierarchy**
+19. **Importance scoring + visual hierarchy — IMPLEMENTED IN STAGING**
    - Rank events/contacts by freshness, severity, rarity, proximity, confidence, and user relevance.
    - Routine activity stays subtle; meaningful activity becomes visually prominent.
+   - **IMPLEMENTED:** deterministic 0–100 importance scoring combines type/severity, freshness, proximity, source health, and explicit heuristic context; notable point contacts receive restrained visual emphasis.
 
-20. **Human-readable explainable alerts**
+20. **Human-readable explainable alerts — IMPLEMENTED IN STAGING**
    - Replace cryptic IDs/codes with plain-English alert summaries.
    - Clearly label heuristic/inferred classifications and why an alert was surfaced.
+   - **IMPLEMENTED:** notable/high-priority cards include `WHY SHOWN`, source, age, and explicit language that military-likely callsign matching is heuristic rather than confirmed status.
 
 21. **Distinct map icon language**
    - Use recognizable icons for aircraft, vessels, satellites, fires, earthquakes, launches, cameras, and infrastructure.

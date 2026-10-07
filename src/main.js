@@ -1,6 +1,7 @@
 import { ShadowNexPrime } from './app.js';
 import { installAblEnhancements } from './ui/ablEnhancements.js';
 import { installIntelligenceEnhancements } from './ui/intelligenceEnhancements.js';
+import { installSituationEnhancements } from './ui/situationEnhancements.js';
 
 function dismissSplash(){
   const splash=document.getElementById('brandSplash');
@@ -16,6 +17,7 @@ function boot(){
       const app=new ShadowNexPrime();
       installAblEnhancements(app);
       installIntelligenceEnhancements(app);
+      installSituationEnhancements(app);
       app.init().then(dismissSplash).catch(fatal);
     }else if(Date.now()-started>15000){
       fatal(new Error('Map engine did not load. Check your connection and reload.'));

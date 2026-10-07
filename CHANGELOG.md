@@ -21,6 +21,11 @@
 - Added a targeted feed recovery watchdog with cooldown protection.
 - Added zoom-aware aircraft clustering to reduce dot overload at world/regional scale.
 - Added contact confidence/provenance badges with source, age, and explicit heuristic/estimated labeling.
+- Added a primary WHAT’S HAPPENING HERE? regional briefing action based on the current viewport.
+- Added opt-in location-first entry choices: Near Me, Search a Place, or Explore the World.
+- Added ranked regional briefing cards with source/freshness context and clear empty/degraded-data wording.
+- Added deterministic importance scoring and restrained visual emphasis for notable point contacts.
+- Added explainable notable/high-priority cards with WHY SHOWN reasoning and explicit heuristic caveats.
 
 ## 2.2.0
 - Independent ShadowNex Prime production candidate.

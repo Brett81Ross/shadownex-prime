@@ -253,5 +253,20 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
 
 Status: atomic batch OPEN — everyday usability/data coverage is currently prioritized. Items 21–44 remain valid and will be resumed after this foundation is QA-stable.
 
+51. **Oklahoma City CCTV / OKTraffic integration — IMPLEMENTED IN STAGING**
+   - Add public OKTraffic camera poles and active web-camera locations, including Oklahoma City and Tulsa metro coverage.
+   - Keep OKTraffic / ODOT-OTA attribution and treat stream availability as provider-dependent.
+
+52. **High-resolution satellite/aerial Earth view — IMPLEMENTED IN STAGING**
+   - Make Esri World Imagery the default detailed Earth surface.
+   - Allow zoom to neighborhood/house scale where source resolution supports it.
+   - Keep Natural Earth II as the resilient basic fallback.
+   - Add a simple `SATELLITE / BASIC` Earth-view switch.
+   - Clearly state that basemap imagery is not live satellite video and varies by place/date/resolution.
+
+53. **Imagery source/date inspector — NEXT**
+   - Expose source/date/resolution for the viewed point when the provider makes that metadata available.
+   - Never call imagery live unless a provider explicitly supplies live imagery.
+
 ### Product rule
 **Simple by default. Powerful by choice. The user asks a simple question; ShadowNex handles the complicated part.**

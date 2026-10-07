@@ -2,15 +2,15 @@ import { cameraState, rectangleDegrees } from '../core/geo.js';
 import { AnnotationController } from './AnnotationController.js';
 import { SceneDirector } from './SceneDirector.js';
 export class GlobeController extends EventTarget {
-  constructor(container,settings){super();this.container=container;this.settings=settings;this.viewer=null;this.selected=null;this.tracking=false;this.cockpit=false;this.annotation=null;this.sceneDirector=null;this.followTimer=null;this.baseMapLayer=null;this.baseMapProvider=null;this.baseMapStatus='LOADING';this.baseMapName='Keyless Earth';this.baseMapErrors=0;this.terrainStatus='ELLIPSOID';this.selectionMarker=null;}
+  constructor(container,settings){super();this.container=container;this.settings=settings;this.viewer=null;this.selected=null;this.tracking=false;this.cockpit=false;this.annotation=null;this.sceneDirector=null;this.followTimer=null;this.baseMapLayer=null;this.baseMapProvider=null;this.baseMapStatus='LOADING';this.baseMapName='Keyless Earth';this.baseMapErrors=0;this.terrainStatus='ELLIPSOID';this.selectionMarker=null;this.baseMapMode='satellite';}
   async init(){
     if(!window.Cesium)throw new Error('Cesium runtime did not load.');
     const C=window.Cesium,compact=matchMedia('(max-width: 900px)').matches||navigator.maxTouchPoints>0;
     if(this.settings.cesiumToken)C.Ion.defaultAccessToken=this.settings.cesiumToken;
     this.viewer=new C.Viewer(this.container,{animation:false,timeline:false,baseLayer:false,baseLayerPicker:false,geocoder:false,homeButton:false,sceneModePicker:false,navigationHelpButton:false,fullscreenButton:false,infoBox:false,selectionIndicator:false,shouldAnimate:false,requestRenderMode:true,maximumRenderTimeChange:1});
     this.viewer.scene.globe.show=true;this.viewer.scene.globe.baseColor=C.Color.fromCssColorString('#0d3242');this.viewer.scene.globe.depthTestAgainstTerrain=true;this.viewer.scene.globe.enableLighting=false;this.viewer.scene.globe.showGroundAtmosphere=true;this.viewer.scene.fxaa=true;this.viewer.scene.requestRenderMode=true;this.viewer.scene.maximumRenderTimeChange=1;if(this.viewer.scene.skyAtmosphere)this.viewer.scene.skyAtmosphere.show=true;
-    this.installKeylessBaseMap();
-    if(compact){this.viewer.resolutionScale=.72;try{this.viewer.scene.globe.tileCacheSize=80}catch{}}
+    this.installSatelliteBaseMap();
+    if(compact){this.viewer.resolutionScale=.82;try{this.viewer.scene.globe.tileCacheSize=120}catch{}}else{try{this.viewer.scene.globe.tileCacheSize=220}catch{}}try{this.viewer.scene.screenSpaceCameraController.minimumZoomDistance=8;this.viewer.scene.globe.maximumScreenSpaceError=1.35}catch{}
     try{if(this.settings.cesiumToken){this.viewer.terrainProvider=await C.createWorldTerrainAsync();this.terrainStatus='ION TERRAIN';}}catch(e){this.terrainStatus='ELLIPSOID';console.warn('[terrain]',e);}
     this.home(false);
     this.annotation=new AnnotationController(this);this.sceneDirector=new SceneDirector(this,this.annotation);
@@ -24,16 +24,32 @@ export class GlobeController extends EventTarget {
     canvas.addEventListener('webglcontextrestored',()=>{this.requestRender();this.dispatchEvent(new CustomEvent('stability',{detail:{state:'restored',message:'Map graphics recovered.'}}));});
     this.requestRender();return this;
   }
+  installSatelliteBaseMap(){
+    const C=window.Cesium;
+    try{
+      if(this.baseMapLayer){try{this.viewer.imageryLayers.remove(this.baseMapLayer,true)}catch{}}
+      const provider=new C.UrlTemplateImageryProvider({url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',maximumLevel:19,credit:'Esri World Imagery · satellite/aerial imagery'});
+      const layer=this.viewer.imageryLayers.addImageryProvider(provider,0);layer.alpha=1;layer.brightness=1;layer.contrast=1.02;
+      this.baseMapProvider=provider;this.baseMapLayer=layer;this.baseMapStatus='READY';this.baseMapName='Esri World Imagery';this.baseMapMode='satellite';this.baseMapErrors=0;
+      provider.errorEvent?.addEventListener?.(()=>{this.baseMapErrors++;if(this.baseMapErrors===6)this.dispatchEvent(new CustomEvent('stability',{detail:{state:'warning',message:'Detailed satellite imagery is having trouble loading. Use More → Basic Earth if needed.'}}));});
+      this.requestRender();return true;
+    }catch(e){console.warn('[satellite basemap]',e);this.installKeylessBaseMap();return false;}
+  }
+  setBaseMap(mode='satellite'){
+    if(mode==='satellite')return this.installSatelliteBaseMap();
+    if(this.baseMapLayer){try{this.viewer.imageryLayers.remove(this.baseMapLayer,true)}catch{}this.baseMapLayer=null;}
+    this.installKeylessBaseMap();this.requestRender();return true;
+  }
   installKeylessBaseMap(){
     const C=window.Cesium;
     try{
       const provider=new C.UrlTemplateImageryProvider({url:C.buildModuleUrl('Assets/Textures/NaturalEarthII')+'/{z}/{x}/{reverseY}.jpg',tilingScheme:new C.GeographicTilingScheme(),maximumLevel:5,credit:'Natural Earth II · CesiumJS'});
       const layer=this.viewer.imageryLayers.addImageryProvider(provider,0);layer.alpha=1;layer.brightness=.98;layer.contrast=1.03;
-      this.baseMapProvider=provider;this.baseMapLayer=layer;this.baseMapStatus='READY';this.baseMapName='Natural Earth II';
+      this.baseMapProvider=provider;this.baseMapLayer=layer;this.baseMapStatus='READY';this.baseMapName='Natural Earth II';this.baseMapMode='basic';
       provider.errorEvent?.addEventListener?.(()=>{this.baseMapErrors++;if(this.baseMapErrors===3){this.baseMapStatus='FALLBACK';this.baseMapName='Fallback Earth';this.dispatchEvent(new CustomEvent('stability',{detail:{state:'warning',message:'Earth imagery is having trouble loading. ShadowNex is keeping a visible fallback globe underneath live contacts.'}}));this.requestRender();}});
     }catch(e){this.baseMapStatus='FALLBACK';this.baseMapName='Fallback Earth';console.warn('[basemap]',e);this.dispatchEvent(new CustomEvent('stability',{detail:{state:'warning',message:'Earth imagery could not load. ShadowNex is showing a visible fallback globe instead of a blank field.'}}));}
   }
-  baseMapInfo(){return {status:this.baseMapStatus,name:this.baseMapName,terrain:this.terrainStatus};}
+  baseMapInfo(){return {status:this.baseMapStatus,name:this.baseMapName,mode:this.baseMapMode,terrain:this.terrainStatus};}
   requestRender(){try{this.viewer?.scene?.requestRender()}catch{}}
   onClick(position){if(this.annotation?.isArmed()){this.annotation.handleClick(position);return;}const picked=this.viewer.scene.pick(position);const meta=picked?.id?.properties?.snxMeta?.getValue?.()??picked?.id?.snxMeta??picked?.primitive?.snxMeta;if(meta?.type==='CLUSTER'){const alt=Math.max(650000,(this.state().alt||6000000)*.42);this.flyTo(Number(meta.longitude),Number(meta.latitude),alt);return;}if(meta)this.select(meta,picked.id||picked.primitive);else if(this.selected)this.clearSelection();}
   select(meta,entity){this.selected={meta,entity};this.setSelectionMarker(entity);this.dispatchEvent(new CustomEvent('select',{detail:meta}));this.requestRender();}

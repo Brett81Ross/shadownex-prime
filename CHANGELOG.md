@@ -33,6 +33,10 @@
 - Added English satellite profile images/summaries from public English Wikipedia/Wikimedia when a match exists.
 - Added Simple Mode and one-thumb mobile navigation: Home / Search / What's Here / Layers / More.
 - Added search subject shortcuts for Aircraft, Cameras, Satellites, Fires, and Quakes.
+- Added OKTraffic / ODOT-OTA public camera coverage for Oklahoma City, Tulsa, and Oklahoma highways.
+- Made detailed Esri World Imagery the default satellite/aerial Earth surface with Natural Earth II fallback.
+- Added much closer globe zoom for neighborhood/house-scale imagery where source resolution supports it.
+- Added a Satellite / Basic Earth-view switch with explicit non-live imagery wording.
 
 ## 2.2.0
 - Independent ShadowNex Prime production candidate.

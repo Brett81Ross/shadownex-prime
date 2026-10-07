@@ -28,7 +28,7 @@ export class GlobeController extends EventTarget {
     const C=window.Cesium;
     try{
       if(this.baseMapLayer){try{this.viewer.imageryLayers.remove(this.baseMapLayer,true)}catch{}}
-      const provider=new C.UrlTemplateImageryProvider({url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',maximumLevel:19,credit:'Esri World Imagery · satellite/aerial imagery'});
+      const provider=new C.UrlTemplateImageryProvider({url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',maximumLevel:19,credit:'Esri, Vantor, Earthstar Geographics, USDA, USGS, CNES/Airbus DS, GeoEye, AeroGRID, IGN, and the GIS User Community'});
       const layer=this.viewer.imageryLayers.addImageryProvider(provider,0);layer.alpha=1;layer.brightness=1;layer.contrast=1.02;
       this.baseMapProvider=provider;this.baseMapLayer=layer;this.baseMapStatus='READY';this.baseMapName='Esri World Imagery';this.baseMapMode='satellite';this.baseMapErrors=0;
       provider.errorEvent?.addEventListener?.(()=>{this.baseMapErrors++;if(this.baseMapErrors===6)this.dispatchEvent(new CustomEvent('stability',{detail:{state:'warning',message:'Detailed satellite imagery is having trouble loading. Use More → Basic Earth if needed.'}}));});

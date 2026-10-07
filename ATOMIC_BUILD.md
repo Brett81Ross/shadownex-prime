@@ -129,23 +129,23 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Selected contacts/events automatically use a useful camera distance and orientation.
    - Prevent camera states that leave the user inside the globe, too far away, or unable to see the selected target.
 
-23. **Context cards**
+23. **Context cards — IMPLEMENTED FOUNDATION IN SBL-02 STAGING**
    - Explain nearby relevant cities, airports, infrastructure, events, and correlated contacts around the selected item.
    - Present correlations as understandable context rather than raw matrices.
 
-24. **Timeline ribbon**
+24. **Timeline ribbon — IMPLEMENTED FOUNDATION IN SBL-02 STAGING**
    - Simple time scopes such as `NOW · 15 MIN · 1 HR · 6 HR · 24 HR`.
    - Use available history/trails/events to make change over time understandable.
 
-25. **Watch Areas**
+25. **Watch Areas — IMPLEMENTED FOUNDATION IN SBL-02 STAGING**
    - Save named geographic regions such as Home, Oklahoma City, Gulf Coast, or a drawn polygon.
    - Surface meaningful changes that occur inside watched areas.
 
-26. **Favorites / Watchlist**
+26. **Favorites / Watchlist — IMPLEMENTED IN SBL-02 STAGING**
    - Star locations, aircraft, vessels, satellites, or events for fast return.
    - Keep watched items distinct from ordinary map clutter.
 
-27. **Recent Activity feed**
+27. **Recent Activity feed — IMPLEMENTED FOUNDATION IN SBL-02 STAGING**
    - Chronological plain-English stream of notable changes, detections, watch-area events, and tracked-item updates.
    - Avoid turning routine feed refreshes into noisy notifications.
 
@@ -189,11 +189,11 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Accept phrases such as “take me to Oklahoma City,” “show fires near Los Angeles,” or “aircraft around Dallas.”
    - Search and command behavior should feel like one intelligence system, not two unrelated interfaces.
 
-38. **Predictable Back / Undo state**
+38. **Predictable Back / Undo state — IMPLEMENTED FOUNDATION IN SBL-02 STAGING**
    - Back out of fly-tos, selected contacts, presets, cockpit scenes, and tool states predictably.
    - Preserve a small navigation/state history so users can recover from accidental actions.
 
-39. **One-tap full Reset**
+39. **One-tap full Reset — IMPLEMENTED IN SBL-02 STAGING**
    - Restore safe camera, layer, modal, tracking, cinematic, filter, and tool defaults in one action.
    - Reset must always recover the app to a known usable state.
 
@@ -309,6 +309,47 @@ Status: atomic batch OPEN — everyday usability/data coverage is currently prio
    - Detailed source diagnostics remain available behind Source Status.
 
 **SBL-01 deployment state:** STAGING ONLY. Do not merge/deploy until reconciliation with current `main` and full QA are complete.
+
+### SBL-02 — Return, watch, and recover (61–67)
+
+61. **Nearby Context — IMPLEMENTED IN SBL-02 STAGING**
+   - Simple Mode translates the technical nearby-correlation matrix into a plain `NEARBY CONTEXT` card.
+   - Summarizes up to five loaded nearby contacts within 100 miles, with human-readable type and distance.
+   - Technical PrimeCorrelate™ remains available in Advanced Mode.
+   - Context explicitly says loaded-source coverage may be partial.
+
+62. **Saved Views — IMPLEMENTED IN SBL-02 STAGING**
+   - Save the current camera, active layers, lens, basemap mode, and selected-subject identity locally on the device.
+   - Restore saved views without requiring a server account.
+   - Keep up to 20 saved views.
+
+63. **Watch Areas — IMPLEMENTED FOUNDATION IN SBL-02 STAGING**
+   - Save the current map center with a 10 / 25 / 50 / 100 / 250 mile radius.
+   - Scan currently loaded contacts/events for each Watch Area and surface total + notable counts.
+   - One tap can reopen an area or fly there and launch a What's Here briefing.
+   - **Truth boundary:** Watch Areas only scan sources loaded while the app is open; they are not background monitoring and do not run while ShadowNex is closed.
+
+64. **Favorites / Watchlist — IMPLEMENTED IN SBL-02 STAGING**
+   - Favorite a selected aircraft, vessel, satellite, event, camera, or other subject.
+   - Reopen a currently loaded subject when available.
+   - If it is not currently loaded, show its last-known saved position instead of pretending it is live.
+
+65. **Recent Activity + event-window ribbon — IMPLEMENTED FOUNDATION IN SBL-02 STAGING**
+   - Keep a local recent history of views, searches, modes, watch actions, favorites, timeline changes, and resets.
+   - Add a simple `15 MIN · 1 HR · 6 HR · 24 HR` event window for loaded earthquake/fire events.
+   - This is a presentation/history filter, not fabricated historical telemetry.
+
+66. **Predictable Back / Undo View — IMPLEMENTED FOUNDATION IN SBL-02 STAGING**
+   - Maintain a small local stack of prior map states before searches, fly-tos, guided modes, saved views, favorites, watch areas, Home, and Reset.
+   - Restore camera, layers, lens, basemap, and selected subject when that subject is still loaded.
+   - Keep at most 12 prior states to avoid unbounded history.
+
+67. **One-tap Full Reset — IMPLEMENTED IN SBL-02 STAGING**
+   - Close dialogs, exit tracking/cockpit/scenes/tools, clear transient map annotations, restore normal lens + detailed satellite Earth, and return to Simple Mode.
+   - Restore the everyday default live layers: Aircraft + Earthquakes.
+   - Reset does not delete user settings, Saved Views, Watch Areas, Favorites, or Recent Activity.
+
+**SBL-02 deployment state:** STAGING ONLY. No background monitoring, no service worker, no production deployment.
 
 ### Product rule
 **Simple by default. Powerful by choice. The user asks a simple question; ShadowNex handles the complicated part.**

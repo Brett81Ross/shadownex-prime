@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "node scripts/build.mjs",
-    "test": "node scripts/qa.mjs && node scripts/qa-abl.mjs && node scripts/qa-intelligence.mjs && node scripts/qa-situation.mjs && node scripts/qa-everyday.mjs && node scripts/qa-sbl.mjs"
+    "test": "node scripts/qa.mjs && node scripts/qa-abl.mjs && node scripts/qa-intelligence.mjs && node scripts/qa-situation.mjs && node scripts/qa-everyday.mjs && node scripts/qa-sbl.mjs && node scripts/qa-sbl-watch.mjs"
   },
   "engines": {
     "node": ">=22 <23"

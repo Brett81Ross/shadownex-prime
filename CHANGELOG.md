@@ -47,5 +47,15 @@
 - Added stale/source-degraded visual fading.
 - Expanded rich profiles for launches, earthquakes, fires, and vessels while preserving the no-invented-mission rule.
 
+### SBL-02 — return, watch, and recover staging
+- Added a local Watch Center for Saved Views, Watch Areas, Favorites, and Recent Activity.
+- Added plain-language Nearby Context cards while preserving PrimeCorrelate™ for Advanced Mode.
+- Added locally persisted Saved Views for camera/layer/lens/basemap restoration.
+- Added Watch Areas with explicit in-app/loaded-source-only monitoring boundaries.
+- Added Favorites with honest last-known-location fallback when a subject is not currently loaded.
+- Added a 15 min / 1 hr / 6 hr / 24 hr event-window filter for loaded earthquake/fire events.
+- Added a bounded Back/Undo map-state history and a one-tap Full Reset to everyday defaults.
+- Changed the Simple Mode fourth bottom action from Layers to Watch; full Layers & Sources remains available under More.
+
 ## 2.2.0
 - Independent ShadowNex Prime production candidate.

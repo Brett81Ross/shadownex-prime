@@ -157,11 +157,11 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Primary state: `LIVE`, `PARTIAL`, or `OFFLINE`.
    - Detailed source diagnostics remain available behind a secondary view.
 
-30. **Self-healing feeds**
+30. **Self-healing feeds — IMPLEMENTED FOUNDATION IN STAGING**
    - Backoff/retry failed providers, preserve healthy layers, and recover feeds independently.
    - Provider failure must never freeze the whole app.
 
-31. **Adaptive performance governor**
+31. **Adaptive performance governor — IMPLEMENTED FOUNDATION IN STAGING**
    - Dynamically tune contact caps, trails, labels, refresh cadence, clustering detail, and render resolution based on device pressure.
    - Restore quality gradually after performance recovers.
 
@@ -169,19 +169,19 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Target bottom navigation: `HOME · SEARCH · GLOBE · WATCH · MORE`.
    - Keep high-frequency actions reachable without opening tactical side panels.
 
-33. **“Explain this” everywhere**
+33. **“Explain this” everywhere — IMPLEMENTED FOUNDATION IN SBL-03 STAGING**
    - Add a concise explanation action to contacts, events, feed states, and modes.
    - Convert technical telemetry into plain-English context without inventing unsupported facts.
 
-34. **Honest uncertainty model**
+34. **Honest uncertainty model — IMPLEMENTED IN SBL-03 STAGING**
    - Standardize statuses such as `CONFIRMED`, `REPORTED`, `ESTIMATED`, `HEURISTIC`, and `STALE`.
    - Keep source confidence separate from user-facing importance/severity.
 
-35. **Source transparency without clutter**
+35. **Source transparency without clutter — IMPLEMENTED IN SBL-03 STAGING**
    - Casual view shows source + update age.
    - Advanced view exposes richer provenance/endpoint/quality details.
 
-36. **Selective Global Overview mode**
+36. **Selective Global Overview mode — IMPLEMENTED FOUNDATION IN SBL-03 STAGING**
    - Show only significant events and meaningful/watchlisted activity instead of enabling every feed.
    - Use clustering/importance scoring to preserve a readable world view.
 
@@ -209,11 +209,11 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Simple mode is the default and changes presentation, not capability.
    - Advanced mode exposes raw telemetry, full feed controls, drawing, scenes, correlation, and diagnostics.
 
-43. **Graceful degraded-data architecture**
+43. **Graceful degraded-data architecture — IMPLEMENTED FOUNDATION IN SBL-03 STAGING**
    - Design the app to stay useful when providers rate-limit, go offline, change schema, or only partially respond.
    - Keep the globe, saved views, local UI, and healthy sources usable during provider outages.
 
-44. **Prime Brief™**
+44. **Prime Brief™ — IMPLEMENTED FOUNDATION IN SBL-03 STAGING**
    - Signature plain-English intelligence briefing for a place or watch area: “What matters here right now?”
    - Combine currently available public sources with freshness, proximity, severity, confidence, and correlations.
    - Keep claims source-linked and explicitly distinguish known facts from estimates/inferences.
@@ -350,6 +350,47 @@ Status: atomic batch OPEN — everyday usability/data coverage is currently prio
    - Reset does not delete user settings, Saved Views, Watch Areas, Favorites, or Recent Activity.
 
 **SBL-02 deployment state:** STAGING ONLY. No background monitoring, no service worker, no production deployment.
+
+### SBL-03 — Trust, explanation, and Prime Brief (68–73)
+
+68. **Explain This everywhere — IMPLEMENTED FOUNDATION IN SBL-03 STAGING**
+   - Selected subjects expose a plain-English `EXPLAIN THIS` action.
+   - Situation/briefing cards expose the same explanation path.
+   - Source Status cards can explain provider state, update age, provenance, and coverage limits.
+   - `More → Explain Current Mode` explains what the selected Guided Mode does and does not prove.
+   - Natural-language `explain this` works for the currently selected subject.
+
+69. **Standard uncertainty model — IMPLEMENTED IN SBL-03 STAGING**
+   - Primary certainty states are now `CONFIRMED · REPORTED · ESTIMATED · HEURISTIC · STALE`.
+   - Importance/severity remains separate from certainty.
+   - Satellites are explicitly estimated; military-likely aircraft are explicitly heuristic; degraded/unavailable sources become stale.
+   - `CONFIRMED` is reserved for source states that actually justify it, such as reviewed earthquake records or completed launch outcomes.
+
+70. **Source transparency without clutter — IMPLEMENTED IN SBL-03 STAGING**
+   - Casual contact view shows certainty, source, source state, and freshness.
+   - Source Status cards show provider + freshness and expose a one-tap explanation.
+   - Advanced technical data remains available without forcing raw endpoint/schema detail into Simple Mode.
+
+71. **Selective Global Overview — IMPLEMENTED FOUNDATION IN SBL-03 STAGING**
+   - Global Overview now includes launches but suppresses routine world-scale clutter.
+   - Significant/notable events, military-likely aircraft, and favorites stay visible first.
+   - Zooming into a region restores routine contacts automatically.
+   - This is a presentation filter only; it does not delete underlying loaded data.
+
+72. **Graceful degraded-data truth layer — IMPLEMENTED FOUNDATION IN SBL-03 STAGING**
+   - Prime Brief and Source Status remain useful when one or more providers are delayed/unavailable.
+   - Healthy sources continue operating independently through the existing retry/backoff and recovery watchdog architecture.
+   - Saved Views, Watch Areas, Favorites, globe controls, and local UI remain usable without pretending missing feeds are complete.
+   - Coverage gaps are described as gaps, never as proof that nothing is happening.
+
+73. **Prime Brief™ — IMPLEMENTED FOUNDATION IN SBL-03 STAGING**
+   - Deterministic local briefing works without an OpenAI key.
+   - Summarizes current-view importance, certainty, source freshness, and coverage health.
+   - Shows up to four source-linked items with `VIEW · EXPLAIN · SOURCE` actions.
+   - Watch Area `PRIME` actions fly to the area and generate the same source-aware brief.
+   - Optional AI briefing remains a secondary enhancement; Prime Brief itself never depends on it.
+
+**SBL-03 deployment state:** STAGING ONLY. No production deployment, no new runtime dependencies, no service worker.
 
 ### Product rule
 **Simple by default. Powerful by choice. The user asks a simple question; ShadowNex handles the complicated part.**

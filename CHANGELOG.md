@@ -57,5 +57,16 @@
 - Added a bounded Back/Undo map-state history and a one-tap Full Reset to everyday defaults.
 - Changed the Simple Mode fourth bottom action from Layers to Watch; full Layers & Sources remains available under More.
 
+### SBL-03 — trust, explanation, and Prime Brief staging
+- Standardized user-facing certainty into CONFIRMED / REPORTED / ESTIMATED / HEURISTIC / STALE.
+- Added Explain This for selected subjects, briefing cards, source-status feeds, and the current Guided Mode.
+- Separated certainty from importance so high-priority items can still be heuristic/stale and say so.
+- Reworked Source Status cards around provider, source state, freshness, loaded count, and explanation.
+- Made Global Overview selective at world scale while preserving favorites and restoring routine contacts as users zoom in.
+- Added launches to Global Overview.
+- Added deterministic Prime Brief™ that works without OpenAI and reports source coverage honestly.
+- Watch Area PRIME actions now generate Prime Brief after flying to the area.
+- Formalized graceful degraded-data behavior on top of independent feed retry/recovery, local Watch Center state, and healthy-source continuity.
+
 ## 2.2.0
 - Independent ShadowNex Prime production candidate.

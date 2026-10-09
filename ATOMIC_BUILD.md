@@ -622,5 +622,49 @@ Status: atomic batch OPEN — everyday usability/data coverage is currently prio
 
 **SBL-09 deployment state:** POST-RECONCILIATION STAGING ONLY. No merge, no production deployment, no service worker.
 
+### SBL-10 — World Explorer depth (115–122)
+
+115. **Simple-mode GLOBE surface — IMPLEMENTED IN SBL-10 STAGING**
+   - Simple bottom navigation becomes `HOME · SEARCH · GLOBE · WATCH · MORE`.
+   - `GLOBE` opens one clear World Explorer surface instead of forcing users to know which technical panel contains place, imagery, or camera tools.
+   - Existing What's Here remains available inside World Explorer and through natural-language search.
+
+116. **Address / property / landmark search — IMPLEMENTED FOUNDATION IN SBL-10 STAGING**
+   - Add an English Nominatim geocoder returning up to five user-invoked place/address results.
+   - House/building results use close viewing altitude; cities/regions remain framed appropriately.
+   - Never claim every address/building is present or exact; results inherit OpenStreetMap/Nominatim completeness.
+
+117. **One-shot ground inspection — IMPLEMENTED IN SBL-10 STAGING**
+   - `TAP MAP` explicitly arms a one-shot ground inspector.
+   - The next empty-ground click resolves latitude/longitude instead of silently deselecting.
+   - Ground inspection never runs passively and automatically disarms after a successful point.
+
+118. **World Explorer place card — IMPLEMENTED IN SBL-10 STAGING**
+   - Inspect the center, a search result, or a tapped ground point.
+   - Show English street/place/neighborhood/locality/region/postcode/country context when Nominatim supplies it.
+   - Preserve exact coordinates for transparency.
+
+119. **Point-specific imagery quality — IMPLEMENTED FOUNDATION IN SBL-10 STAGING**
+   - Reuse Esri World Imagery metadata for the inspected point.
+   - Surface source, acquisition date when supplied, positional accuracy, and an honest detail band: `VERY HIGH · HIGH · GOOD · STANDARD · UNKNOWN`.
+   - Detail band is derived from provider resolution metadata, not image sharpening or fabricated precision.
+   - Continue to state clearly that imagery is not live.
+
+120. **Nearby public-camera discovery — IMPLEMENTED IN SBL-10 STAGING**
+   - One tap enables the connected CCTV layer and lists up to eight loaded public cameras within 25 miles of the inspected point.
+   - Distances use U.S. customary units.
+   - No-result wording explicitly says unsupported/empty ShadowNex coverage does not prove no cameras exist.
+
+121. **World Explorer actions — IMPLEMENTED IN SBL-10 STAGING**
+   - From one surface: `INSPECT CENTER · TAP MAP · WHAT'S HERE · PRIME BRIEF · IMAGERY INFO · CAMERAS NEARBY · SAVE VIEW · WATCH 50 MI`.
+   - Reuse existing Prime Brief, Watch Areas, Saved Views, CCTV, imagery metadata, and navigation history rather than adding parallel state.
+
+122. **SBL-10 safety/QA boundary — IMPLEMENTED**
+   - Add targeted QA for exact-place altitude logic, imagery detail bands, English geocoding, one-shot ground inspection wiring, GLOBE nav, camera-radius discovery, and installer order.
+   - Preserve the SBL-07 QA-green rollback point, SBL-08 alerts/history, SBL-09 dossiers/camera coverage, Node 22, zero npm dependencies, no service worker, and locked Vercel deployment.
+   - SBL-10 remains post-reconciliation staging only; no merge or production deployment is authorized.
+
+**SBL-10 deployment state:** POST-RECONCILIATION STAGING ONLY. No background inspection, no merge, no production deployment, no service worker.
+
 ### Product rule
 **Simple by default. Powerful by choice. The user asks a simple question; ShadowNex handles the complicated part.**

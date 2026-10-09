@@ -125,5 +125,15 @@
 - Added cached English reverse-place context for selected subjects through OpenStreetMap/Nominatim.
 - Added SBL-09 QA while preserving SBL-07 rollback and SBL-08 operational intelligence.
 
+### SBL-10 — World Explorer depth staging
+- Added a Simple-mode GLOBE / World Explorer surface with address/place search, ground inspection, imagery context, nearby cameras, briefing, save, and watch actions.
+- Added English Nominatim address/property/landmark geocoding with up to five results.
+- Upgraded reverse-place context to street/house/neighborhood/postcode detail when public OpenStreetMap data supplies it.
+- Added one-shot user-armed empty-ground inspection to the Cesium globe.
+- Added point-specific imagery detail bands derived from Esri resolution metadata without implying sharpening or live imagery.
+- Added nearby connected public-camera discovery within 25 miles of the inspected point.
+- Changed the Simple primary navigation target to HOME / SEARCH / GLOBE / WATCH / MORE while keeping What's Here inside World Explorer and natural-language search.
+- Kept SBL-10 post-reconciliation and staging-only with production deployment locked.
+
 ## 2.2.0
 - Independent ShadowNex Prime production candidate.

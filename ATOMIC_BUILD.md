@@ -506,5 +506,35 @@ Status: atomic batch OPEN — everyday usability/data coverage is currently prio
 
 **SBL-06 deployment state:** STAGING ONLY. Functional convergence is audited; reconciliation/merge remains a separate step.
 
+### SBL-07 — Reconciled release candidate (94–99)
+
+94. **Dedicated reconciliation branch — IMPLEMENTED**
+   - Created `reconcile-v2.2.1-sbl-07` from a two-parent reconciliation commit.
+   - Current `main` history and the complete audited SBL staging history are both preserved.
+   - Neither source branch was rewritten.
+
+95. **Reconciled-content gate — IMPLEMENTED**
+   - The candidate uses the audited SBL tree after SBL-05/SBL-06 preservation work.
+   - ADSB.lol primary aircraft data, optional bounded OpenSky fallback, native Android installer, detailed satellite Earth, Oklahoma CCTV, SBL-01 through SBL-06 UX/intelligence, Node 22, zero npm dependencies, no service worker, and the deployment lock are all retained.
+
+96. **Core QA corruption repair — IMPLEMENTED**
+   - Replaced a corrupted legacy `scripts/qa.mjs` file that prevented Node from parsing the QA chain.
+   - Rebuilt the core gate with clean syntax and six-source CCTV mocks including Oklahoma.
+
+97. **Real Node 22 CI gate — PASSED**
+   - Executed the full `npm test` chain in GitHub Actions on Node 22 using a temporary QA-only branch derived from the reconciliation candidate.
+   - All SBL/core/preservation/convergence suites passed after the QA-harness-only workflow assertion was adjusted for the temporary branch.
+
+98. **Deterministic build gate — PASSED**
+   - The same real GitHub Actions run completed `npm run build` successfully after the QA chain.
+   - This validates deterministic `dist` construction on the reconciled application tree.
+
+99. **Production hold — LOCKED**
+   - The reconciled candidate is not merged to `main`.
+   - Vercel Git deployment remains disabled.
+   - Creating or testing the reconciliation candidate does not authorize production deployment.
+
+**SBL-07 deployment state:** RECONCILED CANDIDATE QA-GREEN, NOT MERGED, NOT DEPLOYED.
+
 ### Product rule
 **Simple by default. Powerful by choice. The user asks a simple question; ShadowNex handles the complicated part.**

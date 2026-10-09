@@ -96,5 +96,13 @@
 - Added explicit ADSB.lol ODbL 1.0 and OpenSky-fallback terms guidance to third-party notices.
 - Completed a SHA-specific audit of every remaining main-only file and documented which pieces are preserved versus deliberately superseded.
 
+### SBL-07 — reconciled release candidate
+- Created a dedicated two-parent reconciliation candidate preserving current main and audited SBL histories.
+- Repaired a corrupted core QA script discovered by real Node 22 GitHub Actions.
+- Expanded the core CCTV mock gate to cover Oklahoma, London, California, Austin, Seattle, and Maryland.
+- Completed the full repository QA chain successfully in GitHub Actions.
+- Completed the deterministic static build successfully in the same QA run.
+- Kept the reconciliation candidate separate from main and production.
+
 ## 2.2.0
 - Independent ShadowNex Prime production candidate.

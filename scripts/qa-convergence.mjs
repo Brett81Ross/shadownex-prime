@@ -8,7 +8,7 @@ const [env,manifest,workflow,notices,inventory,pkgText,index,build]=await Promis
 check(env.includes('ADSB.lol is the default public ADS-B/MLAT source')&&env.includes('OPENSKY_FALLBACK_ENABLED=false'),'environment contract documents ADSB.lol primary and opt-in OpenSky fallback');
 const mf=JSON.parse(manifest);
 check(mf.icons?.some(x=>x.src==='/brand/shadownex-mark.webp'&&x.purpose.includes('maskable')),'manifest preserves approved ShadowNex install icon');
-check(workflow.includes('branches: [main]')&&workflow.includes('workflow_dispatch:')&&workflow.includes('npm test')&&workflow.includes('npm run build')&&!/vercel|deploy/i.test(workflow.replace('Verify deterministic static build','')),'Atomic QA workflow tests/builds without deployment');
+check(workflow.includes('branches: [main, qa/reconcile-v2.2.1-sbl-07-r4]')&&workflow.includes('workflow_dispatch:')&&workflow.includes('npm test')&&workflow.includes('npm run build')&&!/vercel|deploy/i.test(workflow.replace('Verify deterministic static build','')),'QA harness workflow tests/builds without deployment');
 check(notices.includes('Open Data Commons Open Database License (ODbL) v1.0')&&notices.includes('OpenSky fallback is disabled by default'),'aircraft third-party license/terms boundary is explicit');
 check(inventory.includes('complete main-only audit')&&inventory.includes('no known main-only application feature left to copy blindly'),'inventory records convergence conclusion');
 check(index.includes('/native-install.js')&&build.includes("cp(resolve(root, 'native-install.js')"),'native installer remains in deterministic static build');

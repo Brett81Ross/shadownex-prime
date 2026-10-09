@@ -2,7 +2,7 @@ name: ShadowNex Atomic QA
 
 on:
   push:
-    branches: [main]
+    branches: [main, qa/reconcile-v2.2.1-sbl-07]
   workflow_dispatch:
 
 permissions:

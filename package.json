@@ -1,13 +1,13 @@
 {
   "name": "shadownex-prime",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "private": true,
   "type": "module",
   "description": "ShadowNex Prime — Global Situational Intelligence",
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "node scripts/build.mjs",
-    "test": "node scripts/qa.mjs"
+    "test": "node scripts/qa.mjs && node scripts/qa-abl.mjs && node scripts/qa-intelligence.mjs && node scripts/qa-situation.mjs && node scripts/qa-everyday.mjs && node scripts/qa-sbl.mjs && node scripts/qa-sbl-watch.mjs && node scripts/qa-sbl-trust.mjs && node scripts/qa-sbl-discovery.mjs && node scripts/qa-reconciliation.mjs"
   },
   "engines": {
     "node": ">=22 <23"

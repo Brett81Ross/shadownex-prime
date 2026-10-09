@@ -1,0 +1,17 @@
+import {readFile} from 'node:fs/promises';
+import {withinWindow,itemTimestamp} from '../src/core/watchStore.js';
+let pass=0,fail=0;const check=(ok,msg)=>{if(ok){console.log('✓',msg);pass++;}else{console.error('✗',msg);fail++;}};const read=p=>readFile(new URL(`../${p}`,import.meta.url),'utf8');
+const [ui,css,main,store,abl]=await Promise.all(['src/ui/sblWatch.js','src/ui/sblWatch.css','src/main.js','src/core/watchStore.js','ATOMIC_BUILD.md'].map(read));
+const now=Date.now();
+check(itemTimestamp({time:now-1000})===now-1000&&withinWindow({time:now-4*60000},.0833,now)&&!withinWindow({time:now-10*60000},.0833,now)&&withinWindow({time:now-10*60000},.25,now)&&!withinWindow({time:now-40*60000},.25,now)&&!withinWindow({time:now-25*3600000},24,now),'event-window helper handles NOW, 15-minute, and 24-hour filtering');
+check(ui.includes('Watch Center')&&ui.includes('SAVE CURRENT VIEW')&&ui.includes('WATCH CURRENT AREA'),'Watch Center exposes Saved Views and Watch Areas');
+check(ui.includes('10 mi radius')&&ui.includes('250 mi radius')&&ui.includes('scanWatchAreas'),'Watch Areas support practical U.S. radius choices and loaded-source scans');
+check(ui.includes('not background monitoring')&&ui.includes('do not run while ShadowNex is closed'),'Watch Areas clearly reject fake background-monitoring claims');
+check(ui.includes('favoriteSelected')&&ui.includes('last known position')&&ui.includes('findFavoriteEntity'),'Favorites use live match or honest last-known fallback');
+check(ui.includes('NOW')&&ui.includes('15 MIN')&&ui.includes('1 HR')&&ui.includes('6 HR')&&ui.includes('24 HR')&&ui.includes('applyTimelineWindow'),'event-window ribbon filters loaded event entities');
+check(ui.includes('NEARBY CONTEXT')&&ui.includes('WITHIN 100 MILES')&&css.includes('.sbl-simple .correlation-box{display:none}'),'Simple Mode replaces correlation jargon with Nearby Context');
+check(ui.includes('navHistory')&&ui.includes('goBackState')&&ui.includes('restoreState')&&ui.includes('length>12'),'Back/Undo uses bounded map-state history');
+check(ui.includes('fullReset')&&ui.includes("setLayer('earthquakes',true)")&&ui.includes("setLayer('aircraft',true)")&&ui.includes("applyUiMode('simple')"),'Full Reset restores everyday defaults');
+check(main.includes('installSblWatch(app)'),'SBL-02 Watch module is wired into app boot');
+check(abl.includes('SBL-02')&&abl.includes('STAGING ONLY'),'ABL records SBL-02 staging-only boundary');
+console.log(`\nSBL-02 QA: ${pass} passed, ${fail} failed`);process.exitCode=fail?1:0;

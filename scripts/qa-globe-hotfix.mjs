@@ -10,26 +10,29 @@ const base=await read('src/layers/BaseLayer.js');
 const aircraftApi=await read('api/aircraft.js');
 const aircraftLayer=await read('src/layers/AircraftLayer.js');
 const build=await read('scripts/build.mjs');
-const help=await read('src/demo-help.js');
+const index=await read('index.html');
+const discovery=await read('src/ui/discoveryEnhancements.js');
 
 check(globe.includes('baseLayer:false'),'Cesium default Ion basemap is disabled');
-check(globe.includes('https://tile.openstreetmap.org/{z}/{x}/{y}.png'),'OpenStreetMap basemap is explicit');
-check(globe.includes("baseColor=C.Color.fromCssColorString('#07151d')"),'globe has a visible no-imagery fallback color');
+check(globe.includes('World_Imagery/MapServer'),'detailed Esri satellite/aerial Earth is explicit');
+check(globe.includes('NaturalEarthII')&&globe.includes('GeographicTilingScheme'),'keyless Natural Earth fallback remains available');
+check(globe.includes("baseColor=C.Color.fromCssColorString('#0d3242')"),'globe has a visible no-imagery fallback color');
 check(main.includes('Date.now()-started>12000'),'Cesium startup wait is bounded');
 check(main.includes('if(app.globe?.viewer)dismissSplash()'),'splash releases when the globe viewer is ready');
-check(base.includes("if(this.enabled&&!this.timer)this.timer=setInterval"),'failed initial feeds still get a retry timer');
+check(base.includes('this.failureCount')&&base.includes('retrying in')&&base.includes('this.schedule(gen'),'feed refresh uses bounded backoff and continues after failures');
 check(aircraftApi.includes('https://api.adsb.lol/v2/point/'),'ADSB.lol is the primary bounded aircraft source');
 check(aircraftApi.includes('ADSB_TIMEOUT_MS=5000'),'primary aircraft upstream timeout is bounded');
 check(aircraftApi.includes("process.env.OPENSKY_FALLBACK_ENABLED==='true'"),'OpenSky fallback is explicit opt-in');
 check(aircraftApi.includes("new URL('https://opensky-network.org/api/states/all')")&&aircraftApi.includes('lamin')&&aircraftApi.includes('lomax'),'optional OpenSky fallback uses a bounded region');
-check(aircraftApi.includes('feetToMeters')&&aircraftApi.includes('knotsToMps')&&aircraftApi.includes('feetPerMinToMps'),'ADSB.lol units normalize into the existing aircraft state-vector contract');
+check(aircraftApi.includes('feetToMeters')&&aircraftApi.includes('knotsToMps')&&aircraftApi.includes('feetPerMinToMps'),'ADSB.lol units normalize into the aircraft state-vector contract');
 check(aircraftApi.includes("_license:'ODbL-1.0'"),'ADSB.lol data license is carried in normalized responses');
 check(aircraftLayer.includes('focusCoordinates()')&&aircraftLayer.includes('URLSearchParams'),'aircraft requests follow the current globe view');
 check(aircraftLayer.includes('AbortSignal.timeout(13000)'),'browser aircraft request is bounded');
 check(aircraftLayer.includes("source=String(data._source||'Public ADS-B')"),'aircraft provenance follows the backend source');
-check(build.includes("cp(resolve(root, 'src'), resolve(out, 'src'), { recursive: true })"),'production build copies the ShadowNex source modules');
+check(aircraftLayer.includes('clusterEntities')&&aircraftLayer.includes('enforceCap')&&aircraftLayer.includes('90000'),'aircraft layer retains clustering, hard caps, and stale cleanup');
+check(build.includes("cp(resolve(root, 'native-install.js')")&&index.includes('/native-install.js'),'native Android install launcher is included in production output');
 check(build.includes("cp(resolve(root, 'brand'), resolve(out, 'brand'), { recursive: true })"),'production build copies brand assets');
-check(help.includes('shadownex-prime-60-second-demo.mp4'),'ShadowNex Help points to the app-specific 60-second demo');
+check(discovery.includes('Show Me ShadowNex')&&discovery.includes('restoreState(this.demoRestoreState)'),'new guided-learning demo replaces the old page-loaded demo helper');
 
 const normalized=await mockAircraft();
 const row=normalized.body?.states?.[0];
@@ -38,7 +41,7 @@ check(normalized.body?._source==='ADSB.lol'&&normalized.body?._license==='ODbL-1
 check(Array.isArray(row)&&row[0]==='a50842'&&row[1]==='UPS2897'&&Math.abs(row[7]-10668)<.1,'aircraft normalizer preserves identity and converts altitude feet to meters');
 check(Math.abs(row[9]-231.4998)<.1&&Math.abs(row[11]-2.54)<.01,'aircraft normalizer converts knots and feet/minute to SI units');
 
-console.log(`\nGlobe + aircraft hotfix QA: ${pass} passed, ${fail} failed`);
+console.log(`\nReconciled globe + aircraft QA: ${pass} passed, ${fail} failed`);
 process.exitCode=fail?1:0;
 
 async function mockAircraft(){

@@ -80,5 +80,13 @@
 - Added a documented pre-reconciliation checkpoint and automated reconciliation-safety QA.
 - Kept all discovery/tour state local to the device; no service worker or background process was added.
 
+### SBL-05 — main-capability preservation staging
+- Preserved main's viewport-scoped ADSB.lol aircraft provider with reduced-radius retry and optional OpenSky fallback.
+- Merged that provider path with SBL's stricter aircraft caps, nearest-view prioritization, bounded trails, clustering, and low-power behavior.
+- Preserved the real native Android APK installer and deterministic build inclusion.
+- Integrated the Android install action into the Simple/More experience with a fallback control if the UI fails to mount.
+- Classified the old standalone demo-help surface as superseded by SBL-04 instead of reintroducing duplicate onboarding.
+- Added a SHA-specific reconciliation inventory and aircraft/native preservation QA gate.
+
 ## 2.2.0
 - Independent ShadowNex Prime production candidate.

@@ -440,5 +440,35 @@ Status: atomic batch OPEN — everyday usability/data coverage is currently prio
 
 **SBL-04 deployment state:** STAGING ONLY. This is the planned usability/polish checkpoint before branch reconciliation.
 
+### SBL-05 — Preserve main-only production capabilities (81–86)
+
+81. **Resilient aircraft provider reconciliation — IMPLEMENTED IN SBL-05 STAGING**
+   - Preserve main's viewport-scoped ADSB.lol primary aircraft source.
+   - Preserve bounded provider timeout, 120 NM reduced-radius retry, and optional OpenSky fallback.
+   - Retain SBL mobile caps, nearest-view prioritization, bounded trails, zoom-aware clustering, low-power behavior, provenance, and stale-data fading.
+
+82. **Native Android installer preservation — IMPLEMENTED IN SBL-05 STAGING**
+   - Preserve main's real APK installer and deterministic build copy.
+   - Surface the installer inside More in the Simple experience instead of relying on a permanent floating control.
+   - Keep a fallback install button if the normal app UI fails to mount.
+
+83. **Legacy Demo/Help supersession — LOCKED FOR RECONCILIATION**
+   - Do not load src/demo-help.js in the reconciled application.
+   - SBL-04 Quick Start / Show Me ShadowNex / Help & Guide is the authoritative onboarding system.
+   - Avoid two simultaneous onboarding/help frameworks.
+
+84. **Main-only capability inventory — IMPLEMENTED**
+   - Record must-preserve, superseded, and production-history-only main changes in RECONCILIATION_INVENTORY.md.
+   - Re-read current main before reconciliation because this inventory is SHA-specific.
+
+85. **Aircraft/native preservation QA — IMPLEMENTED**
+   - Add a QA gate proving ADSB.lol normalization/fallback wiring, viewport query parameters, SBL caps/clustering, native installer inclusion, and absence of legacy demo-help loading.
+
+86. **Reconciliation remains non-production — LOCKED**
+   - SBL-05 does not merge to main and does not deploy.
+   - A dedicated reconciled candidate must be built/tested before any PR/merge is considered.
+
+**SBL-05 deployment state:** STAGING ONLY. This pass reduces the true reconciliation gap without overwriting main.
+
 ### Product rule
 **Simple by default. Powerful by choice. The user asks a simple question; ShadowNex handles the complicated part.**

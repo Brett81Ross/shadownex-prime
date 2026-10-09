@@ -1,0 +1,16 @@
+import {readFile} from 'node:fs/promises';
+let pass=0,fail=0;const check=(ok,msg)=>{if(ok){console.log('✓',msg);pass++;}else{console.error('✗',msg);fail++;}};const read=p=>readFile(new URL(`../${p}`,import.meta.url),'utf8');
+const [api,air,native,build,index,friendly,notices,inventory,vercel,pkgText]=await Promise.all(['api/aircraft.js','src/layers/AircraftLayer.js','native-install.js','scripts/build.mjs','index.html','src/ui/friendlyUiEnhancements.js','THIRD_PARTY_NOTICES.md','RECONCILIATION_INVENTORY.md','vercel.json','package.json'].map(read));
+check(api.includes('api.adsb.lol/v2/point/')&&api.includes("OPENSKY_FALLBACK_ENABLED==='true'"),'ADSB.lol primary + opt-in OpenSky fallback are preserved');
+check(api.includes('ADSB_TIMEOUT_MS=5000')&&api.includes('OPENSKY_TIMEOUT_MS=4500')&&api.includes('_reducedRadius=true'),'aircraft backend keeps bounded timeouts and reduced-radius retry');
+check(api.includes("_license:'ODbL-1.0'")&&notices.includes('ADSB.lol (ODbL 1.0)'),'ADSB.lol provenance/license is documented');
+check(air.includes("URLSearchParams({lat:focus.lat.toFixed(4),lon:focus.lon.toFixed(4),radius:String(radius)})")&&air.includes('/api/aircraft?'),'aircraft layer queries around current globe view');
+check(air.includes('densityLimit(140,260,440)')&&air.includes('enforceCap')&&air.includes('updateClusters')&&air.includes('applyPerformanceMode'),'SBL caps/clustering/performance survive provider reconciliation');
+check(air.includes("source=String(data._source||'Public ADS-B')")&&air.includes('PUBLIC ADS-B / MLAT'),'aircraft provenance follows active provider');
+check(native.includes('ShadowNex-Prime.apk')&&native.includes('data-native-install'),'native Android installer is present');
+check(build.includes("cp(resolve(root, 'native-install.js')")&&index.includes('<script src="/native-install.js" defer></script>'),'native installer is copied and loaded by static build');
+check(friendly.includes('data-native-install')&&friendly.includes('Install Android App'),'Simple/More UI exposes native install action');
+check(!index.includes('/src/demo-help.js'),'legacy standalone demo-help is not loaded');
+check(inventory.includes('Must preserve in SBL')&&inventory.includes('Superseded by SBL')&&inventory.includes('Never overwrite main'),'reconciliation inventory records preservation boundaries');
+const v=JSON.parse(vercel),pkg=JSON.parse(pkgText);check(v.git?.deploymentEnabled===false&&pkg.engines?.node==='>=22 <23'&&Object.keys(pkg.dependencies||{}).length===0,'deployment lock / Node 22 / zero dependencies remain intact');
+console.log(`\nSBL-05 preservation QA: ${pass} passed, ${fail} failed`);process.exitCode=fail?1:0;

@@ -4,7 +4,7 @@ const MU=398600.4418; // km^3/s^2
 export function parseTle(name,l1,l2){
   const yy=Number(l1.slice(18,20)); const day=Number(l1.slice(20,32)); const year=yy<57?2000+yy:1900+yy;
   const epoch=new Date(Date.UTC(year,0,1)+(day-1)*86400000);
-  return {name:name.trim(),epoch,inc:Number(l2.slice(8,16))*DEG,raan:Number(l2.slice(17,25))*DEG,ecc:Number(`0.${l2.slice(26,33).trim()}`),argp:Number(l2.slice(34,42))*DEG,M0:Number(l2.slice(43,51))*DEG,n:Number(l2.slice(52,63))};
+  return {name:name.trim(),satnum:l1.slice(2,7).trim(),epoch,inc:Number(l2.slice(8,16))*DEG,raan:Number(l2.slice(17,25))*DEG,ecc:Number(`0.${l2.slice(26,33).trim()}`),argp:Number(l2.slice(34,42))*DEG,M0:Number(l2.slice(43,51))*DEG,n:Number(l2.slice(52,63))};
 }
 export function propagate(orb,date=new Date()){
   const nRad=orb.n*2*Math.PI/86400; const a=Math.cbrt(MU/(nRad*nRad)); const dt=(date-orb.epoch)/1000; let M=(orb.M0+nRad*dt)%(2*Math.PI); if(M<0)M+=2*Math.PI;

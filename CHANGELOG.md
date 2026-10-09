@@ -115,5 +115,15 @@
 - Expanded Nearby Context with selected-source state, live/partial coverage counts, and Watch Area membership.
 - Preserved SBL-07 as the reconciled QA-green rollback checkpoint.
 
+### SBL-09 — subject experience and camera discoverability staging
+- Converted Simple Mode selected-subject details into an expandable mobile bottom-sheet experience.
+- Added a unified selected-subject action rail for follow, favorite, Watch Area, Prime Brief, English place context, and Explain This.
+- Upgraded aircraft dossiers with combined live telemetry + public identity/reference data and stronger mission/route caveats.
+- Upgraded satellite dossiers with NORAD ID, orbit band, altitude, approximate period, inclination, and TLE epoch while keeping position explicitly estimated.
+- Added AIS ShipStaticData subscription/merge for vessel call sign, IMO, vessel type, destination, ETA, and dimensions when AISStream provides them.
+- Added a public Camera Coverage browser with Oklahoma City, Tulsa, California, London, Austin, Seattle, and Maryland/DC quick-jump regions.
+- Added cached English reverse-place context for selected subjects through OpenStreetMap/Nominatim.
+- Added SBL-09 QA while preserving SBL-07 rollback and SBL-08 operational intelligence.
+
 ## 2.2.0
 - Independent ShadowNex Prime production candidate.

@@ -577,5 +577,50 @@ Status: atomic batch OPEN — everyday usability/data coverage is currently prio
 
 **SBL-08 deployment state:** POST-RECONCILIATION STAGING ONLY. In-app alerts only; no service worker, background monitor, push notification, merge, or production deployment.
 
+### SBL-09 — Subject experience and camera discoverability (107–114)
+
+107. **Mobile subject bottom sheet — IMPLEMENTED IN SBL-09 STAGING**
+   - In Simple Mode on phones/Fold-sized layouts, selected-subject details now behave as a map-first bottom sheet instead of a permanent desktop-style side panel.
+   - The sheet can expand for deeper inspection and collapses when selection is cleared.
+   - Desktop/Advanced behavior remains available without removing underlying detail.
+
+108. **Unified subject action rail — IMPLEMENTED IN SBL-09 STAGING**
+   - Put high-value actions directly under the selected subject name: `FOLLOW · FAVORITE · WATCH 50 MI · PRIME HERE · WHERE IS THIS? · EXPLAIN`.
+   - FOLLOW appears only for moving aircraft/vessel/satellite subjects.
+   - Watch/Favorite/Prime reuse the existing Watch Center and Prime Brief systems rather than creating parallel state.
+
+109. **Aircraft Dossier v3 — IMPLEMENTED IN SBL-09 STAGING**
+   - Combine current public position telemetry with public identity/reference enrichment in one card.
+   - Show photo when available, callsign, registration, aircraft type, registered owner, Mode-S hex, altitude in feet, speed in knots, heading, ground state, and published route match when available.
+   - Preserve the strict rule that a published route or military-likely callsign does not prove current mission, passengers, cargo, crew, or intent.
+
+110. **Satellite Dossier v3 — IMPLEMENTED IN SBL-09 STAGING**
+   - Preserve English reference imagery/mission summary and add public orbital context: NORAD ID, orbit band, altitude in miles, approximate period, inclination, and TLE epoch.
+   - Enrich parsed TLE records with NORAD catalog number.
+   - Keep position explicitly estimated from public TLE propagation, not direct live spacecraft telemetry.
+
+111. **Vessel Dossier v2 + AIS static data — IMPLEMENTED FOUNDATION IN SBL-09 STAGING**
+   - Subscribe to AIS `ShipStaticData` in addition to position reports when AISStream is configured.
+   - Merge available vessel name, call sign, IMO, AIS vessel type, destination, ETA, and dimensions into the live position contact.
+   - State clearly that AIS identity/destination/ETA can be self-reported, delayed, incomplete, or absent.
+
+112. **Camera Coverage browser — IMPLEMENTED IN SBL-09 STAGING**
+   - Add `More → Camera Coverage` and searchable `camera coverage / camera regions` intent.
+   - Show provider health/counts and quick-jump regions for Oklahoma City, Tulsa, California, London, Austin, Seattle, and Maryland/DC.
+   - Oklahoma City/Tulsa remain backed by the public OKTraffic catalog.
+   - Explicitly state that unsupported ShadowNex coverage does not mean cameras do not exist in that place.
+
+113. **English nearby-place context — IMPLEMENTED IN SBL-09 STAGING**
+   - `WHERE IS THIS?` resolves the selected subject position through cached English OpenStreetMap/Nominatim reverse context.
+   - Surface nearby locality/region/country and road when available.
+   - The lookup is user-invoked and does not continuously reverse-geocode moving subjects.
+
+114. **SBL-09 safety/QA boundary — IMPLEMENTED**
+   - Add dedicated QA for dossier wiring, AIS static-data merge path, TLE/NORAD orbital metadata, camera regions, English reverse-place lookup, mobile sheet, and boot order.
+   - Preserve Node 22, zero npm dependencies, no service worker, Vercel deployment lock, SBL-07 QA-green rollback point, and all SBL-08 operational watch behavior.
+   - SBL-09 remains post-reconciliation staging only; no merge or production deployment is authorized.
+
+**SBL-09 deployment state:** POST-RECONCILIATION STAGING ONLY. No merge, no production deployment, no service worker.
+
 ### Product rule
 **Simple by default. Powerful by choice. The user asks a simple question; ShadowNex handles the complicated part.**

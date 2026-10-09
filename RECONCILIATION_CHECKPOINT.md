@@ -44,6 +44,14 @@ The branches are materially diverged. **NO BLIND MERGE, FORCE MERGE, OR WHOLE-TR
 - Demo Mode restores the user's prior state.
 - Vercel Git deployment stays locked until explicit authorization.
 
+## Reconciliation candidate
+
+- Branch: `reconcile-sbl-v2.2.1`
+- Base `main`: `9423586a4e62636ed45a5bc8bdc2249b7367f24f`
+- Initial reconciled candidate: `032db7b1f151ff4c154e633f9daadce0c86b4a25`
+- Candidate preserves ADSB.lol primary aircraft data, native install/branding, and the SBL-01 through SBL-04 feature line.
+- The branch-only QA workflow trigger may add a later harness commit. It does not authorize merging or deployment.
+
 ## Rollback boundary
 
 The final pre-reconciliation SBL staging SHA is the rollback point for the accumulated SBL-01 through SBL-04 work. Record that SHA in the conversation/release notes once SBL-04 advances the staging branch.

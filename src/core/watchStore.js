@@ -1,4 +1,4 @@
-const KEYS={views:'shadownex.prime.savedViews.v1',areas:'shadownex.prime.watchAreas.v1',favorites:'shadownex.prime.favorites.v1',activity:'shadownex.prime.activity.v1'};
+const KEYS={views:'shadownex.prime.savedViews.v1',areas:'shadownex.prime.watchAreas.v1',favorites:'shadownex.prime.favorites.v1',activity:'shadownex.prime.activity.v1',events:'shadownex.prime.eventHistory.v1',alerts:'shadownex.prime.watchAlerts.v1'};
 export function loadCollection(kind){try{const raw=localStorage.getItem(KEYS[kind]);const v=JSON.parse(raw||'[]');return Array.isArray(v)?v:[];}catch{return [];}}
 export function saveCollection(kind,value){try{localStorage.setItem(KEYS[kind],JSON.stringify(value));return true;}catch{return false;}}
 export function makeId(prefix='item'){return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,7)}`;}

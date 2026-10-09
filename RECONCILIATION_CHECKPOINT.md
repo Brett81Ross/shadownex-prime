@@ -79,3 +79,13 @@ A temporary QA-only branch then executed the complete test chain and determinist
 The temporary QA branch differs from the candidate only in QA-harness trigger/assertion lines needed to execute the workflow on a non-main branch. Application/runtime content is the reconciliation candidate content.
 
 This checkpoint still does **not** authorize merge or production deployment.
+
+
+## SBL-08 post-reconciliation rollback boundary
+
+Protected reconciled/QA-green staging checkpoint before new post-reconciliation features:
+- `93086d8b2cf201d8259adf20a257542a53b966a8` — SBL-07 record reconciled QA-green candidate.
+
+SBL-08 and later work is additive staging work after that checkpoint. If a post-SBL-07 feature causes a regression, return to the SHA above rather than disturbing the completed main-convergence audit.
+
+This does not authorize merge or production deployment. Vercel Git deployment must remain disabled until the user explicitly approves production.

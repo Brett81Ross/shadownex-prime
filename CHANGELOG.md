@@ -104,5 +104,16 @@
 - Completed the deterministic static build successfully in the same QA run.
 - Kept the reconciliation candidate separate from main and production.
 
+### SBL-08 — operational watch intelligence staging
+- Added in-app Watch Alerts with silent first-scan baselining and per-area mute/unmute.
+- Added notable-event rules for M4+ earthquakes, wildfire events/detections, launches, and military-likely aircraft heuristics.
+- Added a locally persisted 24-hour notable-event history tied to the existing event-window ribbon.
+- Added honest last-observed fallback when a historical event is no longer currently loaded.
+- Added intelligence events and Watch Alerts into Recent Activity without logging routine refresh noise.
+- Added Watch Area new-event change detection with bounded seen-key baselines.
+- Added explicit near-me world queries such as “what’s flying over me” and “cameras near me,” with location permission requested only from the explicit query.
+- Expanded Nearby Context with selected-source state, live/partial coverage counts, and Watch Area membership.
+- Preserved SBL-07 as the reconciled QA-green rollback checkpoint.
+
 ## 2.2.0
 - Independent ShadowNex Prime production candidate.

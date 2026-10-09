@@ -129,15 +129,15 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Selected contacts/events automatically use a useful camera distance and orientation.
    - Prevent camera states that leave the user inside the globe, too far away, or unable to see the selected target.
 
-23. **Context cards — IMPLEMENTED FOUNDATION IN SBL-02 STAGING**
+23. **Context cards — UPGRADED IN SBL-08 STAGING**
    - Explain nearby relevant cities, airports, infrastructure, events, and correlated contacts around the selected item.
    - Present correlations as understandable context rather than raw matrices.
 
-24. **Timeline ribbon — IMPLEMENTED FOUNDATION IN SBL-02 STAGING**
+24. **Timeline ribbon — UPGRADED WITH LOCAL EVENT HISTORY IN SBL-08 STAGING**
    - Simple time scopes such as `NOW · 15 MIN · 1 HR · 6 HR · 24 HR`.
    - Use available history/trails/events to make change over time understandable.
 
-25. **Watch Areas — IMPLEMENTED FOUNDATION IN SBL-02 STAGING**
+25. **Watch Areas — UPGRADED WITH IN-APP ALERTS IN SBL-08 STAGING**
    - Save named geographic regions such as Home, Oklahoma City, Gulf Coast, or a drawn polygon.
    - Surface meaningful changes that occur inside watched areas.
 
@@ -145,7 +145,7 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Star locations, aircraft, vessels, satellites, or events for fast return.
    - Keep watched items distinct from ordinary map clutter.
 
-27. **Recent Activity feed — IMPLEMENTED FOUNDATION IN SBL-02 STAGING**
+27. **Recent Activity feed — UPGRADED WITH INTELLIGENCE EVENTS IN SBL-08 STAGING**
    - Chronological plain-English stream of notable changes, detections, watch-area events, and tracked-item updates.
    - Avoid turning routine feed refreshes into noisy notifications.
 
@@ -185,7 +185,7 @@ Status: atomic batch OPEN — items 1–20 are now integrated in staging. Smart 
    - Show only significant events and meaningful/watchlisted activity instead of enabling every feed.
    - Use clustering/importance scoring to preserve a readable world view.
 
-37. **Natural-language unified Search + NexCommand — IMPLEMENTED FOUNDATION IN SBL STAGING**
+37. **Natural-language unified Search + NexCommand — UPGRADED WITH EXPLICIT NEAR-ME INTENTS IN SBL-08 STAGING**
    - Accept phrases such as “take me to Oklahoma City,” “show fires near Los Angeles,” or “aircraft around Dallas.”
    - Search and command behavior should feel like one intelligence system, not two unrelated interfaces.
 
@@ -535,6 +535,47 @@ Status: atomic batch OPEN — everyday usability/data coverage is currently prio
    - Creating or testing the reconciliation candidate does not authorize production deployment.
 
 **SBL-07 deployment state:** RECONCILED CANDIDATE QA-GREEN, NOT MERGED, NOT DEPLOYED.
+
+### SBL-08 — Operational watch intelligence (100–106)
+
+100. **In-app Watch Alerts v1 — IMPLEMENTED IN SBL-08 STAGING**
+   - Watch Areas establish a silent first-scan baseline and alert only on newly loaded notable activity after that baseline.
+   - Initial notable rules: M4+ earthquakes, wildfire events/detections, launches, and military-likely aircraft heuristics.
+   - Alerts clearly remain in-app only; they require ShadowNex to be open with the relevant feed loaded.
+   - Each Watch Area can mute/unmute its own alerts.
+   - Military-likely alerts explicitly retain heuristic wording.
+
+101. **Local 24-hour event history — IMPLEMENTED IN SBL-08 STAGING**
+   - Persist notable events ShadowNex actually observed from loaded feeds on this device for up to 24 hours.
+   - Reuse the existing `NOW · 15 MIN · 1 HR · 6 HR · 24 HR` window to filter the local history.
+   - Historical items can reopen the currently loaded subject or fly to the last locally observed position.
+   - Explicitly state that this is a local observation history, not a complete authoritative historical archive.
+
+102. **Intelligence-aware Recent Activity — IMPLEMENTED FOUNDATION IN SBL-08 STAGING**
+   - Newly observed notable events are added to Recent Activity after the initial baseline.
+   - Watch Alerts also appear in Recent Activity.
+   - Routine feed refreshes remain suppressed to avoid notification noise.
+
+103. **Watch Area change detection — IMPLEMENTED FOUNDATION IN SBL-08 STAGING**
+   - Track the set of currently notable event keys inside each Watch Area.
+   - Alert only when a notable event key appears after the previous scan.
+   - Persist a bounded seen-key baseline so ordinary refreshes do not retrigger the same alert.
+
+104. **Explicit near-me world queries — IMPLEMENTED IN SBL-08 STAGING**
+   - Understand user-initiated phrases such as `what's flying over me`, `cameras near me`, `fires nearby`, and `what's happening around me`.
+   - Request device location only because the user explicitly asked a near-me query.
+   - Never request location in the background or simply because Search is open.
+
+105. **Context Coverage v2 — IMPLEMENTED IN SBL-08 STAGING**
+   - Nearby Context now also shows the selected source state, count of live/partial enabled feeds, and Watch Area membership.
+   - Continue to describe context only from loaded public sources.
+
+106. **Post-reconciliation safety boundary — IMPLEMENTED**
+   - SBL-07 staging SHA `93086d8b2cf201d8259adf20a257542a53b966a8` is the protected reconciled/QA-green rollback checkpoint.
+   - SBL-08 is additive post-reconciliation staging work and does not change the prior main-convergence audit conclusions.
+   - Production remains locked and no merge/deploy is authorized by this batch.
+
+**SBL-08 deployment state:** POST-RECONCILIATION STAGING ONLY. In-app alerts only; no service worker, background monitor, push notification, merge, or production deployment.
 
 ### Product rule
 **Simple by default. Powerful by choice. The user asks a simple question; ShadowNex handles the complicated part.**

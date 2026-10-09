@@ -52,6 +52,27 @@ The branches are materially diverged. **NO BLIND MERGE, FORCE MERGE, OR WHOLE-TR
 - Candidate preserves ADSB.lol primary aircraft data, native install/branding, and the SBL-01 through SBL-04 feature line.
 - The branch-only QA workflow trigger may add a later harness commit. It does not authorize merging or deployment.
 
+## Reconciliation QA result
+
+- Green functional candidate: `6d1023584ef666f3c97f8f27d73c6349f22c4b81`
+- GitHub Actions green run: `37870552887`
+- Node: 22.x
+- Core QA: 34 passed, 0 failed
+- ABL QA: 9 passed, 0 failed
+- Intelligence QA: 7 passed, 0 failed
+- Situation QA: 11 passed, 0 failed
+- Everyday UX QA: 11 passed, 0 failed
+- SBL-01 QA: 14 passed, 0 failed
+- SBL-02 QA: 11 passed, 0 failed
+- SBL-03 QA: 17 passed, 0 failed
+- SBL-04 discovery QA: 16 passed, 0 failed
+- Reconciliation gate: 10 passed, 0 failed
+- Reconciled globe + aircraft QA: 24 passed, 0 failed
+- Production build: PASS — deterministic `dist/` completed
+- Total automated assertions across the chained application/reconciliation suites: 164 passed, 0 failed.
+- The temporary reconciliation-branch workflow trigger was removed after the green gate; the workflow is restored to its normal `main` push trigger.
+- This green result is a merge-readiness gate only. It is **not** production deployment approval.
+
 ## Rollback boundary
 
 The final pre-reconciliation SBL staging SHA is the rollback point for the accumulated SBL-01 through SBL-04 work. Record that SHA in the conversation/release notes once SBL-04 advances the staging branch.

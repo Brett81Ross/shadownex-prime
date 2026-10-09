@@ -1,58 +1,127 @@
-import {readdir,readFile} from 'node:fs/promises';import {join,extname} from 'node:path';import {spawnSync} from 'node:child_process';
-import {TrailStore} from '../src/core/trails.js';import {correlateContacts} from '../src/core/contactCorrelation.js';import {polygonAreaKm2,polylineKm} from '../src/core/geo.js';
-const root=new URL('..',import.meta.url);const rootPath=decodeURIComponent(root.pathname);let pass=0,fail=0;const check=(ok,msg)=>{if(ok){console.log('âœ“',msg);pass++;}else{console.error('âœ—',msg);fail++;}};
-const pkg=JSON.parse(await readFile(new URL('../package.json',import.meta.url),'utf8'));check(pkg.version==='2.2.1','version is 2.2.1');check(pkg.engines?.node==='>=22 <23','Node engine targets 22.x');check(Object.keys(pkg.dependencies||{}).length===0&&Object.keys(pkg.devDependencies||{}).length===0,'no npm dependencies');
-const files=await walk(rootPath);const textFiles=files.filter(f=>['.js','.mjs','.html','.css','.md','.txt','.json'].includes(extname(f)));let corpus='';for(const f of textFiles)corpus+='\n'+await readFile(f,'utf8');
-const retired=[String.fromCharCode(103,111,100,115,32,101,121,101),String.fromCharCode(103,101,116,45),String.fromCharCode(98,105,108,97,119,97,108,32,115,105,100,104,117)];check(retired.every(x=>!corpus.toLowerCase().includes(x)),'no retired brand or author seams');const executable=await Promise.all(files.filter(f=>['.js','.mjs','.html'].includes(extname(f))).map(f=>readFile(f,'utf8')));check(!/navigator\.serviceWorker|serviceWorker\.register|new\s+ServiceWorker/i.test(executable.join('\n')),'no service worker registration code');const oldLicense=String.fromCharCode(77,73,84);check(!corpus.split(/\W+/).includes(oldLicense),'no retired app-level license notice in the clean tree');check(/All Rights Reserved/.test(corpus),'proprietary ownership notice present');check(/THIRD_PARTY_NOTICES/.test(corpus),'third-party notices documented');
-const js=files.filter(f=>['.js','.mjs'].includes(extname(f)));let syntax=true;for(const f of js){const r=spawnSync(process.execPath,['--check',f],{encoding:'utf8'});if(r.status!==0){syntax=false;console.error(r.stderr);break;}}check(syntax,`${js.length} JS/MJS files pass syntax checks`);
-check(files.some(f=>f.endsWith('/src/core/qr.js')),'original ShadowNex QR encoder present');check(files.some(f=>f.endsWith('/src/core/orbišœÉÊJK	Ú[™\[™[Ü˜š][š\ÝX[›ÜYØ]Üˆ™\Ù[	ÊNØÚXÚÊš[\ËœÛÛYJO™‹™[™ÕÚ]
-	ËØ\KØœšYYš[™ËšœÉÊJK	ÜÙ\™\‹[Û›H™^ÛÛ[X[™œšYYš[™È[™Ú[™\Ù[	ÊNØÚXÚÊš[\ËœÛÛYJO™‹™[™ÕÚ]
-	ËØ\KØ›Ý[™\žKšœÉÊJK	ÜÙ\™\‹\ÚYH›Ý[™\žH™\ÛÛ™\ˆ™\Ù[	ÊNØÚXÚÊš[\ËœÛÛYJO™‹™[™ÕÚ]
-	ËØ\KØØÝ‹šœÉÊJK	ÜÙ\™\‹\ÚYH][K\ÛÝ\˜ÙHÐÕˆ›Ü›X[^™\ˆ™\Ù[	ÊNØÚXÚÊš[\ËœÛÛYJO™‹™[™ÕÚ]
-	ËÜÜ˜ËÛ^Y\œËÔÝXœÙXS^Y\‹šœÉÊJK	ÙYXØ]YÔÓHÝXœÙXHØX›H^Y\ˆ™\Ù[	ÊNØÚXÚÊš[\ËœÛÛYJO™‹™[™ÕÚ]
-	ËÜÜ˜ËÙÛØ™KÐ[››Ý][ÛÛÛ›Û\‹šœÉÊJK	Ú[™\[™[™^˜]ÈÛÛ›Û\ˆ™\Ù[	ÊNØÚXÚÊš[\ËœÛÛYJO™‹™[™ÕÚ]
-	ËÜÜ˜ËÙÛØ™KÔØÙ[™Q\™XÝÜ‹šœÉÊJK	Ú[™\[™[ØÙ[™Q\™XÝÜˆ™\Ù[	ÊNÂ˜ÛÛœÝ˜\ÙS^Y\X]ØZ]™XYš[J™]ÈT“
-	Ë‹‹ÜÜ˜ËÛ^Y\œËÐ˜\ÙS^Y\‹šœÉË[\Ü›Y]K\›
-K	Ý]Ž	ÊNØÚXÚÊ˜\ÙS^Y\‹š[˜ÛY\Ê	Ý\Ëœ™Yœ™\Ú[™ÉÊI‰˜˜\ÙS^Y\‹š[˜ÛY\Ê	ÙØÝ[Y[šY[‰ÊK	Û^Y\ˆ™Yœ™\Ú\È\™H›Û‹[Ý™\›\[™È[™˜XÚÙÜ›Ý[™X]Ø\™IÊNØÛÛœÝZ\˜Ü˜YX]ØZ]™XYš[J™]ÈT“
-	Ë‹‹ÜÜ˜ËÛ^Y\œËÐZ\˜Ü˜Y^Y\‹šœÉË[\Ü›Y]K\›
-K	Ý]Ž	ÊNØÚXÚÊZ\˜Ü˜Yš[˜ÛY\Ê	Ù[™›Ü˜ÙPØ\
-[Z]ÙY[ŠIÊI‰˜Z\˜Ü˜Yš[˜ÛY\Ê	Ù[œÚ]S[Z]
-MŒ
-IÊK	ØZ\˜Ü˜Y™[™\š[™È\ÈH\™[Øš[K\ØY™H[]HØ\	ÊNØÛÛœÝÛØ™OX]ØZ]™XYš[J™]ÈT“
-	Ë‹‹ÜÜ˜ËÙÛØ™KÑÛØ™PÛÛ›Û\‹šœÉË[\Ü›Y]K\›
-K	Ý]Ž	ÊNØÚXÚÊÛØ™Kš[˜ÛY\Ê	Ü™\]Y\Ý™[™\“[ÙNYIÊI‰™ÛØ™Kš[˜ÛY\Ê	Ü™\ÛÛ][Û”ØØ[OKÌ‰ÊK	ÙÛØ™H\Ù\ÈÛ‹Y[X[™™[™\š[™È[™[Øš[H™\ÛÛ][ÛˆØØ[[™ÉÊNÂ˜ÛÛœÝ[X]ØZ]™XYš[J™]ÈT“
-	Ë‹‹Ú[™^š[	Ë[\Ü›Y]K\›
-K	Ý]Ž	ÊNØÚXÚÊÉÜ›Ý]P‰Ë	Ø\™XP‰Ë	ÛYX\Ý\™P‰Ë	Ùš[š\Ú[››Ð‰Ë	ÛÜ˜š]ØÙ[™P‰Ë	ÝÛÜ›ØÙ[™P‰Ë	Ü›Ý]TØÙ[™P‰Ë	ØÛØÚÜ]Ý™\›^IË	ÝÙ[ÛÛYQX[ÙÉË	Û[Ü™S^Y\“\Ý	Ë	ÜÝXš[]P˜[›™\‰Ë	ÜØÛÜPÛÜÙP‰×K™]™\žJYOš[š[˜ÛY\ÊYH‰ÚYH˜
-JK	ØÛÜ™KY˜[˜ÙYÛ˜›Ø\™[™ËÝXš[]K[™ÛÛXÝXÛÜÙHÛÛ›ÛÈ\™H™\Ù[	ÊNØÚXÚÊ[š[˜ÛY\Ê	ÓPTQÑS‘	ÊI‰š[š[˜ÛY\Ê	ÑÙ]HÛUÛHÙ^IÊI‰š[š[˜ÛY\Ê	ÑÙ][ˆRTÔÝ™X[HÙ^IÊK	ÛYÙ[™[™TKZÙ^HÝZY[˜ÙH\™H™\Ù[	ÊNØÚXÚÊÛØ™Kš[˜ÛY\Ê	Ù[ÙHYŠ\ËœÙ[XÝY
-]\Ë˜ÛX\”Ù[XÝ[ÛŠ
-IÊI‰™ÛØ™Kš[˜ÛY\Ê	Ý\Ë™\Ü]Ú›ÛÝÊ
-IÊK	Ù[\KYÛØ™HÛXÚÈÛX\œÈÛÛXÝÙ[XÝ[Ûˆ[™›ÛÝÈRIÊNØÛÛœÝ\^X]ØZ]™XYš[J™]ÈT“
-	Ë‹‹ÜÜ˜ËØ\šœÉË[\Ü›Y]K\›
-K	Ý]Ž	ÊNØÚXÚÊ\^š[˜ÛY\Ê	ÒÑVH‘TURT‘Q	ÊI‰˜\^š[˜ÛY\Ê™šYOOIÝ™\ÜÙ[ÉÉ‰ˆ]\ËœÙ][™ÜË˜Z\ÒÙ^HŠK	ÚÙ^KYØ]Y^Y\œÈY™\\ÙH™\]Z\™[Y[È™Y›Ü™HXÝ]˜][Û‰ÊNØÛÛœÝ™\ÜÙ[^X]ØZ]™XYš[J™]ÈT“
-	Ë‹‹ÜÜ˜ËÛ^Y\œËÕ™\ÜÙ[^Y\‹šœÉË[\Ü›Y]K\›
-K	Ý]Ž	ÊNØÚXÚÊ™\ÜÙ[^š[˜ÛY\Ê	Ý\Ë™[˜X›YY˜[ÙIÊI‰™\ÜÙ[^š[˜ÛY\Ê	ÐRTÔÝ™X[HÙ^H™\]Z\™Y	ÊK	Ý™\ÜÙ[^Y\ˆÝ^\È\ØX›YÚ[ˆ]ÈÙ^H\ÈZ\ÜÚ[™ÉÊNÂ˜ÛÛœÝ˜Z[Ï[™]È˜Z[ÝÜ™JÛX^Ú[ÎŒËX^YÙS\ÎŒLZ[“[Ý™RÛNŒJNÝ˜Z[Ëœ\Ú
-	ØIËÛ]ŒÛŽŒKJNÝ˜Z[Ëœ\Ú
-	ØIËÛ]ŒÛŽŒ_KŠNÝ˜Z[Ëœ\Ú
-	ØIËÛ]ŒÛŽŒŸKÊNÝ˜Z[Ëœ\Ú
-	ØIËÛ]ŒÛŽŒßK
-NØÚXÚÊ˜Z[Ë™Ù]
-	ØIË
-K›[™ÝOOLÉ‰˜Z[Ë™Ù]
-	ØIË
-VÌK›ÛOOLK	Õ˜Z[ÝÜ™H›Ý[™È[Ýš[™ËXÛÛXÝ\ÝÜžIÊNÂ˜ÛÛœÝ^Y\œÏVÞÚY‰ØZ\˜Ü˜Y	Ë[˜X›YYK[]Y\Î–ÞÜ›Ü\Y\ÎžÜÛžY]NžÝ\N‰ÐRTÔQ•	ËY‰Ø‰Ë˜[YN‰Ð‰Ë]]YNŒÛ™Ú]YNŒ___W_KÚY‰Ùš\™\ÉË[˜X›YYK[]Y\Î–ÞÜ›Ü\Y\ÎžÜÛžY]NžÝ\N‰Ñ’T‘IËY‰Ù‰Ë˜[YN‰Ñ‰Ë]]YNŒÛ™Ú]YN‹___W_WNØÛÛœÝ]ÏXÛÜœ™[]PÛÛXÝÊÝ\N‰ÐRTÔQ•	ËY‰ØIË]]YNŒÛ™Ú]YNŒK^Y\œËÜ˜Y]\ÒÛNŒŒ[Z]_JNØÚXÚÊ]Ë›[™ÝOOL‰‰š]ÖÌK›Y]K\OOOIÑ’T‘IÉ‰š]ÖÌK™\Ý[˜ÙRÛO]ÖÌWK™\Ý[˜ÙRÛK	Ôš[YPÛÜœ™[]H˜[šÜÈ™X\˜žHÜ›ÜÜËY™YYÛÛXÝÉÊNÂ˜ÚXÚÊX]˜XœÊÛ[[™RÛJÞÛ]ŒÛŽŒKÛ]ŒÛŽŒ_WJKLLLKŒŠOK	Ó™^˜]È\Ý[˜ÙHX]\ÈØ[™IÊNØÚXÚÊÛYÛÛ\™XRÛLŠÞÛ]ŒÛŽŒKÛ]ŒÛŽŒ_KÛ]ŒKÛŽŒ_KÛ]ŒKÛŽŒWJOŒLŒ	Ó™^˜]ÈÛYÛÛ‹X\™XHX]\ÈØ[™IÊNÂ˜ÛÛœÝØÙ[™OX]ØZ]™XYš[J™]ÈT“
-	Ë‹‹ÜÜ˜ËÙÛØ™KÔØÙ[™Q\™XÝÜ‹šœÉË[\Ü›Y]K\›
-K	Ý]Ž	ÊNØÚXÚÊØÙ[™Kš[˜ÛY\Ê	Ô‘PÓÓ”Õ•PÕQTÕSPUH8 %“ÕU‘HSSQU–IÊI‰œØÙ[™Kš[˜ÛY\Ê	Û][˜Ú™XÛÛœÝXÝ[Û‰ÊK	Û][˜Ú™XÛÛœÝXÝ[Ûˆ\È^XÚ]X›Ý]\Ý[X]K[Û›HÝ]\ÉÊNÂ˜ÛÛœÝØÝX]ØZ][ØÚÐØÝŠ
-NØÚXÚÊØÝ‹œÝ]\ÏOOLŒ	‰˜ØÝ‹˜›ÙKœÚ[Ë›[™ÝOOLÉ‰›™]ÈÙ]
-ØÝ‹˜›ÙKœÚ[Ë›X\
-OžœÛÝ\˜ÙJJKœÚ^™OOOLË	ÐÐÕˆ›Ü›X[^™\ˆY\™Ù\È™YHX›XË\ÛÝ\˜ÙHÚ\\ÉÊNÂ˜ÛÛœÛÛK›ÙÊ”PNˆ	Ü\ÜßH\ÜÙY	Ù˜Z[H˜Z[Y
-NÜ›ØÙ\ÜË™^]ÛÙOY˜Z[ÌNŒÂ˜\Þ[˜È[˜Ý[Ûˆ[ØÚÐØÝŠ
-^ØÛÛœÝÛYÛØ˜[\Ë™™]ÚÙÛØ˜[\Ë™™]ÚX\Þ[˜È[œ]OžØÛÛœÝOTÝš[™Ê[œ]
-NÚYŠKš[˜ÛY\Ê	Ø\K›™ÛÝ‹ZÉÊJ\™]\›ˆÚÊÞÚY‰ÝIËÛÛ[[Û“˜[YN‰ÓÛ™Û‰Ë]LKKÛŽ‹KŒKY][Û˜[›Ü\Y\Î–ÞÚÙ^N‰Ø]˜Z[X›IË˜[YN‰ÝYIßW_WJNÚYŠKš[˜ÛY\Ê	ØØ[˜[œËYÚ\ÉÊJ\™]\›ˆÚÊÙ™X]\™\Î–ÞÙÙ[ÛY]žNžØÛÛÜ™[˜]\Î–ËLLŒKÍ×_K›Ü\Y\ÎžÓÐ’‘PÕQËØØ][Û“˜[YN‰ÐÐHØ[IËÛ™Ú]YN‹LLŒK]]YNŒÍË[”Ù\šXÙN‰ÝYIß_W_JNÚYŠKš[˜ÛY\Ê	Ø]\Ý[^\ÉÊJ\™]\›ˆÚÊÙ™X]\™\Î–ÞÚY‰ØLIËÙ[ÛY]žNžØÛÛÜ™[˜]\Î–ËNMËËÌŒ—_K›Ü\Y\ÎžØØ[Y\˜WÚY‰ÐLIËØØ][Û—Û˜[YN‰Ð]\Ý[ˆØ[IËØ[Y\˜WÜÝ]\Î‰ÕT“‘QÓÓ‰ß_W_JNÝ›ÝÈ™]È\œ›ÜŠ	Ý[™^XÝY[ØÚÈT“	ÊÝJ_NÝž^ØÛÛœÝÙY˜][š[™\ŸOX]ØZ][\Ü
-	Ë‹‹Ø\KØØÝ‹šœÏÜXOIÊÑ]K››ÝÊ
-JNÛ]Ý]\ÏLŒ›ÙO[[ØÛÛœÝ™\Ï^ÜÝ]\ÊŠ^ÜÝ]\Ï[ŽÜ™]\›ˆ\ßKœÛÛŠÊ^Ø›ÙO[ÎÜ™]\›ˆß_NØ]ØZ][™\ŠÛY]Ù‰ÑÑU	Ë\›‰ËØ\KØØÝ‰ßK™\ÊNÜ™]\›ˆÜÝ]\Ë›Ù_NßYš[˜[^ÙÛØ˜[\Ë™™]Ú[Û_B™[˜Ý[ÛˆÚÊ]J^Ü™]\›ˆÛÚÎYKÝ]\ÎŒŒœÛÛŽ˜\Þ[˜Ê
-OO™]__B˜\Þ[˜È[˜Ý[ÛˆØ[Ê\Š^ØÛÛœÝÝ]V×NÙ›ÜŠÛÛœÝHÙˆ]ØZ]™XY\Š\‹ÝÚ]š[U\\ÎY_JJ^ÚYŠK›˜[YOOOIË™Ú]	ßK›˜[YOOOIÛ›ÙWÛ[Ù[\ÉÊXÛÛ[YNØÛÛœÝZ›Ú[Š\‹K›˜[YJNÚYŠKš\Ñ\™XÝÜžJ
-J[Ý]œ\Ú
-‹‹˜]ØZ]Ø[Ê
-JNÙ[ÙHÝ]œ\Ú
-
-Nß\™]\›ˆÝ]ßB
+import {readdir,readFile} from 'node:fs/promises';
+import {join,extname} from 'node:path';
+import {spawnSync} from 'node:child_process';
+import {TrailStore} from '../src/core/trails.js';
+import {correlateContacts} from '../src/core/contactCorrelation.js';
+import {polygonAreaKm2,polylineKm} from '../src/core/geo.js';
+
+const root=new URL('..',import.meta.url);
+const rootPath=decodeURIComponent(root.pathname);
+let pass=0,fail=0;
+const check=(ok,msg)=>{if(ok){console.log('PASS',msg);pass++;}else{console.error('FAIL',msg);fail++;}};
+
+const pkg=JSON.parse(await readFile(new URL('../package.json',import.meta.url),'utf8'));
+check(pkg.version==='2.2.1','version is 2.2.1');
+check(pkg.engines?.node==='>=22 <23','Node engine targets 22.x');
+check(Object.keys(pkg.dependencies||{}).length===0&&Object.keys(pkg.devDependencies||{}).length===0,'no npm dependencies');
+
+const files=await walk(rootPath);
+const textFiles=files.filter(f=>['.js','.mjs','.html','.css','.md','.txt','.json'].includes(extname(f)));
+let corpus='';
+for(const f of textFiles)corpus+='\n'+await readFile(f,'utf8');
+
+const retired=[
+  String.fromCharCode(103,111,100,115,32,101,121,101),
+  String.fromCharCode(103,101,118,45),
+  String.fromCharCode(98,105,108,97,119,97,108,32,115,105,100,104,117)
+];
+check(retired.every(x=>!corpus.toLowerCase().includes(x)),'no retired brand or author seams');
+
+const executable=await Promise.all(files.filter(f=>['.js','.mjs','.html'].includes(extname(f))).map(f=>readFile(f,'utf8')));
+check(!/navigator\.serviceWorker|serviceWorker\.register|new\s+ServiceWorker/i.test(executable.join('\n')),'no service worker registration code');
+
+const oldLicense=String.fromCharCode(77,73,84);
+check(!corpus.split(/\W+/).includes(oldLicense),'no retired app-level license notice in the clean tree');
+check(/All Rights Reserved/.test(corpus),'proprietary ownership notice present');
+check(/THIRD_PARTY_NOTICES/.test(corpus),'third-party notices documented');
+
+const js=files.filter(f=>['.js','.mjs'].includes(extname(f)));
+let syntax=true;
+for(const f of js){
+  const r=spawnSync(process.execPath,['--check',f],{encoding:'utf8'});
+  if(r.status!==0){syntax=false;console.error(r.stderr);break;}
+}
+check(syntax,`${js.length} JS/MJS files pass syntax checks`);
+
+const required=[
+  '/src/core/qr.js',
+  '/src/core/orbit.js',
+  '/api/briefing.js',
+  '/api/boundary.js',
+  '/api/cctv.js',
+  '/api/aircraft.js',
+  '/api/imagery.js',
+  '/src/layers/SubseaLayer.js',
+  '/src/globe/AnnotationController.js',
+  '/src/globe/SceneDirector.js',
+  '/src/ui/sblUi.js',
+  '/src/ui/sblWatch.js',
+  '/src/ui/trustEnhancements.js',
+  '/src/ui/discoveryEnhancements.js'
+];
+for(const p of required)check(files.some(f=>f.endsWith(p)),`required module present: ${p}`);
+
+const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
+check(['routeBtn','areaBtn','measureBtn','finishAnnoBtn','orbitSceneBtn','worldSceneBtn','routeSceneBtn','cockpitOverlay','scopeCloseBtn','homeBtn'].every(id=>html.includes(`id="${id}"`)),'NexDraw, SceneDirector, cockpit, close, and Home controls are present');
+check(html.includes('/native-install.js'),'native Android install launcher is page-loaded');
+check(!html.includes('/src/demo-help.js'),'legacy Demo/Help script is not page-loaded after SBL-04');
+
+const trails=new TrailStore({maxPoints:3,maxAgeMs:100000,minMoveKm:0});
+trails.push('a',{lat:0,lon:0},1);
+trails.push('a',{lat:0,lon:1},2);
+trails.push('a',{lat:0,lon:2},3);
+trails.push('a',{lat:0,lon:3},4);
+check(trails.get('a',4).length===3&&trails.get('a',4)[0].lon===1,'TrailStore bounds moving-contact history');
+
+const layers=[
+  {id:'aircraft',enabled:true,entities:[{properties:{snxMeta:{type:'AIRCRAFT',id:'b',name:'B',latitude:0,longitude:1}}}]},
+  {id:'fires',enabled:true,entities:[{properties:{snxMeta:{type:'FIRE',id:'f',name:'F',latitude:0,longitude:.5}}}]}
+];
+const hits=correlateContacts({type:'AIRCRAFT',id:'a',latitude:0,longitude:0},layers,{radiusKm:200,limit:5});
+check(hits.length===2&&hits[0].meta.type==='FIRE'&&hits[0].distanceKm<hits[1].distanceKm,'PrimeCorrelate ranks nearby cross-feed contacts');
+
+check(Math.abs(polylineKm([{lat:0,lon:0},{lat:0,lon:1}])-111.2)<1,'NexDraw distance math is sane');
+check(polygonAreaKm2([{lat:0,lon:0},{lat:0,lon:1},{lat:1,lon:1},{lat:1,lon:0}])>12000,'NexDraw polygon-area math is sane');
+
+const scene=await readFile(new URL('../src/globe/SceneDirector.js',import.meta.url),'utf8');
+check(scene.includes('RECONSTRUCTED ESTIMATE â€” NOT LIVE TELEMETRY')&&scene.includes('launchReconstruction'),'launch reconstruction is explicit about estimate-only status');
+
+const cctv=await mockCctv();
+check(cctv.status===200&&cctv.body.points.length===6,'CCTV normalizer accepts six mocked public camera providers');
+check(new Set(cctv.body.points.map(x=>x.source)).size===6,'CCTV mock preserves six distinct source attributions');
+check(cctv.body.points.some(x=>x.source==='OKTraffic / ODOT-OTA'),'Oklahoma camera provider is present in normalized CCTV output');
+
+console.log(`\nQA: ${pass} passed, ${fail} failed`);
+process.exitCode=fail?1:0;
+
+async function mockCctv(){
+  const old=globalThis.fetch;
+  globalThis.fetch=async input=>{
+    const u=String(input);
+    if(u.includes('oktraffic.org/api/CameraPoles'))return ok([{id:'p1',name:'OKC Pole',mapCameras:[{id:'ok1',location:'I-35 at SE 44th',latitude:35.4201,longitude:-97.489,status:'In Service',direction:'North',streamDictionary:{streamName:'OKC Cam',streamSrc:'https://example.invalid/ok.m3u8'}}]}]);
+    if(u.includes('api.tfl.gov.uk'))return ok([{id:'t1',commonName:'London',lat:51.5,lon:-.1,additionalProperties:[{key:'available',value:'true'}]}]);
+    if(u.includes('caltrans-gis'))return ok({features:[{geometry:{coordinates:[-121,37]},properties:{OBJECTID:7,locationName:'CA Cam',longitude:-121,latitude:37,inService:'true'}}]});
+    if(u.includes('austintexas'))return ok({features:[{id:'a1',geometry:{coordinates:[-97.7,30.2]},properties:{camera_id:'A1',location_name:'Austin Cam',camera_status:'TURNED_ON'}}]});
+    if(u.includes('services.arcgis.com'))return ok({features:[{geometry:{coordinates:[-122.33,47.61]},properties:{OBJECTID:8,NAME:'Seattle Cam',URL:'https://example.invalid/sea',SERVSTAT:'In Service'}}]});
+    if(u.includes('mdgeodata.md.gov'))return ok({features:[{geometry:{coordinates:[-76.61,39.29]},properties:{OBJECTID:9,location:'Baltimore Cam',county:'Baltimore',url:'https://example.invalid/md',lat:39.29,long:-76.61}}]});
+    throw new Error('unexpected mock URL '+u);
+  };
+  try{
+    const {default:handler}=await import('../api/cctv.js?qa='+Date.now());
+    let status=200,body=null;
+    const res={status(n){status=n;return this},json(o){body=o;return o}};
+    await handler({method:'GET',url:'/api/cctv'},res);
+    return {status,body};
+  }finally{globalThis.fetch=old;}
+}
+function ok(data){return {ok:true,status:200,json:async()=>data};}
+
+async function walk(dir){
+  const out=[];
+  for(const e of await readdir(dir,{withFileTypes:true})){
+    if(e.name==='.git'||e.name==='node_modules'||e.name==='dist')continue;
+    const p=join(dir,e.name);
+    if(e.isDirectory())out.push(...await walk(p));else out.push(p);
+  }
+  return out;
+}

@@ -447,29 +447,71 @@ Status: atomic batch OPEN — everyday usability/data coverage is currently prio
 
 **SBL-04 deployment state:** STAGING ONLY. This is the planned usability/polish checkpoint before branch reconciliation.
 
-### SBL-05 — Reconciliation candidate (81–85)
+### SBL-05 — Preserve main-only production capabilities (81–86)
 
-81. **Preserve newer aircraft backend — RECONCILED**
-   - Keep `main` ADSB.lol bounded point queries, ODbL provenance, request timeouts, cache, reduced-radius retry, and explicit opt-in OpenSky fallback.
-   - Layer the SBL mobile caps, proximity prioritization, clustering, bounded trails, stale cleanup, recovery, and source labeling on top.
+81. **Resilient aircraft provider reconciliation — IMPLEMENTED IN SBL-05 STAGING**
+   - Preserve main's viewport-scoped ADSB.lol primary aircraft source.
+   - Preserve bounded provider timeout, 120 NM reduced-radius retry, and optional OpenSky fallback.
+   - Retain SBL mobile caps, nearest-view prioritization, bounded trails, zoom-aware clustering, low-power behavior, provenance, and stale-data fading.
 
-82. **Preserve native install + branding — RECONCILED**
-   - Keep the approved eye mark, brand CSS, manifest icon, branded splash, and native Android install launcher from newer `main`.
-   - Use SBL-04 for in-app guided learning instead of loading the older Demo/Help script in the page.
+82. **Native Android installer preservation — IMPLEMENTED IN SBL-05 STAGING**
+   - Preserve main's real APK installer and deterministic build copy.
+   - Surface the installer inside More in the Simple experience instead of relying on a permanent floating control.
+   - Keep a fallback install button if the normal app UI fails to mount.
 
-83. **Preserve detailed Earth + usability SBL — RECONCILED**
-   - Keep high-resolution Esri World Imagery, Natural Earth fallback, Oklahoma CCTV, imperial units, English-first metadata, Simple Mode, rich profiles, Search, What’s Here, Prime Brief, Watch Center, and discovery/help systems.
+83. **Legacy Demo/Help supersession — LOCKED FOR RECONCILIATION**
+   - Do not load src/demo-help.js in the reconciled application.
+   - SBL-04 Quick Start / Show Me ShadowNex / Help & Guide is the authoritative onboarding system.
+   - Avoid two simultaneous onboarding/help frameworks.
 
-84. **Align QA with reconciled architecture — RECONCILED**
-   - Update the older globe-hotfix assertions so they validate the detailed Earth/fallback architecture and SBL retry loop instead of requiring the temporary OpenStreetMap hotfix.
-   - Preserve ADSB.lol backend normalization tests and native-install/build assertions.
+84. **Main-only capability inventory — IMPLEMENTED**
+   - Record must-preserve, superseded, and production-history-only main changes in RECONCILIATION_INVENTORY.md.
+   - Re-read current main before reconciliation because this inventory is SHA-specific.
 
-85. **No-main/no-production boundary — ACTIVE**
-   - Reconciliation work occurs only on `reconcile-sbl-v2.2.1`.
-   - `main` remains untouched until the reconciled candidate passes the complete QA/build gate and receives explicit approval.
-   - Production deployment remains a separate explicit approval after any future merge.
+85. **Aircraft/native preservation QA — IMPLEMENTED**
+   - Add a QA gate proving ADSB.lol normalization/fallback wiring, viewport query parameters, SBL caps/clustering, native installer inclusion, and absence of legacy demo-help loading.
 
-**SBL-05 state:** RECONCILIATION BRANCH ONLY. No merge to `main`; no production deployment.
+86. **Reconciliation remains non-production — LOCKED**
+   - SBL-05 does not merge to main and does not deploy.
+   - A dedicated reconciled candidate must be built/tested before any PR/merge is considered.
+
+**SBL-05 deployment state:** STAGING ONLY. This pass reduces the true reconciliation gap without overwriting main.
+
+### SBL-06 — Main convergence audit (87–93)
+
+87. **Aircraft environment contract — IMPLEMENTED IN SBL-06 STAGING**
+   - Document ADSB.lol as the default no-key public aircraft source.
+   - Document OpenSky as an explicit opt-in bounded fallback controlled by `OPENSKY_FALLBACK_ENABLED=false`.
+   - Do not imply anonymous OpenSky is the primary aircraft path.
+
+88. **Install manifest / app icon preservation — IMPLEMENTED IN SBL-06 STAGING**
+   - Preserve the approved ShadowNex mark in the web-app manifest for standalone/native-adjacent install surfaces.
+   - Manifest metadata does not add a service worker and does not change the no-service-worker rule.
+
+89. **Low-burden Atomic QA workflow — IMPLEMENTED IN SBL-06 STAGING**
+   - Preserve a GitHub Actions QA workflow for `main` plus manual dispatch.
+   - Run Node 22, the complete `npm test` chain, and deterministic `npm run build`.
+   - Use concurrency cancellation and a short timeout to avoid wasting CI minutes.
+   - The workflow performs QA only; it does not deploy.
+
+90. **Dynamic ADSB normalization gate — IMPLEMENTED IN SBL-06 STAGING**
+   - Mock ADSB.lol at the API boundary and prove identity, source/license metadata, altitude conversion, groundspeed conversion, and vertical-rate conversion.
+   - Prove the endpoint uses the bounded point API around the requested view.
+
+91. **Explicit third-party aircraft license boundary — IMPLEMENTED IN SBL-06 STAGING**
+   - Retain ADSB.lol ODbL 1.0 notice.
+   - Keep OpenSky fallback disabled by default and subject to its current terms.
+
+92. **Superseded-main lock — IMPLEMENTED IN SBL-06 STAGING**
+   - Do not reintroduce legacy `src/demo-help.js`, the old OSM-only globe hotfix, or legacy setInterval feed behavior.
+   - Their valid intent is already covered by stronger SBL implementations and QA.
+
+93. **Main-only functional audit complete — IMPLEMENTED**
+   - As of main `9423586a4e62636ed45a5bc8bdc2249b7367f24f`, every user-facing/release-critical main-only capability is preserved, superseded deliberately, or classified as production history.
+   - Re-read main again before creating any reconciled candidate.
+   - This does **not** authorize a merge or production deployment.
+
+**SBL-06 deployment state:** STAGING ONLY. Functional convergence is audited; reconciliation/merge remains a separate step.
 
 ### Product rule
 **Simple by default. Powerful by choice. The user asks a simple question; ShadowNex handles the complicated part.**

@@ -76,3 +76,25 @@ The branches are materially diverged. **NO BLIND MERGE, FORCE MERGE, OR WHOLE-TR
 ## Rollback boundary
 
 The final pre-reconciliation SBL staging SHA is the rollback point for the accumulated SBL-01 through SBL-04 work. Record that SHA in the conversation/release notes once SBL-04 advances the staging branch.
+
+
+## SBL-06 convergence update
+
+- SBL staging convergence head: `92474e1c7a540120363b530b0be84261787ba496`
+- Main audited again: `9423586a4e62636ed45a5bc8bdc2249b7367f24f`
+- Reconciliation inventory now classifies every remaining main-only file as preserved, superseded deliberately, or production/history-only.
+- Environment documentation now reflects ADSB.lol as the primary no-key aircraft source and OpenSky as an explicit opt-in fallback.
+- The approved ShadowNex manifest icon remains present without introducing a service worker.
+- SBL-05 preservation QA and SBL-06 convergence QA are added to the normal `npm test` chain.
+- The previously green reconciled `qa-globe-hotfix.mjs` remains as an additional reconciliation-specific workflow assertion.
+- GitHub Atomic QA remains non-deploying and normal `main`/manual only.
+
+This convergence update does not invalidate the earlier green gate; it adds release-contract checks on top. A fresh QA/build run is still required before any future merge approval.
+
+### Superseded-main lock
+Do not reintroduce:
+- legacy page-loaded `src/demo-help.js`,
+- the temporary OpenStreetMap-only globe hotfix,
+- legacy simple `setInterval` feed retry behavior.
+
+Their valid intent is covered by stronger reconciled SBL implementations.

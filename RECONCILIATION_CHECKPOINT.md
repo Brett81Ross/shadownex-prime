@@ -47,3 +47,17 @@ The branches are materially diverged. **NO BLIND MERGE, FORCE MERGE, OR WHOLE-TR
 ## Rollback boundary
 
 The final pre-reconciliation SBL staging SHA is the rollback point for the accumulated SBL-01 through SBL-04 work. Record that SHA in the conversation/release notes once SBL-04 advances the staging branch.
+
+
+## SBL-06 convergence update
+
+The main-only functional audit was completed against `9423586a4e62636ed45a5bc8bdc2249b7367f24f`.
+
+Before a reconciled candidate is created, confirm again that main has not moved. The reconciled candidate must preserve:
+- ADSB.lol primary aircraft source and opt-in OpenSky fallback.
+- Native Android installation path and manifest icon.
+- Detailed Esri World Imagery + Natural Earth fallback.
+- SBL-01 through SBL-06 behavior and QA.
+- `git.deploymentEnabled=false`.
+
+The old standalone Demo/Help, basic OSM globe hotfix, and legacy globe-hotfix QA file are explicitly superseded and must not be reintroduced.

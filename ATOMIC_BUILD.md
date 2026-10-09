@@ -470,5 +470,41 @@ Status: atomic batch OPEN — everyday usability/data coverage is currently prio
 
 **SBL-05 deployment state:** STAGING ONLY. This pass reduces the true reconciliation gap without overwriting main.
 
+### SBL-06 — Main convergence audit (87–93)
+
+87. **Aircraft environment contract — IMPLEMENTED IN SBL-06 STAGING**
+   - Document ADSB.lol as the default no-key public aircraft source.
+   - Document OpenSky as an explicit opt-in bounded fallback controlled by `OPENSKY_FALLBACK_ENABLED=false`.
+   - Do not imply anonymous OpenSky is the primary aircraft path.
+
+88. **Install manifest / app icon preservation — IMPLEMENTED IN SBL-06 STAGING**
+   - Preserve the approved ShadowNex mark in the web-app manifest for standalone/native-adjacent install surfaces.
+   - Manifest metadata does not add a service worker and does not change the no-service-worker rule.
+
+89. **Low-burden Atomic QA workflow — IMPLEMENTED IN SBL-06 STAGING**
+   - Preserve a GitHub Actions QA workflow for `main` plus manual dispatch.
+   - Run Node 22, the complete `npm test` chain, and deterministic `npm run build`.
+   - Use concurrency cancellation and a short timeout to avoid wasting CI minutes.
+   - The workflow performs QA only; it does not deploy.
+
+90. **Dynamic ADSB normalization gate — IMPLEMENTED IN SBL-06 STAGING**
+   - Mock ADSB.lol at the API boundary and prove identity, source/license metadata, altitude conversion, groundspeed conversion, and vertical-rate conversion.
+   - Prove the endpoint uses the bounded point API around the requested view.
+
+91. **Explicit third-party aircraft license boundary — IMPLEMENTED IN SBL-06 STAGING**
+   - Retain ADSB.lol ODbL 1.0 notice.
+   - Keep OpenSky fallback disabled by default and subject to its current terms.
+
+92. **Superseded-main lock — IMPLEMENTED IN SBL-06 STAGING**
+   - Do not reintroduce legacy `src/demo-help.js`, the old OSM-only globe hotfix, or legacy setInterval feed behavior.
+   - Their valid intent is already covered by stronger SBL implementations and QA.
+
+93. **Main-only functional audit complete — IMPLEMENTED**
+   - As of main `9423586a4e62636ed45a5bc8bdc2249b7367f24f`, every user-facing/release-critical main-only capability is preserved, superseded deliberately, or classified as production history.
+   - Re-read main again before creating any reconciled candidate.
+   - This does **not** authorize a merge or production deployment.
+
+**SBL-06 deployment state:** STAGING ONLY. Functional convergence is audited; reconciliation/merge remains a separate step.
+
 ### Product rule
 **Simple by default. Powerful by choice. The user asks a simple question; ShadowNex handles the complicated part.**

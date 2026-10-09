@@ -1,4 +1,4 @@
-# ShadowNex Prime™ — SBL-05 Reconciliation Inventory
+# ShadowNex Prime™ — SBL-06 Reconciliation Inventory
 
 Observed before SBL-05:
 - main: 9423586a4e62636ed45a5bc8bdc2249b7367f24f
@@ -35,3 +35,28 @@ Production deployment and relock commits document release history. They do not r
 
 ## Reconciliation rule
 Re-read current main immediately before a reconciliation candidate is built. Preserve newer work deliberately. Never overwrite main with the SBL tree wholesale.
+
+## SBL-06 complete main-only audit
+
+Current main audited: `9423586a4e62636ed45a5bc8bdc2249b7367f24f`.
+
+### Preserved from main
+- ADSB.lol viewport-scoped aircraft backend, bounded provider timeouts, reduced-radius retry, optional OpenSky fallback, and ODbL provenance.
+- Native Android installer script plus deterministic static-build copy.
+- Cyan ShadowNex brand mark and native/PWA manifest icon metadata.
+- Environment documentation for ADSB.lol default behavior and explicit `OPENSKY_FALLBACK_ENABLED=false`.
+- A non-deploying GitHub Atomic QA workflow that runs the repository QA chain and deterministic build.
+
+### Preserved by stronger SBL implementation
+- Main's simple setInterval feed retry is superseded by SBL bounded retry/backoff, non-overlapping refresh, background-aware polling, and recovery watchdog.
+- Main's OpenStreetMap/basic globe hotfix is superseded by Esri World Imagery + Natural Earth II fallback + imagery metadata + close zoom.
+- Main's standalone `src/demo-help.js` is superseded by SBL-04 Quick Start v2, Show Me ShadowNex, Help & Guide, contextual discovery, and Advanced introduction.
+- Main's `qa-globe-hotfix.mjs` assertions are superseded by the SBL QA chain plus SBL-06 dynamic aircraft normalization/provider tests.
+
+### Audit conclusion
+As of the main SHA above, every user-facing or release-critical main-only capability is either:
+1. preserved in the SBL staging line,
+2. preserved by a stronger SBL implementation, or
+3. intentionally excluded as production/history-only behavior.
+
+There is no known main-only application feature left to copy blindly into staging.

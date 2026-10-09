@@ -61,3 +61,21 @@ Before a reconciled candidate is created, confirm again that main has not moved.
 - `git.deploymentEnabled=false`.
 
 The old standalone Demo/Help, basic OSM globe hotfix, and legacy globe-hotfix QA file are explicitly superseded and must not be reintroduced.
+
+
+## SBL-07 reconciled candidate
+
+Reconciliation candidate branch: `reconcile-v2.2.1-sbl-07`
+
+The first real Node 22 CI attempt exposed corruption in the legacy core QA file before application tests could run. That QA file was repaired on staging and the reconciliation candidate was rebuilt without changing production.
+
+A temporary QA-only branch then executed the complete test chain and deterministic build on GitHub Actions. Final QA-harness run:
+- workflow run: `37882190789`
+- Node: 22
+- `npm test`: PASS
+- `npm run build`: PASS
+- deployment step: none
+
+The temporary QA branch differs from the candidate only in QA-harness trigger/assertion lines needed to execute the workflow on a non-main branch. Application/runtime content is the reconciliation candidate content.
+
+This checkpoint still does **not** authorize merge or production deployment.

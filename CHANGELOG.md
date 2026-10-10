@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.2 — Android startup reliability hotfix (isolated candidate)
+- Do not block launch behind USGS and aircraft network initialization.
+- Bound USGS earthquake requests to 10 seconds; degraded feeds retry through existing scheduler.
+- Surface synchronous boot errors through the existing recovery panel.
+- Provide a visible reload action after 18 seconds even when a JavaScript module never loads.
+- No service worker and no changes to native APK or the live source providers.
+
 ## 2.2.1 — Stability + clarity hotfix
 - Hard-capped aircraft entities and reduced mobile aircraft/trail load.
 - Prioritized aircraft nearest the current view instead of allowing global entity accumulation.

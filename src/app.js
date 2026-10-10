@@ -18,7 +18,7 @@ import { escapeHtml, fmtAlt, fmtNum } from './core/geo.js';
 import { correlateContacts } from './core/contactCorrelation.js';
 
 export class ShadowNexPrime {
- constructor(){this.version='2.2.1';this.settings=loadSettings();this.compact=matchMedia('(max-width: 900px)').matches||navigator.maxTouchPoints>0;this.registry=new SourceRegistry();this.layers=new Map();this.command=new CommandEngine(this);this.audio=new Audio();this.audio.crossOrigin='anonymous';this.onboardKey='shadownex.prime.onboarding.v1';}
+ constructor(){this.version='2.2.2';this.settings=loadSettings();this.compact=matchMedia('(max-width: 900px)').matches||navigator.maxTouchPoints>0;this.registry=new SourceRegistry();this.layers=new Map();this.command=new CommandEngine(this);this.audio=new Audio();this.audio.crossOrigin='anonymous';this.onboardKey='shadownex.prime.onboarding.v1';}
  async init(){
    this.applyMotion(); this.globe=new GlobeController('globe',this.settings); await this.globe.init();
    [new AircraftLayer(this),new EarthquakeLayer(this),new FireLayer(this),new SatelliteLayer(this),new LaunchLayer(this),new ContextLayer(this),new RadioLayer(this),new CctvLayer(this),new BikeLayer(this),new VesselLayer(this),new SubseaLayer(this)].forEach(l=>this.layers.set(l.id,l));
@@ -30,7 +30,7 @@ export class ShadowNexPrime {
    this.globe.addEventListener('follow',e=>this.updateFollowUi(e.detail));
    this.globe.addEventListener('stability',e=>this.handleStability(e.detail));
    this.clockTimer=setInterval(()=>this.tickClock(),1000);this.cockpitTimer=setInterval(()=>this.updateCockpitHud(),500);this.tickClock();
-   await this.setLayer('earthquakes',true); await this.setLayer('aircraft',true);
+   void Promise.allSettled([this.setLayer('earthquakes',true), this.setLayer('aircraft',true)]);
    this.showWelcome(false);
    window.__shadowNexPrime=this; return this;
  }

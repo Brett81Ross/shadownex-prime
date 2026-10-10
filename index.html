@@ -24,7 +24,7 @@
       <img class="splash-mark" src="/brand/shadownex-mark.webp" alt="ShadowNex Prime eye emblem" />
       <div class="splash-title">ShadowNex <span>Prime™</span></div>
       <div class="splash-tag">Global Situational Intelligence</div>
-      <div class="splash-status">INITIALIZING LIVE EARTH · v2.2.1</div>
+      <div class="splash-status">INITIALIZING LIVE EARTH · v2.2.2</div>
     </div>
     <div class="splash-studio">ShadowNex Prime™ · Cactus🌵Byte Studios™ · All Rights Reserved</div>
   </div>
@@ -93,7 +93,7 @@
     <div id="toast" class="toast hidden"></div>
     <div id="stabilityBanner" class="stability-banner hidden"><span>Map renderer paused.</span><button id="reloadAppBtn" class="hud-btn">RELOAD</button></div>
 
-    <footer class="footer glass"><span>ShadowNex Prime™ · v2.2.1</span><span>Cactus🌵Byte Studios™ · All Rights Reserved</span></footer>
+    <footer class="footer glass"><span>ShadowNex Prime™ · v2.2.2</span><span>Cactus🌵Byte Studios™ · All Rights Reserved</span></footer>
 
     <dialog id="welcomeDialog" class="modal glass quick-guide"><div class="modal-card"><div class="modal-head"><div><b>ShadowNex Quick Start</b><small>THE BASICS — NOTHING ELSE REQUIRED</small></div></div><div class="guide-steps"><div><b>1</b><span><strong>Move the globe</strong><small>Drag to rotate Earth. Pinch or scroll to zoom. HOME always brings you back.</small></span></div><div><b>2</b><span><strong>Choose what you want to see</strong><small>Open Layers and turn live data on or off. Aircraft and earthquakes start automatically.</small></span></div><div><b>3</b><span><strong>Tap a contact</strong><small>Tap any marker for a plain-English summary. Open More Details only when you want technical data.</small></span></div></div><p class="guide-note">That is enough to use ShadowNex. Advanced tools stay out of the way until you open them.</p><button id="welcomeStartBtn" class="hud-btn wide">START LIVE MAP</button></div></dialog>
 
@@ -104,6 +104,23 @@
     <dialog id="commandDialog" class="modal glass"><form method="dialog" class="modal-card command-card"><div class="modal-head"><div><b>AI Command</b><small>NexCommand™ · TYPE WHAT YOU WANT THE MAP TO DO</small></div><button value="cancel" class="icon-btn">✕</button></div><div id="commandLog" class="command-log"><p>Try: “show aircraft”, “go to Tokyo”, “thermal mode”, “brief me”.</p></div><div class="command-input-row"><input id="commandInput" placeholder="Enter command…" autocomplete="off" /><button id="micBtn" type="button" class="icon-btn" aria-label="Voice command">◉</button><button id="runCommandBtn" type="button" class="hud-btn">RUN</button></div></form></dialog>
   </div>
   <script src="/native-install.js" defer></script>
+  <script>
+    // Static bootstrap watchdog: also runs when an ES module fails to load.
+    window.setTimeout(() => {
+      const splash = document.getElementById('brandSplash');
+      if (!splash || !splash.isConnected || splash.classList.contains('out')) return;
+      const status = splash.querySelector('.splash-status');
+      if (status) status.textContent = 'STARTUP DELAYED · RELOAD AVAILABLE';
+      if (document.getElementById('startupRetry')) return;
+      const retry = document.createElement('button');
+      retry.id = 'startupRetry';
+      retry.type = 'button';
+      retry.textContent = 'RELOAD APP';
+      retry.style.cssText = 'display:block;margin:22px auto 0;padding:12px 22px;background:#00dbe9;color:#00161a;border:0;border-radius:9px;font:bold 14px system-ui;cursor:pointer';
+      retry.addEventListener('click', () => window.location.reload());
+      splash.querySelector('.splash-lockup')?.appendChild(retry);
+    }, 18000);
+  </script>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

@@ -11,7 +11,7 @@ let pass=0,fail=0;
 const check=(ok,msg)=>{if(ok){console.log('✓',msg);pass++;}else{console.error('✗',msg);fail++;}};
 
 const pkg=JSON.parse(await readFile(new URL('../package.json',import.meta.url),'utf8'));
-check(pkg.version==='2.2.1','version is 2.2.1');
+check(pkg.version==='2.2.2','version is 2.2.2');
 check(pkg.engines?.node==='>=22 <23','Node engine targets 22.x');
 check(Object.keys(pkg.dependencies||{}).length===0&&Object.keys(pkg.devDependencies||{}).length===0,'no npm dependencies');
 
@@ -54,6 +54,14 @@ check(files.some(f=>f.endsWith('/src/globe/SceneDirector.js')),'independent Scen
 
 const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
 check(['routeBtn','areaBtn','measureBtn','finishAnnoBtn','orbitSceneBtn','worldSceneBtn','routeSceneBtn','cockpitOverlay'].every(id=>html.includes(`id="${id}"`)),'NexDraw, SceneDirector, and cockpit controls are present');
+
+const startupApp=await readFile(new URL('../src/app.js',import.meta.url),'utf8');
+const startupMain=await readFile(new URL('../src/main.js',import.meta.url),'utf8');
+const quakeLayer=await readFile(new URL('../src/layers/EarthquakeLayer.js',import.meta.url),'utf8');
+check(startupApp.includes("Promise.allSettled([this.setLayer('earthquakes',true), this.setLayer('aircraft',true)])"),'boot does not block on public feed network');
+check(quakeLayer.includes('AbortSignal.timeout(10000)'),'earthquake feed has bounded request timeout');
+check(startupMain.includes('catch(e){fatal(e);}}else if'),'synchronous initialization failures reach visible error overlay');
+check(html.includes("retry.id = 'startupRetry'"),'static startup watchdog offers reload even when module loading fails');
 
 const trails=new TrailStore({maxPoints:3,maxAgeMs:100000,minMoveKm:0});
 trails.push('a',{lat:0,lon:0},1);

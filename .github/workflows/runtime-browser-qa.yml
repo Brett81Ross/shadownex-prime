@@ -1,0 +1,19 @@
+name: ShadowNex Read-Only Runtime Browser QA
+on:
+  push:
+    branches: [qa/shadownex-runtime-boot-20261010]
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Browser-test dependencies on runner only
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core
+      - name: Check actual production browser boot
+        run: node scripts/qa-live-browser.mjs

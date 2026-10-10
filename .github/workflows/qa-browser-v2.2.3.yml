@@ -1,0 +1,29 @@
+name: ShadowNex v2.2.3 Real Browser QA
+on:
+  push:
+    branches: [qa/shadownex-v2.2.3-browser-gate]
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Full release QA (including ES module graph linking)
+        run: npm test
+      - name: Verify production build
+        run: npm run build
+      - name: Install runner-only browser test dependency
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core
+      - name: Launch local app without deploying
+        run: |
+          node scripts/dev.mjs > /tmp/shadownex-local-server.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/shadownex-local-server.log
+          exit 1
+      - name: Real browser desktop + Android-style startup checks
+        run: node scripts/qa-live-browser.mjs

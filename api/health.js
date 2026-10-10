@@ -1,1 +1,1 @@
-export default function handler(req,res){res.status(200).json({app:'ShadowNex Prime',version:'2.2.0',status:'ok',node:process.version,openaiConfigured:!!process.env.OPENAI_API_KEY,firmsConfigured:!!process.env.FIRMS_MAP_KEY});}
+export default function handler(req,res){res.status(200).json({app:'ShadowNex Prime',version:'2.2.1',status:'ok',node:process.version,openaiConfigured:!!process.env.OPENAI_API_KEY,firmsConfigured:!!process.env.FIRMS_MAP_KEY});}

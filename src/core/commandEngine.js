@@ -8,6 +8,7 @@ const PLACES={
 export class CommandEngine{
  constructor(app){this.app=app;}
  async run(raw){const t=raw.trim().toLowerCase();if(!t)return 'No command received.';
+   if(/^(home|home view|reset view|reset map|world view)$/.test(t)){this.app.resetView();return 'Returned to the full-Earth home view.';}
    if(/\bbrief( me|ing)?\b|situational report|sitrep/.test(t))return await this.app.requestBriefing(raw);
    const boundary=t.match(/^(?:outline|draw boundary(?: of)?|show boundary(?: of)?)\s+(.{2,120})$/);if(boundary)return await this.app.outlineBoundary(boundary[1]);
    for(const [name,pos] of Object.entries(PLACES)){if(t.includes(name)){this.app.globe.flyTo(...pos);return `NexVision repositioning to ${name.toUpperCase()}.`;}}

@@ -1,6 +1,13 @@
 export const DEG=Math.PI/180, RAD=180/Math.PI;
 export function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
 export function fmtNum(v,d=1){return Number.isFinite(v)?Number(v).toFixed(d):'—';}
+// Kilometer inputs are converted to U.S. miles for visible user-facing distances.
+export function fmtDistanceKm(km){
+  const n=Number(km);
+  if(km==null||!Number.isFinite(n)||n<0)return '—';
+  const miles=n*0.621371192237334;
+  return (miles<10?miles.toFixed(1):Math.round(miles).toLocaleString('en-US'))+' mi';
+}
 export function fmtAlt(m){ if(!Number.isFinite(m)) return '—'; return m>10000?`${(m/1000).toFixed(1)} km`:`${Math.round(m)} m`; }
 export function haversineKm(a,b){
   const R=6371; const p1=a.lat*DEG,p2=b.lat*DEG,dp=(b.lat-a.lat)*DEG,dl=(b.lon-a.lon)*DEG;

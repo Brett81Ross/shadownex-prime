@@ -2,7 +2,7 @@ name: ShadowNex Atomic QA
 
 on:
   push:
-    branches: [main]
+    branches: [main, fix/shadownex-startup-stall-v2.2.2]
   workflow_dispatch:
 
 permissions:

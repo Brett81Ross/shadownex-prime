@@ -7,7 +7,7 @@ const sizes=[{width:360,height:740},{width:412,height:915},{width:720,height:780
 let fail=0;
 try{
 for(const v of sizes){
- const ctx=await browser.newContext({viewport:v,hasTouch:true,isMobile:true});
+ const ctx=await browser.newContext({viewport:v,hasTouch:true,isMobile:true,userAgent:'Mozilla/5.0 (Linux; Android 16; SM-F936U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36'});
  const page=await ctx.newPage();
  const errors=[];
  page.on('pageerror',err=>errors.push(err.message));
@@ -28,10 +28,10 @@ for(const v of sizes){
    app.openSituationBrief();
    const briefing=geometry(['situationDialog','situationCloseBtn','situationOverview','situationCards']);
    app.$('situationDialog').close();
-   return {vw:innerWidth,vh:innerHeight,visualWidth:visualViewport?.width??innerWidth,location,briefing};
+   return {vw:innerWidth,vh:innerHeight,visualWidth:visualViewport?.width??innerWidth,visualOffsetLeft:visualViewport?.offsetLeft??0,visualOffsetTop:visualViewport?.offsetTop??0,visualHeight:visualViewport?.height??innerHeight,visualScale:visualViewport?.scale??1,location,briefing};
   });
-  const visible=(r,w,h)=>r.every(x=>!x.missing&&x.left>=-1&&x.right<=w+1&&x.top>=-1&&x.top<h&&x.width>0&&x.scrollWidth<=x.clientWidth+2);
-  const ok=visible(result.location,result.vw,result.vh)&&visible(result.briefing,result.vw,result.vh)&&errors.length===0;
+  const visible=(r,left,width,top,height)=>r.every(x=>!x.missing&&x.left>=left-1&&x.right<=left+width+1&&x.top>=top-1&&x.top<top+height&&x.width>0&&x.scrollWidth<=x.clientWidth+2);
+  const ok=visible(result.location,result.visualOffsetLeft,result.visualWidth,result.visualOffsetTop,result.visualHeight)&&visible(result.briefing,result.visualOffsetLeft,result.visualWidth,result.visualOffsetTop,result.visualHeight)&&errors.length===0;
   console.log('FOLD_LAYOUT',v.width+'x'+v.height,JSON.stringify({ok,...result,errors}));
   if(!ok)fail++;
  }catch(e){console.error('FOLD_FAILURE',v.width+'x'+v.height,e.stack||String(e));fail++}

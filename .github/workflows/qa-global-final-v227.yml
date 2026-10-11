@@ -1,0 +1,41 @@
+name: ShadowNex ABL 8 Global Camera Final QA
+on:
+  push:
+    branches: [qa/shadownex-v227-global-final]
+permissions: {contents: read}
+jobs:
+  global:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: {node-version: '22'}
+      - name: Entire regression suite, including worldwide cameras
+        run: npm test
+      - name: Build production artifacts offline
+        run: npm run build
+      - name: Verify no-key global webcam endpoint degrades safely
+        run: |
+          node --input-type=module - <<'NODE'
+          import handler,{normalizeWindyWebcam} from './api/webcams.js';
+          delete process.env.WINDY_WEBCAMS_API_KEY;
+          let status=0,body=null;
+          await handler({method:'GET',query:{lat:'40',lon:'-74'}},{status(n){status=n;return this},json(x){body=x;return x}});
+          if(status!==200||body?.configured!==false||body.points.length!==0)throw Error('Global connector tried to call paid/key-required endpoint');
+          console.log('No-key global webcam path safe');
+          NODE
+      - name: Iowa DOT official camera video metadata sample
+        run: |
+          curl -fsSL --max-time 30 'https://services.arcgis.com/8lRhdTsQyJpO52F1/arcgis/rest/services/Traffic_Cameras_View/FeatureServer/0/query?where=1%3D1&outFields=*&resultRecordCount=12&outSR=4326&f=geojson' -o /tmp/official-iowa.json
+          node --input-type=module -e "import fs from 'node:fs';const x=JSON.parse(fs.readFileSync('/tmp/official-iowa.json')); if(!x.features?.some(v=>v.properties?.ImageURL))throw Error('Iowa metadata not published');console.log('Official Iowa video and still metadata verified')"
+      - name: Browser dependency only for local QA
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core
+      - name: Start local ShadowNex app (NO Vercel)
+        run: |
+          node scripts/dev.mjs > /tmp/shadownex-global.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/shadownex-global.log
+          exit 1
+      - name: Real Oklahoma camera native and HLS.js stream with Fold resize checks
+        run: node scripts/qa-selected-camera.mjs

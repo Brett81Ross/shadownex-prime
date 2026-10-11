@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2.2.6 — Galaxy Fold modal containment and optional true 3D (staging candidate)
+- Fix app shell retaining stale pixel width/height after Fold resize; restore normal responsive layout, resize Cesium canvas, anchor Reset App to globe and contain Watch Center save actions.
 - Extend visualViewport positioning beyond the welcome and situation dialogs to More, Settings, Watch Center and other overlays.
 - Replace paid Cesium ion 3D dependency with opt-in, token-free Re:Earth Terrain plus Re:Earth Buildings preview; license attribution and best-effort/community-host warning visible.
 - Reversible ellipsoid fallback, terrain-only degradation if 3D building feed fails, and Reset App integration.

@@ -31,7 +31,7 @@ export function installCameraViewer(app){
     document.getElementById('app').append(dialog);
     this.$('liveCameraClose').onclick=()=>{this.stopLiveCamera();dialog.close()};
     this.$('liveCameraRetry').onclick=()=>this._cameraMeta&&this.openLiveCamera(this._cameraMeta);
-    dialog.addEventListener('close',()=>this.stopLiveCamera());
+    dialog.addEventListener('close',()=>{if(!dialog.open)this.stopLiveCamera()});
     this._cameraGeneration=0;
   };
   app.stopLiveCamera=function(){

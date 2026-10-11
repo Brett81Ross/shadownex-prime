@@ -1,0 +1,36 @@
+name: ShadowNex $0 Community 3D QA (no deployment)
+on:
+  push:
+    branches: [qa/shadownex-v226-free-community-3d]
+permissions:
+  contents: read
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Full regression suite including free 3D provider mocks
+        run: npm test
+      - name: Static production build
+        run: npm run build
+      - name: Verify community endpoint metadata (one request per provider)
+        run: |
+          set -euo pipefail
+          curl -fsSL --retry 1 --max-time 28 -H 'Origin: https://shadownex-prime.vercel.app' -D /tmp/terrain.headers 'https://terrain.reearth.land/cesium-mesh/ellipsoid/layer.json' -o /tmp/terrain.json
+          curl -fsSL --retry 1 --max-time 28 -H 'Origin: https://shadownex-prime.vercel.app' -D /tmp/buildings.headers 'https://buildings.reearth.land/tileset.json' -o /tmp/buildings.json
+          node --input-type=module -e "import fs from 'node:fs';const t=JSON.parse(fs.readFileSync('/tmp/terrain.json'));const b=JSON.parse(fs.readFileSync('/tmp/buildings.json'));if(!Array.isArray(t.tiles)||!b.root||b.asset?.version!=='1.1')throw Error('Unexpected 3D metadata');console.log('Verified Re:Earth terrain metadata, building tileset 1.1 metadata');"
+          grep -i 'access-control-allow-origin' /tmp/terrain.headers /tmp/buildings.headers
+      - name: Install temporary Chromium test dependency
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core
+      - name: Local Node server only — no Vercel preview
+        run: |
+          node scripts/dev.mjs > /tmp/shadownex-local.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/shadownex-local.log
+          exit 1
+      - name: Real browser enable/disable of free 3D on Android-sized viewport
+        run: node scripts/qa-free-3d-live.mjs

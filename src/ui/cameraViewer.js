@@ -29,7 +29,7 @@ export function installCameraViewer(app){
     const dialog=document.createElement('dialog');dialog.id='liveCameraDialog';dialog.className='modal glass live-camera-dialog';
     dialog.innerHTML=`<div class="modal-card camera-card"><div class="modal-head"><div><b id="liveCameraName">Oklahoma Traffic Camera</b><small id="liveCameraDirection">OKTRAFFIC · PUBLIC CAMERA</small></div><button id="liveCameraClose" class="icon-btn" type="button" aria-label="Close live camera">✕</button></div><div class="camera-video-wrap"><video id="liveCameraVideo" controls autoplay muted playsinline preload="none" aria-label="Oklahoma live traffic camera"></video></div><div id="liveCameraStatus" role="status" aria-live="polite">Connecting…</div><button id="liveCameraRetry" class="hud-btn" type="button">RETRY LIVE VIDEO</button><small class="camera-note">Public OKTraffic / ODOT–OTA video. Feeds may be delayed or unavailable. No recording.</small></div>`;
     document.getElementById('app').append(dialog);
-    this.$('liveCameraClose').onclick=()=>dialog.close();
+    this.$('liveCameraClose').onclick=()=>{this.stopLiveCamera();dialog.close()};
     this.$('liveCameraRetry').onclick=()=>this._cameraMeta&&this.openLiveCamera(this._cameraMeta);
     dialog.addEventListener('close',()=>this.stopLiveCamera());
     this._cameraGeneration=0;

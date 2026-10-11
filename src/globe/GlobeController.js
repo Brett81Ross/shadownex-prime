@@ -50,41 +50,54 @@ export class GlobeController extends EventTarget {
     }catch(e){this.baseMapStatus='FALLBACK';this.baseMapName='Fallback Earth';console.warn('[basemap]',e);this.dispatchEvent(new CustomEvent('stability',{detail:{state:'warning',message:'Earth imagery could not load. ShadowNex is showing a visible fallback globe instead of a blank field.'}}));}
   }
   baseMapInfo(){return {status:this.baseMapStatus,name:this.baseMapName,mode:this.baseMapMode,terrain:this.terrainStatus};}
-  // Cesium ion is optional; without a user-supplied token the existing globe stays intact.
-  // Buildings are geometric OSM 3D models, not photogrammetric trees or structures.
+  // $0 Community 3D preview: public open-data services, no ion token or paid API.
+  // Upstream hosts are best-effort; this remains opt-in and OFF by default.
   async setWorld3D(enabled){
     const C=window.Cesium;
-    if(!this.viewer||!C)return {ok:false,reason:'3D viewer is unavailable.'};
+    if(!this.viewer||!C)return {ok:false,reason:'3D viewer unavailable.'};
+    const epoch=this._world3DEpoch=(this._world3DEpoch||0)+1;
+    const credit=document.getElementById('world3DAttribution');
     if(!enabled){
       if(this.world3DBuildings)this.world3DBuildings.show=false;
       this.viewer.terrainProvider=new C.EllipsoidTerrainProvider();
-      this.world3DMode='off';this.terrainStatus='ELLIPSOID';this.requestRender();
+      this.viewer.scene.globe.maximumScreenSpaceError=1.35;
+      this.world3DMode='off';this.terrainStatus='ELLIPSOID';
+      credit?.classList.add('hidden');this.requestRender();
       return {ok:true,enabled:false};
     }
-    if(!this.settings.cesiumToken)return {ok:false,reason:'A Cesium ion token is required in Settings.'};
+    const withTimeout=(task,label)=>Promise.race([task,new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+' timed out')),18000))]);
     try{
-      C.Ion.defaultAccessToken=this.settings.cesiumToken;
-      const terrain=await C.createWorldTerrainAsync({requestVertexNormals:true});
+      const terrain=await withTimeout(C.CesiumTerrainProvider.fromUrl(
+        'https://terrain.reearth.land/cesium-mesh/ellipsoid',
+        {requestVertexNormals:false,requestWaterMask:false}
+      ),'3D terrain');
+      if(epoch!==this._world3DEpoch)return {ok:false,reason:'3D activation was cancelled.'};
       this.viewer.terrainProvider=terrain;
-      this.terrainStatus='ION TERRAIN';
+      this.terrainStatus='COMMUNITY TERRAIN';
+      this.viewer.scene.globe.maximumScreenSpaceError=2.5;
+      this.world3DMode='terrain-only';
+      credit?.classList.remove('hidden');this.requestRender();
     }catch(error){
-      console.warn('[3d terrain]',error);
-      this.terrainStatus='ELLIPSOID';
-      return {ok:false,reason:'Cesium World Terrain is unavailable with this token.'};
+      console.warn('[free 3d terrain]',error);
+      if(epoch===this._world3DEpoch){this.world3DMode='off';credit?.classList.add('hidden');}
+      return {ok:false,reason:'Free terrain service unavailable. Original map remains available.'};
     }
     try{
       if(!this.world3DBuildings){
-        const tileset=await C.createOsmBuildingsAsync();
-        tileset.maximumScreenSpaceError=20;
+        const tileset=await withTimeout(C.Cesium3DTileset.fromUrl(
+          'https://buildings.reearth.land/tileset.json'
+        ),'3D buildings');
+        if(epoch!==this._world3DEpoch)return {ok:false,reason:'3D activation was cancelled.'};
+        tileset.maximumScreenSpaceError=32;
         this.world3DBuildings=this.viewer.scene.primitives.add(tileset);
       }else this.world3DBuildings.show=true;
       this.world3DMode='on';this.requestRender();
-      return {ok:true,enabled:true};
+      return {ok:true,enabled:true,buildings:true};
     }catch(error){
-      console.warn('[3d buildings]',error);
-      this.world3DMode='off';
-      this.requestRender();
-      return {ok:false,reason:'3D terrain loaded, but OSM building tiles are unavailable; existing imagery remains visible.'};
+      console.warn('[free 3d buildings]',error);
+      if(epoch!==this._world3DEpoch)return {ok:false,reason:'3D activation was cancelled.'};
+      this.world3DMode='terrain-only';this.requestRender();
+      return {ok:true,enabled:true,buildings:false,reason:'3D terrain is available; community buildings are temporarily unavailable.'};
     }
   }
   requestRender(){try{this.viewer?.scene?.requestRender()}catch{}}

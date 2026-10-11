@@ -40,9 +40,10 @@ try{
  console.log('OKTRAFFIC_LIVE_PLAYBACK',JSON.stringify({camera:{id:camera.id,name:camera.name,streamUrl:camera.streamUrl},playing,state,streamResponses:streamResponses.slice(0,12),errors}));
  if(!playing||errors.length||state.modal.left<state.modal.viewportOffset-2||state.modal.right>state.modal.viewportOffset+state.modal.viewportWidth+2)throw Error('Actual selected camera playback/viewport failed');
  await page.locator('#liveCameraClose').click();
- const stopped=await page.evaluate(()=>({dialogOpen:document.getElementById('liveCameraDialog').open,hlsAlive:!!window.__shadowNexPrime._cameraHls,paused:document.getElementById('liveCameraVideo').paused}));
+ await page.waitForFunction(()=>document.getElementById('liveCameraVideo')?.getAttribute('src')===null&&!window.__shadowNexPrime._cameraHls,null,{timeout:8000});
+ const stopped=await page.evaluate(()=>({dialogOpen:document.getElementById('liveCameraDialog').open,hlsAlive:!!window.__shadowNexPrime._cameraHls,paused:document.getElementById('liveCameraVideo').paused,ready:document.getElementById('liveCameraVideo').readyState,hasSource:!!document.getElementById('liveCameraVideo').getAttribute('src'),network:document.getElementById('liveCameraVideo').networkState}));
  console.log('CAMERA_CLEANUP',JSON.stringify(stopped));
- if(stopped.dialogOpen||stopped.hlsAlive||!stopped.paused)throw Error('Camera stream did not stop on close');
+ if(stopped.dialogOpen||stopped.hlsAlive||stopped.hasSource||stopped.ready!==0)throw Error('Camera media network source did not release on close');
  await context.close();
 }finally{await browser.close()}
 console.log('PASS: exact selected Oklahoma camera live video plays in Chromium, header Reset remains clear, close releases stream');

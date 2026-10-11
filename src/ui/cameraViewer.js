@@ -16,13 +16,17 @@ export function resolveCameraMedia(meta){
     if(ok||iowa||caltrans)return {kind:'hls',url:video.href,label:'LIVE VIDEO',provider:source};
     if(london)return {kind:'clip',url:video.href,label:'RECENT VIDEO CLIP',provider:source};
   }
+  if(source==='Windy Webcams'){
+    const frame=parse(meta?.playerUrl);
+    if(frame&&(frame.hostname==='windy.com'||frame.hostname.endsWith('.windy.com')))return {kind:'embed',url:frame.href,label:'WEBCAM PLAYER · WINDY',provider:source};
+  }
   const img=parse(meta?.previewUrl);
   if(img){
     const h=img.hostname.toLowerCase();
     const allowed=source==='Iowa DOT'&&h.endsWith('.iowadot.gov')||
       source==='Transport for London'&&h==='s3-eu-west-1.amazonaws.com'&&img.pathname.startsWith('/jamcams.tfl.gov.uk/')||
       source==='Caltrans'&&(h==='dot.ca.gov'||h.endsWith('.dot.ca.gov'))||
-      source==='City of Austin'&&(h.endsWith('.austintexas.gov')||h.endsWith('.texas.gov'));
+      source==='City of Austin'&&(h.endsWith('.austintexas.gov')||h.endsWith('.texas.gov'))||source==='Windy Webcams';
     if(allowed)return {kind:'snapshot',url:img.href,label:'UPDATED CAMERA IMAGE',provider:source};
   }
   return null;
@@ -47,7 +51,7 @@ export function cameraDirections(meta,points=[]){
  const list=matching.length?matching:[meta];
  return list.filter(Boolean).map(c=>({
   type:'CCTV',id:c.id,name:c.name,source:c.source,view:c.direction??c.view??null,
-  streamUrl:c.streamUrl,videoUrl:c.videoUrl,previewUrl:c.previewUrl,url:c.url,groupId:c.groupId,
+  streamUrl:c.streamUrl,videoUrl:c.videoUrl,previewUrl:c.previewUrl,playerUrl:c.playerUrl,url:c.url,groupId:c.groupId,
   latitude:c.lat??c.latitude,longitude:c.lon??c.longitude,mediaKind:c.mediaKind
  })).filter((x,i,a)=>a.findIndex(y=>y.id===x.id)===i).sort((a,b)=>String(a.view||'').localeCompare(String(b.view||'')));
 }
@@ -64,7 +68,7 @@ export function installCameraViewer(app){
   const dialog=document.createElement('dialog');dialog.id='liveCameraDialog';dialog.className='modal glass live-camera-dialog';
   dialog.innerHTML=`<div class="modal-card camera-card">
   <div class="modal-head"><div><b id="liveCameraName">Public Camera</b><small id="liveCameraDirection">OFFICIAL PUBLIC SOURCE</small></div><button id="liveCameraClose" type="button" class="icon-btn" aria-label="Close camera">✕</button></div>
-  <div class="camera-media"><video id="liveCameraVideo" controls autoplay muted playsinline preload="none" aria-label="Selected camera video"></video><img id="liveCameraImage" alt="Latest camera image" hidden/></div>
+  <div class="camera-media"><video id="liveCameraVideo" controls autoplay muted playsinline preload="none" aria-label="Selected camera video"></video><img id="liveCameraImage" alt="Latest camera image" hidden/><iframe id="liveCameraEmbed" title="Official webcam player" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation" allow="autoplay; fullscreen" hidden></iframe></div>
   <div id="liveCameraStatus" role="status" aria-live="polite">Selecting camera…</div>
   <div id="liveCameraDirections" role="group" aria-label="Available camera directions" class="camera-directions" hidden></div>
   <div class="camera-actions"><button id="liveCameraFullscreen" type="button" class="hud-btn">FULLSCREEN</button><button id="liveCameraRetry" type="button" class="hud-btn">RETRY CAMERA</button><a id="liveCameraSource" class="hud-btn" target="_blank" rel="noopener noreferrer" hidden>OFFICIAL SOURCE</a></div>
@@ -88,6 +92,7 @@ export function installCameraViewer(app){
   const v=this.$('liveCameraVideo');
   if(v){v.autoplay=false;v.onplaying=null;v.onerror=null;v.pause();v.removeAttribute('src');v.load();v.pause()}
   const img=this.$('liveCameraImage');if(img){img.onload=null;img.onerror=null;img.removeAttribute('src')}
+  const frame=this.$('liveCameraEmbed');if(frame)frame.removeAttribute('src')
  };
  app.cameraOptionsFor=function(meta){
   return cameraDirections(meta,this.layers?.get('cctv')?.catalogPoints||[]);
@@ -95,7 +100,7 @@ export function installCameraViewer(app){
  app.openLiveCamera=async function(meta){
   this.ensureLiveCameraUi();
   this.stopLiveCamera();this._cameraMeta=meta;
-  const dialog=this.$('liveCameraDialog'),video=this.$('liveCameraVideo'),img=this.$('liveCameraImage'),status=this.$('liveCameraStatus');
+  const dialog=this.$('liveCameraDialog'),video=this.$('liveCameraVideo'),img=this.$('liveCameraImage'),frame=this.$('liveCameraEmbed'),status=this.$('liveCameraStatus');
   const media=resolveCameraMedia(meta);this._cameraMedia=media;
   this.$('liveCameraName').textContent=String(meta.name||'Public Camera');
   this.$('liveCameraDirection').textContent=String(meta.source||'Public Camera')+' · '+String(meta.view||meta.direction||'VIEW');
@@ -111,12 +116,16 @@ export function installCameraViewer(app){
   official.hidden=!source;if(source)official.href=source;else official.removeAttribute('href');
   this.$('liveCameraRetry').disabled=!media;
   this.$('liveCameraFullscreen').disabled=!media;
-  this.$('liveCameraAttribution').textContent=String(meta.source||'Public source')+' · '+(media?.kind==='hls'?'Live video may be delayed or offline.':media?.kind==='clip'?'Recent recorded clip. Not continuous live video.':media?.kind==='snapshot'?'Latest published image. Not continuous live video.':'No embeddable feed available.')+' No recording.';
-  video.hidden=!media||media.kind==='snapshot';img.hidden=media?.kind!=='snapshot';
+  this.$('liveCameraAttribution').textContent=(meta.source==='Windy Webcams'?'Webcams provided by Windy.com · Open official source for webcam details.':String(meta.source||'Public source'))+' · '+(media?.kind==='hls'?'Live video may be delayed or offline.':media?.kind==='clip'?'Recent recorded clip. Not continuous live video.':media?.kind==='snapshot'?'Latest published image. Not continuous live video.':media?.kind==='embed'?'Official webcam embed; timelapse or live as provided.':'No embeddable feed available.')+' No recording.';
+  video.hidden=!media||media.kind==='snapshot'||media.kind==='embed';img.hidden=media?.kind!=='snapshot';frame.hidden=media?.kind!=='embed';
   status.textContent=media?media.label+' · CONNECTING…':'No direct playable feed available for this camera. Check the official provider.';
   if(!dialog.open)dialog.showModal();this.$('app')?.__snxFitDialogs?.();
   const generation=this._cameraGeneration;
   if(!media)return;
+  if(media.kind==='embed'){
+   frame.onload=()=>{if(generation===this._cameraGeneration)status.textContent='OFFICIAL WEBCAM PLAYER · STATUS MANAGED BY PROVIDER'};
+   frame.src=media.url;return;
+  }
   if(media.kind==='snapshot'){
    img.alt='Latest published image from '+String(meta.name||meta.source||'public camera');
    img.onload=()=>{if(generation===this._cameraGeneration)status.textContent='LATEST PUBLISHED CAMERA IMAGE · NOT LIVE VIDEO'};

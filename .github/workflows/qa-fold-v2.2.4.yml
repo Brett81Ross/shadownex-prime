@@ -1,0 +1,29 @@
+name: ShadowNex v2.2.4 Fold Dialog QA
+on:
+  push:
+    branches: [qa/shadownex-v2.2.4-fold-dialog-gate]
+permissions:
+  contents: read
+jobs:
+  fold:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Release QA including module linking
+        run: npm test
+      - name: Static build
+        run: npm run build
+      - name: Runner-only browser dependency
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core
+      - name: Local app server (not Vercel)
+        run: |
+          node scripts/dev.mjs > /tmp/shadownex-server.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/shadownex-server.log
+          exit 1
+      - name: Folded phone, unfolded Fold, and standard Android viewport assertions
+        run: node scripts/qa-fold-dialogs.mjs

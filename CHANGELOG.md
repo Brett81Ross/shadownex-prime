@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.6 — Galaxy Fold modal containment and optional true 3D (staging candidate)
+- Extend visualViewport positioning beyond the welcome and situation dialogs to More, Settings, Watch Center and other overlays.
+- Add non-destructive 3D terrain and modeled OSM buildings toggle that requires an explicitly supplied Cesium ion token; no token means the existing imagery continues normally.
+- Offer a reversible ellipsoid fallback and reset integration, with mobile performance limits.
+- Do not imply satellite imagery is a real 3D building or that trees are modeled; realistic vegetation requires separate photorealistic 3D data.
+- No Vercel preview, production merge or deployment authorized.
+
+
 ## 2.2.5 — Visible non-destructive Reset App (atomic candidate, no deploy)
 - Add a dedicated 44px-tall Reset App control positioned inside the actual Android/Fold visual viewport without crowding primary navigation.
 - Reset the current globe, enabled layers, display lens, and controls to everyday defaults through the existing Full Reset routine.

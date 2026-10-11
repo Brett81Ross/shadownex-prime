@@ -2,7 +2,7 @@ import { cameraState, rectangleDegrees } from '../core/geo.js';
 import { AnnotationController } from './AnnotationController.js';
 import { SceneDirector } from './SceneDirector.js';
 export class GlobeController extends EventTarget {
-  constructor(container,settings){super();this.container=container;this.settings=settings;this.viewer=null;this.selected=null;this.tracking=false;this.cockpit=false;this.annotation=null;this.sceneDirector=null;this.followTimer=null;this.baseMapLayer=null;this.baseMapProvider=null;this.baseMapStatus='LOADING';this.baseMapName='Keyless Earth';this.baseMapErrors=0;this.terrainStatus='ELLIPSOID';this.selectionMarker=null;this.baseMapMode='satellite';}
+  constructor(container,settings){super();this.container=container;this.settings=settings;this.viewer=null;this.selected=null;this.tracking=false;this.cockpit=false;this.annotation=null;this.sceneDirector=null;this.followTimer=null;this.baseMapLayer=null;this.baseMapProvider=null;this.baseMapStatus='LOADING';this.baseMapName='Keyless Earth';this.baseMapErrors=0;this.terrainStatus='ELLIPSOID';this.selectionMarker=null;this.baseMapMode='satellite';this.world3DMode='off';this.world3DBuildings=null;}
   async init(){
     if(!window.Cesium)throw new Error('Cesium runtime did not load.');
     const C=window.Cesium,compact=matchMedia('(max-width: 900px)').matches||navigator.maxTouchPoints>0;
@@ -50,6 +50,43 @@ export class GlobeController extends EventTarget {
     }catch(e){this.baseMapStatus='FALLBACK';this.baseMapName='Fallback Earth';console.warn('[basemap]',e);this.dispatchEvent(new CustomEvent('stability',{detail:{state:'warning',message:'Earth imagery could not load. ShadowNex is showing a visible fallback globe instead of a blank field.'}}));}
   }
   baseMapInfo(){return {status:this.baseMapStatus,name:this.baseMapName,mode:this.baseMapMode,terrain:this.terrainStatus};}
+  // Cesium ion is optional; without a user-supplied token the existing globe stays intact.
+  // Buildings are geometric OSM 3D models, not photogrammetric trees or structures.
+  async setWorld3D(enabled){
+    const C=window.Cesium;
+    if(!this.viewer||!C)return {ok:false,reason:'3D viewer is unavailable.'};
+    if(!enabled){
+      if(this.world3DBuildings)this.world3DBuildings.show=false;
+      this.viewer.terrainProvider=new C.EllipsoidTerrainProvider();
+      this.world3DMode='off';this.terrainStatus='ELLIPSOID';this.requestRender();
+      return {ok:true,enabled:false};
+    }
+    if(!this.settings.cesiumToken)return {ok:false,reason:'A Cesium ion token is required in Settings.'};
+    try{
+      C.Ion.defaultAccessToken=this.settings.cesiumToken;
+      const terrain=await C.createWorldTerrainAsync({requestVertexNormals:true});
+      this.viewer.terrainProvider=terrain;
+      this.terrainStatus='ION TERRAIN';
+    }catch(error){
+      console.warn('[3d terrain]',error);
+      this.terrainStatus='ELLIPSOID';
+      return {ok:false,reason:'Cesium World Terrain is unavailable with this token.'};
+    }
+    try{
+      if(!this.world3DBuildings){
+        const tileset=await C.createOsmBuildingsAsync();
+        tileset.maximumScreenSpaceError=20;
+        this.world3DBuildings=this.viewer.scene.primitives.add(tileset);
+      }else this.world3DBuildings.show=true;
+      this.world3DMode='on';this.requestRender();
+      return {ok:true,enabled:true};
+    }catch(error){
+      console.warn('[3d buildings]',error);
+      this.world3DMode='off';
+      this.requestRender();
+      return {ok:false,reason:'3D terrain loaded, but OSM building tiles are unavailable; existing imagery remains visible.'};
+    }
+  }
   requestRender(){try{this.viewer?.scene?.requestRender()}catch{}}
   onClick(position){if(this.annotation?.isArmed()){this.annotation.handleClick(position);return;}const picked=this.viewer.scene.pick(position);const meta=picked?.id?.properties?.snxMeta?.getValue?.()??picked?.id?.snxMeta??picked?.primitive?.snxMeta;if(meta?.type==='CLUSTER'){const alt=Math.max(650000,(this.state().alt||6000000)*.42);this.flyTo(Number(meta.longitude),Number(meta.latitude),alt);return;}if(meta)this.select(meta,picked.id||picked.primitive);else if(this.selected)this.clearSelection();}
   select(meta,entity){this.selected={meta,entity};this.setSelectionMarker(entity);this.dispatchEvent(new CustomEvent('select',{detail:meta}));this.requestRender();}

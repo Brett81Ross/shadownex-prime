@@ -1,5 +1,18 @@
 # ShadowNex Prime™ Atomic Build
 
+## ABL v2.2.6 — Galaxy Fold viewport + optional 3D (staging only)
+- [x] Contain More, Settings, Watch Center and remaining overlays in the *actual* visible viewport, with vertical scrolling.
+- [x] Preserve earlier location and briefing viewport corrections.
+- [x] Add opt-in Cesium World Terrain + OSM 3D building geometry with local token gate, graceful fallback and disable option.
+- [x] Avoid representing 2D imagery as true 3D trees; do not add a billed Google service automatically.
+- [x] Preserve globe, saved watches, settings, and reset behavior.
+- [ ] Full Node 22 build, code QA and live browser Fold viewport verification.
+- [ ] Physical Android verification and Cesium ion credential verification when available.
+- [ ] Owner approval before any merge or Vercel production deployment.
+
+**Release boundary:** STAGING ONLY. No Vercel preview or production deployment.
+
+
 ## ABL v2.2.5 — Visible Reset App (isolated; not deployed)
 - [x] Reuse existing everyday `fullReset()` behavior without erasing watch collections or settings.
 - [x] Add a dedicated Reset App button with a 44px tap target and visible label.

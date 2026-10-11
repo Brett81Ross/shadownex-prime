@@ -45,7 +45,7 @@ export function installSblUi(app){
     overview.innerHTML=`<div class='brief-title-row'><strong>Current view</strong><span class='brief-state ${state.toLowerCase()}'>${state}</span></div><div class='brief-source-grid'>${rows}</div><small>Coverage reflects only enabled public sources. “No loaded items” does not mean no real-world activity exists.</small>`;
     cards.innerHTML='';if(!snap.top.length)cards.innerHTML=`<div class='situation-empty'>No notable loaded contact/event is available in this view yet. A source may be disabled, delayed, unavailable, or outside its coverage.</div>`;for(const item of snap.top)this.renderSituationCard(item,cards);
     const foot=this.$('situationDialog')?.querySelector('.situation-footnote');if(foot)foot.textContent='ShadowNex reports partial truth honestly: enabled public feeds only. Missing coverage is never treated as proof of no activity.';
-    const d=this.$('situationDialog');if(d&&!d.open)d.showModal();
+    const d=this.$('situationDialog');if(d&&!d.open)d.showModal();this.fitSituationDialog(d);
   };
   app.openImageryInfo=async function(){
     const d=this.$('imageryInfoDialog'),box=this.$('imageryInfoBody'),p=this.globe.focusCoordinates(),z=imageryZoom(this.globe.state().alt);if(!d.open)d.showModal();

@@ -65,7 +65,10 @@ export class GlobeController extends EventTarget {
       credit?.classList.add('hidden');this.requestRender();
       return {ok:true,enabled:false};
     }
-    const withTimeout=(task,label)=>Promise.race([task,new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+' timed out')),18000))]);
+    const withTimeout=(task,label)=>new Promise((resolve,reject)=>{
+      const timer=setTimeout(()=>reject(new Error(label+' timed out')),18000);
+      Promise.resolve(task).then(value=>{clearTimeout(timer);resolve(value);},error=>{clearTimeout(timer);reject(error);});
+    });
     try{
       const terrain=await withTimeout(C.CesiumTerrainProvider.fromUrl(
         'https://terrain.reearth.land/cesium-mesh/ellipsoid',

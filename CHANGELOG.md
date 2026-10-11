@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.3 — Startup module-linking hotfix
+- Export the missing fmtDistanceKm utility used by rich profiles and Watch Center; display miles.
+- Add an actual ES-module linking QA gate to catch missing imports/exports before deployment.
+- Restore Android/browser startup without changing globe, native wrapper, feed logic, or branding.
+
+
 ## 2.2.2 — Android startup reliability hotfix (isolated candidate)
 - Do not block launch behind USGS and aircraft network initialization.
 - Bound USGS earthquake requests to 10 seconds; degraded feeds retry through existing scheduler.

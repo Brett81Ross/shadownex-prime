@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {validatedOklahomaHls,installCameraViewer} from '../src/ui/cameraViewer.js';
+const read=p=>readFile(new URL('../'+p,import.meta.url),'utf8');
+const [api,layer,abl,app,brief,main,css,watch]=await Promise.all(['api/cctv.js','src/layers/CctvLayer.js','src/ui/ablEnhancements.js','src/app.js','src/ui/situationEnhancements.js','src/main.js','src/ui/sblWatch.css','src/ui/sblWatch.js'].map(read));
+const url='https://stream.oktraffic.org/delay-stream/05b4121fa2ef53b8.stream/playlist.m3u8';
+assert.equal(validatedOklahomaHls(url),url);
+for(const bad of ['https://oktraffic.org/','http://stream.oktraffic.org/delay-stream/a.stream/playlist.m3u8','https://evil.org/delay-stream/a.stream/playlist.m3u8','javascript:alert(1)','https://stream.oktraffic.org/a/playlist.m3u8'])assert.equal(validatedOklahomaHls(bad),null);
+assert.ok(api.includes('streamUrl:sd.streamSrc||null')&&layer.includes('streamUrl:c.streamUrl'));
+assert.ok(main.includes('installCameraViewer(app)'), 'camera viewer installed');
+assert.ok(abl.includes("meta.type==='CCTV'")&&abl.includes('this.openLiveCamera(meta)'));
+assert.ok(app.includes('this.openLiveCamera(meta)'));
+assert.ok(brief.includes("meta.type==='CCTV'?this.openLiveCamera(meta)"));
+assert.ok(css.includes('position:static!important')&&!css.includes('right:12px'));
+assert.ok(watch.includes("host.querySelector('.topbar')"));
+assert.equal(typeof installCameraViewer,'function');
+console.log('PASS: validated camera-specific HLS player routing; topbar reset cannot float over buttons');

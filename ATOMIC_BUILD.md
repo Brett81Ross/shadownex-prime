@@ -1,5 +1,13 @@
 # ShadowNex Prime™ Atomic Build
 
+## ABL v2.2.7 — Oklahoma camera HLS + nonoverlapping Reset (staging only)
+- [x] Open the exact selected OKTraffic camera HLS video, not the provider's general landing page.
+- [x] Add in-app live player with native/HLS.js compatibility, auto-open, close/retry and honest unavailable states.
+- [x] Reposition Reset App into top header, preserving one-click nondestructive reset without overlaying map controls.
+- [ ] Test actual selected feed, HLS CDN, stream CORS/segments, viewer, and Fold layout in live browser.
+- [ ] Separate user approval required for merge and single production deploy; do not deploy yet.
+
+
 ## ABL v2.2.6 — Galaxy Fold viewport + optional 3D (staging only)
 - [x] Contain More, Settings, Watch Center and remaining overlays in the *actual* visible viewport, with vertical scrolling.
 - [x] Preserve earlier location and briefing viewport corrections.

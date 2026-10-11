@@ -53,3 +53,24 @@ dialog.viewport-modal .modal-card *{overflow-wrap:anywhere}
   color:#d7f4f2;font:600 9px/1.3 ui-sans-serif,system-ui,sans-serif;
   pointer-events:none;
 }
+
+/* v2.2.6 Fold transition regression: follow dynamic app dimensions, never the stale viewport. */
+#app{position:relative;min-width:0;max-width:100%;width:100%;height:100dvh}
+dialog.viewport-modal.watch-dialog .watch-card{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  max-height:none;
+  overflow-x:hidden;
+}
+dialog.viewport-modal.watch-dialog .watch-tabs{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+dialog.viewport-modal.watch-dialog .watch-create,
+dialog.viewport-modal.watch-dialog .watch-area-create{
+  grid-template-columns:minmax(0,1fr);
+}
+dialog.viewport-modal.watch-dialog .watch-create>*,
+dialog.viewport-modal.watch-dialog .watch-area-create>*{
+  min-width:0;max-width:100%;width:100%;
+}

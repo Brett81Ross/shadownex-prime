@@ -23,3 +23,15 @@
 }
 .reset-app-button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .reset-app-button:disabled{opacity:.7;cursor:wait}
+
+/* Reset stays anchored to the actual globe/app, including Fold/unfold transitions.
+   No JS pixel positioning or detached floating element. */
+#app .reset-app-button{
+  position:absolute;
+  left:auto!important;
+  top:auto!important;
+  right:12px;
+  bottom:calc(80px + env(safe-area-inset-bottom));
+  transform:none;
+  max-width:calc(100% - 24px);
+}

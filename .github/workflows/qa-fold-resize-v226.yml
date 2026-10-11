@@ -1,0 +1,26 @@
+name: ShadowNex Fold Resize Regression (QA only)
+on:
+  push:
+    branches: [qa/shadownex-v226-fold-resize-regression]
+permissions:
+  contents: read
+jobs:
+  fold:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - run: npm test
+      - run: npm run build
+      - run: npm install --no-save --no-package-lock --ignore-scripts playwright-core
+      - name: Local QA-only server
+        run: |
+          node scripts/dev.mjs > /tmp/shadownex-fold-dev.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/shadownex-fold-dev.log
+          exit 1
+      - name: Fold unfold with app, globe, reset and Watch Center
+        run: node scripts/qa-fold-transition-v226.mjs

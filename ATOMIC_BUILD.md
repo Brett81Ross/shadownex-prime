@@ -6,6 +6,7 @@
 - [x] Worldwide Windy Webcams API v3 discovery adapter with secure server-only free key (disabled when no key is configured), 50 nearby webcam limit / 250km and moving-globe refresh.
 - [ ] Verify global connector with a user-provided free Windy API key before describing its worldwide coverage as active.
 - [x] Full Node 22 QA, deterministic build, Iowa published media metadata, global no-key safety, Android 360px native+HLS.js playback and Fold transition QA PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38148775574.
+- [x] Real Chromium camera direction button selects the correct HLS URL; fullscreen command, no-video provider official-link fallback, Iowa still display and TfL recorded-clip labeling PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38149082436.
 - [x] Open the exact selected OKTraffic camera HLS video, not the provider's general landing page.
 - [x] Add in-app live player with native/HLS.js compatibility, auto-open, close/retry and honest unavailable states.
 - [x] Reposition Reset App into top header, preserving one-click nondestructive reset without overlaying map controls.

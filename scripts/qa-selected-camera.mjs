@@ -44,6 +44,18 @@ try{
  const stopped=await page.evaluate(()=>({dialogOpen:document.getElementById('liveCameraDialog').open,hlsAlive:!!window.__shadowNexPrime._cameraHls,paused:document.getElementById('liveCameraVideo').paused,ready:document.getElementById('liveCameraVideo').readyState,hasSource:!!document.getElementById('liveCameraVideo').getAttribute('src'),network:document.getElementById('liveCameraVideo').networkState}));
  console.log('CAMERA_CLEANUP',JSON.stringify(stopped));
  if(stopped.dialogOpen||stopped.hlsAlive||stopped.hasSource||stopped.ready!==0)throw Error('Camera media network source did not release on close');
+ // Verify Reset and primary navigation still fit after Fold screen transitions.
+ for(const sz of [{width:840,height:620},{width:360,height:740}]){
+  await page.setViewportSize(sz);await page.waitForTimeout(400);
+  const geometry=await page.evaluate(()=>{
+   const r=id=>{const x=document.getElementById(id).getBoundingClientRect();return {left:x.left,right:x.right,top:x.top,bottom:x.bottom}};
+   const root=r('app'),header=document.querySelector('.topbar').getBoundingClientRect();
+   return {root,reset:r('resetAppBtn'),nav:r('friendlyNav'),header:{left:header.left,right:header.right,top:header.top,bottom:header.bottom},screen:visualViewport.width};
+  });
+  const within=geometry.reset.left>=geometry.header.left-1&&geometry.reset.right<=geometry.header.right+1&&geometry.reset.top>=geometry.header.top-1&&geometry.reset.bottom<=geometry.header.bottom+1&&geometry.reset.bottom<geometry.nav.top;
+  console.log('FOLD_RESET_HEADER',JSON.stringify({size:sz,within,geometry}));
+  if(!within)throw Error('Reset App overlaps other Fold controls after resizing');
+ }
  // Also force the HLS.js/MSE fallback used by Android browsers without native HLS support.
  await page.evaluate(()=>{const v=document.getElementById('liveCameraVideo');v.canPlayType=()=>'';});
  await page.evaluate(camera=>{

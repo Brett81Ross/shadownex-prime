@@ -1,6 +1,8 @@
 # ShadowNex Prime™ Atomic Build
 
-## ABL v2.2.7 — Oklahoma camera HLS + nonoverlapping Reset (staging only)
+## ABL v2.2.7 — Expanded US / international CCTV and no-overlap Reset (staging only)
+- [x] Additional no-key Iowa DOT statewide official camera source with real image/video URLs when available.
+- [ ] Direction switcher, media type handling, fullscreen, and provider parity tests.
 - [x] Open the exact selected OKTraffic camera HLS video, not the provider's general landing page.
 - [x] Add in-app live player with native/HLS.js compatibility, auto-open, close/retry and honest unavailable states.
 - [x] Reposition Reset App into top header, preserving one-click nondestructive reset without overlaying map controls.

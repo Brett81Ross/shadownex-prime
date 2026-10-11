@@ -1,0 +1,35 @@
+name: ShadowNex v2.2.7 Real Camera Playback QA
+on:
+  push:
+    branches: [qa/shadownex-v2.2.7-camera-playback]
+permissions:
+  contents: read
+jobs:
+  camera:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Full regression suite
+        run: npm test
+      - name: Production build
+        run: npm run build
+      - name: Check public Oklahoma HLS manifest origin and content
+        run: |
+          set -euo pipefail
+          curl -fSL --max-time 18 -D /tmp/okhls.headers -H 'Origin: https://shadownex-prime.vercel.app' 'https://stream.oktraffic.org/delay-stream/05b4121fa2ef53b8.stream/playlist.m3u8' -o /tmp/okhls.m3u8
+          grep '#EXTM3U' /tmp/okhls.m3u8
+          grep -i 'access-control-allow-origin' /tmp/okhls.headers
+      - name: Browser dependency only on temporary QA runner
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core
+      - name: Local application server (no Vercel)
+        run: |
+          node scripts/dev.mjs > /tmp/shadownex-v227.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/shadownex-v227.log
+          exit 1
+      - name: Real Android-sized Chrome HLS playing and Reset App placement
+        run: node scripts/qa-selected-camera.mjs

@@ -2,6 +2,7 @@
 
 ## v2.2.7 expanded ABL #8 — camera coverage foundation
 - Added official Iowa DOT statewide cameras with published still images and video addresses where present.
+- Added official Washington State DOT statewide camera locations and approximately five-minute updated image URLs; separate from the existing Seattle city feed, no key required.
 - Generalized source handling: HLS live streams, TfL recorded short clips, camera snapshots and official Windy webcam embeds, with truthful media labels.
 - Added direction selector, fullscreen and official-source controls; preserved existing USA/UK providers.
 - Optional worldwide Windy webcam lookup around any globe location; requires a free owner-provided API key stored server-side, and is disabled until configured. Do not imply full worldwide coverage or permanent image access.

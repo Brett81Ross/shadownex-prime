@@ -2,6 +2,7 @@
 
 ## ABL v2.2.7 — Expanded US / international CCTV and no-overlap Reset (staging only)
 - [x] Additional no-key Iowa DOT statewide official camera source with real image/video URLs when available.
+- [x] Washington State DOT statewide official camera coordinates/images (roughly 5-minute updated snapshots), independent of Seattle DOT, no key.
 - [x] Direction switcher for shared camera positions, fullscreen, HLS video/short clips/still photos/Windy official embeds.
 - [x] Worldwide Windy Webcams API v3 discovery adapter with secure server-only free key (disabled when no key is configured), 50 nearby webcam limit / 250km and moving-globe refresh.
 - [ ] Verify global connector with a user-provided free Windy API key before describing its worldwide coverage as active.

@@ -13,6 +13,9 @@ assert.equal(resolveCameraMedia({source:'Iowa DOT',streamUrl:'https://evil.com/p
 const options=cameraDirections({id:'OK-1',groupId:'P1',source:'OKTraffic / ODOT-OTA',name:'junction'},[{id:'OK-1',groupId:'P1',source:'OKTraffic / ODOT-OTA',direction:'North'},{id:'OK-2',groupId:'P1',source:'OKTraffic / ODOT-OTA',direction:'South'},{id:'OK-3',groupId:'P2',source:'OKTraffic / ODOT-OTA',direction:'East'}]);
 assert.equal(options.length,2);assert.deepEqual(options.map(x=>x.view),['North','South']);
 assert.ok(api.includes('loadIowa')&&api.includes('Traffic_Cameras_View/FeatureServer'),'official Iowa statewide provider available');
+assert.ok(api.includes('loadWashington')&&api.includes('TravelInfoCamerasWeather/FeatureServer'),'official Washington statewide 5-minute snapshot provider');
+assert.equal(resolveCameraMedia({source:'Washington State DOT',previewUrl:'https://images.wsdot.wa.gov/sw/005vc00320.jpg'}).kind,'snapshot');
+assert.equal(resolveCameraMedia({source:'Washington State DOT',previewUrl:'https://www.tripcheck.com/RoadCams/cams/i5brnbn_pid552.jpg'}).kind,'snapshot');
 assert.ok(layer.includes('catalogPoints')&&layer.includes('groupId:c.groupId'),'all provider directions available');
 assert.ok(layer.includes("'/api/webcams?lat='")&&layer.includes('camera.moveEnd.addEventListener'),'global optional webcam discovery follows map center');
 assert.ok(api.includes('loadTfl')&&api.includes('loadCaltrans')&&api.includes('loadMaryland')&&api.includes('loadSeattle')&&api.includes('loadAustin')&&api.includes('loadOklahoma'),'existing providers preserved');

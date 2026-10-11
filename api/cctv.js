@@ -1,10 +1,10 @@
 const CACHE={at:0,data:null},TTL=5*60*1000;
 export default async function handler(req,res){
   if(CACHE.data&&Date.now()-CACHE.at<TTL)return res.status(200).json({...CACHE.data,cached:true});
-  const defs=[['OKTraffic / Oklahoma',loadOklahoma],['Transport for London',loadTfl],['Caltrans',loadCaltrans],['City of Austin',loadAustin],['Seattle DOT',loadSeattle],['Maryland CHART',loadMaryland],['Iowa DOT',loadIowa]];
+  const defs=[['OKTraffic / Oklahoma',loadOklahoma],['Transport for London',loadTfl],['Caltrans',loadCaltrans],['City of Austin',loadAustin],['Seattle DOT',loadSeattle],['Maryland CHART',loadMaryland],['Iowa DOT',loadIowa],['Washington State DOT',loadWashington]];
   const jobs=await Promise.allSettled(defs.map(([,fn])=>fn())),points=[],sources=[];
   jobs.forEach((job,i)=>{const name=defs[i][0];if(job.status==='fulfilled'){points.push(...job.value.points);sources.push({name,count:job.value.points.length,status:'LIVE'});}else sources.push({name,count:0,status:'DEGRADED',error:job.reason?.message||String(job.reason)});});
-  const data={points,sources,updatedAt:Date.now(),coverage:['Oklahoma City / Tulsa / Oklahoma highways','California statewide','London','Austin','Seattle','Maryland / DC region','Iowa statewide']};CACHE.at=Date.now();CACHE.data=data;return res.status(200).json(data);
+  const data={points,sources,updatedAt:Date.now(),coverage:['Oklahoma City / Tulsa / Oklahoma highways','California statewide','London','Austin','Seattle','Maryland / DC region','Iowa statewide','Washington statewide']};CACHE.at=Date.now();CACHE.data=data;return res.status(200).json(data);
 }
 async function loadOklahoma(){
   const filter=JSON.stringify({include:[{relation:'mapCameras',scope:{include:'streamDictionary',where:{status:{neq:'Out Of Service'},type:'Web',blockAtis:{neq:'1'}}}}]});
@@ -32,6 +32,27 @@ async function loadIowa(){
    const lat=Number(p.latitude??xy[1]),lon=Number(p.longitude??xy[0]);
    if(!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180)continue;
    points.push({id:'IA-'+String(p.FID??f.id??points.length),name:p.Desc_||'Iowa DOT Camera',lat,lon,groupId:`IA-${lat.toFixed(5)}-${lon.toFixed(5)}`,source:'Iowa DOT',status:'PUBLISHED',url:'https://511ia.org/',streamUrl:p.VideoURL||null,previewUrl:p.ImageURL||null,mediaKind:p.VideoURL?'live-video':'snapshot',county:p.REGION||null,route:p.Route||null});
+  }
+  if(features.length<size)break;
+ }
+ return {points};
+}
+// Official WSDOT ArcGIS statewide camera snapshots (refreshed about every 5 min).
+// Distinct from Seattle city DOT; no API key needed; preserve their source credit.
+async function loadWashington(){
+ const base='https://data.wsdot.wa.gov/arcgis/rest/services/TravelInformation/TravelInfoCamerasWeather/FeatureServer/0/query';
+ const points=[],size=1500;
+ for(let offset=0;offset<10000;offset+=size){
+  const url=new URL(base);
+  for(const [k,v] of Object.entries({where:'1=1',outFields:'OBJECTID,CameraTitle,ImageURL,CompassDirection',returnGeometry:'true',outSR:'4326',f:'geojson',resultOffset:String(offset),resultRecordCount:String(size)}))url.searchParams.set(k,v);
+  const data=await json(url);if(data.error)throw Error('WSDOT camera catalog query error');
+  const features=data.features||[];
+  for(const feature of features){
+   const p=feature.properties||{},coords=feature.geometry?.coordinates||[];
+   const lon=Number(coords[0]),lat=Number(coords[1]);
+   if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat<44||lat>50||lon< -125||lon> -116)continue;
+   const id=String(p.OBJECTID??feature.id??points.length);
+   points.push({id:'WA-'+id,name:p.CameraTitle||'Washington State Camera',lat,lon,groupId:'WA-'+lat.toFixed(5)+'-'+lon.toFixed(5),direction:p.CompassDirection||null,status:'PUBLISHED',source:'Washington State DOT',url:'https://wsdot.com/travel/real-time/map/',previewUrl:p.ImageURL||null,mediaKind:'snapshot'});
   }
   if(features.length<size)break;
  }

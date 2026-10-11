@@ -26,7 +26,8 @@ export function resolveCameraMedia(meta){
     const allowed=source==='Iowa DOT'&&h.endsWith('.iowadot.gov')||
       source==='Transport for London'&&h==='s3-eu-west-1.amazonaws.com'&&img.pathname.startsWith('/jamcams.tfl.gov.uk/')||
       source==='Caltrans'&&(h==='dot.ca.gov'||h.endsWith('.dot.ca.gov'))||
-      source==='City of Austin'&&(h.endsWith('.austintexas.gov')||h.endsWith('.texas.gov'))||source==='Windy Webcams';
+      source==='City of Austin'&&(h.endsWith('.austintexas.gov')||h.endsWith('.texas.gov'))||
+      source==='Washington State DOT'&&(h==='images.wsdot.wa.gov'||h==='www.tripcheck.com'||h==='tripcheck.com')||source==='Windy Webcams';
     if(allowed)return {kind:'snapshot',url:img.href,label:'UPDATED CAMERA IMAGE',provider:source};
   }
   return null;

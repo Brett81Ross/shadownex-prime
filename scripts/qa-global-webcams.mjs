@@ -8,6 +8,7 @@ assert.equal(sample.source,'Windy Webcams');assert.equal(sample.mediaKind,'provi
 assert.equal(resolveCameraMedia(sample).kind,'embed');
 assert.equal(normalizeWindyWebcam({...source,location:{latitude:NaN,longitude:1}}),null);
 assert.equal(normalizeWindyWebcam({...source,urls:{detail:'https://malicious.example/'}}),null);
+assert.equal(normalizeWindyWebcam({...source,urls:{detail:'https://evilwindy.com/webcams/123456'}}),null,'fake Windy suffix is not an official provider link');
 assert.equal(resolveCameraMedia({...sample,playerUrl:'https://evil.example/webcam'}).kind,'snapshot');
 assert.equal(resolveCameraMedia({...sample,playerUrl:'http://embed.windy.com/webcam'}).kind,'snapshot');
 console.log('PASS: global v3 camera normalization, provider iframe allowlist, photo fallback and official Windy source links');

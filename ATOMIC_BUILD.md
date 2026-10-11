@@ -4,7 +4,8 @@
 - [x] Open the exact selected OKTraffic camera HLS video, not the provider's general landing page.
 - [x] Add in-app live player with native/HLS.js compatibility, auto-open, close/retry and honest unavailable states.
 - [x] Reposition Reset App into top header, preserving one-click nondestructive reset without overlaying map controls.
-- [ ] Test actual selected feed, HLS CDN, stream CORS/segments, viewer, and Fold layout in live browser.
+- [x] Native browser selected-camera stream playback and HLS.js fallback playback on actual public OKTraffic video, CORS, close/reopen cleanup and Reset top-header placement PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38106409563.
+- [ ] Final Fold/unfold QA for top-header Reset (running separately); physical Galaxy Fold validation after owner-approved deployment.
 - [ ] Separate user approval required for merge and single production deploy; do not deploy yet.
 
 

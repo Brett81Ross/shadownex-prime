@@ -17,7 +17,27 @@ export function installSituationEnhancements(app){
     if(!this.$('situationDialog'))host.insertAdjacentHTML('beforeend',`<dialog id="situationDialog" class="modal glass situation-dialog"><div class="modal-card command-card"><div class="modal-head"><div><b>Regional / Daily Brief</b><small>WHAT MATTERS IN THE CURRENT VIEW · LIVE + RECENT PUBLIC FEEDS</small></div><button id="situationCloseBtn" class="icon-btn" type="button">✕</button></div><div id="situationOverview" class="situation-overview"></div><div id="situationCards" class="situation-cards"></div><div class="situation-footnote">Based only on currently loaded public/open-source feeds. Missing, delayed, or unavailable sources are not treated as “no activity.”</div></div></dialog>`);
   };
 
-  app.showLocationStart=function(){const d=this.$?.('locationStartDialog');if(d&&!d.open)d.showModal();};
+  // Dialogs must follow the actual visible viewport, not Android's sometimes wider layout viewport.
+  app.fitSituationDialog=function(d){
+    if(!d?.open)return;
+    const view=window.visualViewport;
+    if(!view)return;
+    const w=Math.max(1,view.width-16),h=Math.max(1,view.height-16);
+    d.style.left=(view.offsetLeft+view.width/2)+'px';
+    d.style.top=(view.offsetTop+view.height/2)+'px';
+    d.style.width=Math.min(640,w)+'px';
+    d.style.maxWidth=w+'px';
+    d.style.maxHeight=h+'px';
+  };
+  const adjustSituationDialogs=()=>{
+    for(const id of ['locationStartDialog','situationDialog']){
+      const d=document.getElementById(id);
+      if(d?.open)app.fitSituationDialog(d);
+    }
+  };
+  window.visualViewport?.addEventListener('resize',adjustSituationDialogs);
+  window.visualViewport?.addEventListener('scroll',adjustSituationDialogs);
+  app.showLocationStart=function(){const d=this.$?.('locationStartDialog');if(d&&!d.open)d.showModal();this.fitSituationDialog(d);};
   app.finishLocationStart=function(){try{localStorage.setItem(this.locationStartKey,'done')}catch{}const d=this.$('locationStartDialog');if(d?.open)d.close();};
   app.startNearMe=function(){const status=this.$('locationStartStatus');if(!navigator.geolocation){status.textContent='Device location is not available here. Use Search a Place instead.';return;}status.textContent='Requesting your device location…';navigator.geolocation.getCurrentPosition(pos=>{const lat=pos.coords.latitude,lon=pos.coords.longitude;this.finishLocationStart();this.globe.flyTo(lon,lat,420000);this.toast('Centered near your device location.');setTimeout(()=>this.openSituationBrief(),1100);},err=>{status.textContent=err.code===1?'Location permission was not granted. Search and Explore still work normally.':'Could not get device location. Search and Explore still work normally.';},{enableHighAccuracy:false,timeout:10000,maximumAge:300000});};
 
@@ -25,7 +45,7 @@ export function installSituationEnhancements(app){
   app.currentSituation=function(){const {items,bounds,center}=this.collectSituationItems();return buildSituation(items,{center,bounds,limit:5});};
   app.ageLabel=function(ts){if(!ts)return 'time unavailable';const s=Math.max(0,Math.round((Date.now()-ts)/1000));if(s<60)return `${s}s ago`;const m=Math.round(s/60);if(m<60)return `${m}m ago`;const h=Math.round(m/60);return h<48?`${h}h ago`:`${Math.round(h/24)}d ago`;};
   app.reasonText=function(rank){return rank.reasons.length?rank.reasons.join(' · '):'surfaced from current public-source activity';};
-  app.openSituationBrief=function(){const snap=this.currentSituation(),overview=this.$('situationOverview'),cards=this.$('situationCards');const countParts=Object.entries(snap.counts).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,v])=>`${v} ${k.toLowerCase().replace('_',' ')}`);overview.innerHTML=`<strong>${snap.total?`${snap.total} loaded contacts/events in this view`:'No loaded contacts/events in this view'}</strong><small>${escapeHtml(countParts.join(' · ')||'Turn on a guided mode or zoom to another area.')}</small>${snap.alerts.length?`<em>${snap.alerts.length} notable item${snap.alerts.length===1?'':'s'} surfaced</em>`:''}`;cards.innerHTML='';if(!snap.top.length){cards.innerHTML='<div class="situation-empty">No active loaded feed has an item in this view yet. This does not mean nothing is happening — a source may be off, loading, unavailable, or outside its coverage.</div>';}for(const item of snap.top)this.renderSituationCard(item,cards);const d=this.$('situationDialog');if(!d.open)d.showModal();};
+  app.openSituationBrief=function(){const snap=this.currentSituation(),overview=this.$('situationOverview'),cards=this.$('situationCards');const countParts=Object.entries(snap.counts).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,v])=>`${v} ${k.toLowerCase().replace('_',' ')}`);overview.innerHTML=`<strong>${snap.total?`${snap.total} loaded contacts/events in this view`:'No loaded contacts/events in this view'}</strong><small>${escapeHtml(countParts.join(' · ')||'Turn on a guided mode or zoom to another area.')}</small>${snap.alerts.length?`<em>${snap.alerts.length} notable item${snap.alerts.length===1?'':'s'} surfaced</em>`:''}`;cards.innerHTML='';if(!snap.top.length){cards.innerHTML='<div class="situation-empty">No active loaded feed has an item in this view yet. This does not mean nothing is happening — a source may be off, loading, unavailable, or outside its coverage.</div>';}for(const item of snap.top)this.renderSituationCard(item,cards);const d=this.$('situationDialog');if(!d.open)d.showModal();this.fitSituationDialog(d);};
   app.renderSituationCard=function(item,host){const {meta,rank}=item,card=document.createElement('article');card.className=`situation-card ${rank.level.toLowerCase()}`;const label=rank.score>=82?'HIGH PRIORITY':rank.score>=68?'NOTABLE':rank.level;card.innerHTML=`<div class="situation-card-head"><span>${escapeHtml(label)}</span><b>${rank.score}</b></div><strong>${escapeHtml(meta.name||meta.type||'Contact')}</strong><p>${escapeHtml(situationSummary(meta,rank))}</p><small><b>WHY SHOWN:</b> ${escapeHtml(this.reasonText(rank))}</small><div class="situation-source">${escapeHtml(meta.source||'Public source')}${rank.timestamp?` · ${escapeHtml(this.ageLabel(rank.timestamp))}`:''}</div><div class="situation-actions"><button type="button" class="ghost-btn view-contact">VIEW ON GLOBE</button>${meta.url?'<button type="button" class="ghost-btn open-source">SOURCE</button>':''}</div>`;card.querySelector('.view-contact').onclick=()=>{this.globe.select(meta,item.entity);const lon=Number(meta.longitude),lat=Number(meta.latitude);if(Number.isFinite(lon)&&Number.isFinite(lat))this.globe.flyTo(lon,lat,Math.max(160000,Number(meta.altitude)||350000));this.$('situationDialog').close();};const source=card.querySelector('.open-source');if(source)source.onclick=()=>window.open(meta.url,'_blank','noopener');host.appendChild(card);};
 
   app.refreshSituationAwareness=function(){if(!this.globe?.viewer)return;const snap=this.currentSituation(),badge=this.$?.('situationAlertCount');if(badge){badge.textContent=String(snap.alerts.length);badge.classList.toggle('hidden',!snap.alerts.length);}this.applyImportanceVisuals(snap.ranked);};

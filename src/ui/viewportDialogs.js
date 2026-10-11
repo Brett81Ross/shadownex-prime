@@ -7,12 +7,14 @@ export function installViewportDialogs(){
   const excluded=new Set(['locationStartDialog','situationDialog']);
   const layout=()=>{
     const v=window.visualViewport;
-    // Some Android browser and Fold configurations expose an inflated layout viewport
-    // (e.g. 720 CSS px for 360 visible px). Constrain the whole app surface to the
-    // visible viewport; otherwise focusing a control pans the document horizontally.
+    // Android can temporarily report a double-width *layout* viewport. A previous
+    // workaround permanently froze #app at that width/height after the Fold opened.
+    // Clamp only while needed, then release ALL dimensions on resize or rotation.
     const screenWidth=Math.max(1,v?.width||window.innerWidth);
     const screenHeight=Math.max(1,v?.height||window.innerHeight);
-    if(v&&Math.abs(window.innerWidth-screenWidth)>8&&Math.abs(v.scale-1)<0.01){
+    const mustClamp=!!v&&Math.abs(window.innerWidth-screenWidth)>8&&Math.abs(v.scale-1)<0.01;
+    if(mustClamp){
+      root.dataset.snxVisualClamped='1';
       document.documentElement.style.width=screenWidth+'px';
       document.body.style.width=screenWidth+'px';
       root.style.width=screenWidth+'px';
@@ -22,9 +24,19 @@ export function installViewportDialogs(){
       root.style.top='0';
       root.style.maxWidth=screenWidth+'px';
       root.style.maxHeight=screenHeight+'px';
-      window.requestAnimationFrame(()=>{
-        try{window.__shadowNexPrime?.globe?.viewer?.resize()}catch{}
-      });
+    }else if(root.dataset.snxVisualClamped==='1'){
+      delete root.dataset.snxVisualClamped;
+      document.documentElement.style.removeProperty('width');
+      document.body.style.removeProperty('width');
+      for(const prop of ['width','height','position','left','top','max-width','max-height']){
+        root.style.removeProperty(prop);
+      }
+    }
+    const viewer=window.__shadowNexPrime?.globe?.viewer;
+    const rect=root.getBoundingClientRect();
+    if(viewer&&(root.__snxLastW!==rect.width||root.__snxLastH!==rect.height)){
+      root.__snxLastW=rect.width;root.__snxLastH=rect.height;
+      window.requestAnimationFrame(()=>{try{viewer.resize();viewer.scene.requestRender();}catch{}});
     }
     const width=Math.max(1,v?.width||window.innerWidth);
     const height=Math.max(1,v?.height||window.innerHeight);
@@ -48,6 +60,9 @@ export function installViewportDialogs(){
   window.visualViewport?.addEventListener('resize',layout);
   window.visualViewport?.addEventListener('scroll',layout);
   window.addEventListener('resize',layout);
+  window.addEventListener('orientationchange',()=>window.requestAnimationFrame(layout));
+  window.addEventListener('pageshow',layout);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)layout()});
   root.__snxFitDialogs=layout;
   layout();
 }

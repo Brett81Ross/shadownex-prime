@@ -3,11 +3,12 @@
 ## ABL v2.2.6 — Galaxy Fold viewport + optional 3D (staging only)
 - [x] Contain More, Settings, Watch Center and remaining overlays in the *actual* visible viewport, with vertical scrolling.
 - [x] Preserve earlier location and briefing viewport corrections.
-- [x] Add opt-in Cesium World Terrain + OSM 3D building geometry with local token gate, graceful fallback and disable option.
+- [x] Implement opt-in, zero-key Re:Earth quantized-mesh terrain plus Overture-based 3D building geometry, with attribution and terrain-only fallback.
 - [x] Avoid representing 2D imagery as true 3D trees; do not add a billed Google service automatically.
 - [x] Preserve globe, saved watches, settings, and reset behavior.
 - [x] Full Node 22 QA, deterministic static build and five local Chromium viewport interaction tests PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38101118947. (Mock-only 3D provider QA; live token verification still pending.)
-- [ ] Physical Android verification and Cesium ion credential verification when available.
+- [ ] Verify live Re:Earth metadata endpoints, CORS, and real Cesium 1.132 rendering; test Fold device performance.
+- [ ] Respect provider notice: community building endpoint not for production-scale reliance. Find a compliant mirror/host if traffic grows.
 - [ ] Owner approval before any merge or Vercel production deployment.
 
 **Release boundary:** STAGING ONLY. No Vercel preview or production deployment.

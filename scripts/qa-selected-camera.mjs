@@ -49,7 +49,10 @@ try{
  await page.evaluate(camera=>{
    window.__shadowNexPrime.openLiveCamera({type:'CCTV',id:camera.id,name:camera.name,streamUrl:camera.streamUrl,view:camera.direction});
  },camera);
- await page.waitForFunction(()=>!!window.Hls&&!!window.__shadowNexPrime._cameraHls,null,{timeout:35000});
+ try{await page.waitForFunction(()=>!!window.Hls&&!!window.__shadowNexPrime._cameraHls,null,{timeout:15000});}catch(e){
+  const diag=await page.evaluate(()=>({status:document.getElementById('liveCameraStatus').textContent,play:document.getElementById('liveCameraVideo').paused,src:document.getElementById('liveCameraVideo').src,canPlay:document.getElementById('liveCameraVideo').canPlayType('application/vnd.apple.mpegurl'),hlsLoaded:!!window.Hls,hlsInstance:!!window.__shadowNexPrime._cameraHls,scripts:[...document.scripts].filter(x=>/hls/i.test(x.src)).map(x=>x.src)}));
+  console.log('HLS_FALLBACK_INIT_FAILURE',JSON.stringify({diag,streamResponses,errors,error:String(e)}));throw e;
+ }
  let fallbackPlaying=false;
  try{await page.waitForFunction(()=>{
    const v=document.getElementById('liveCameraVideo');return v&&!v.paused&&v.readyState>=2&&v.currentTime>0;

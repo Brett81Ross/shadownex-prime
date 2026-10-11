@@ -12,7 +12,7 @@ check(ui.includes('NOW')&&ui.includes('15 MIN')&&ui.includes('1 HR')&&ui.include
 check(ui.includes('NEARBY CONTEXT')&&ui.includes('WITHIN 100 MILES')&&css.includes('.sbl-simple .correlation-box{display:none}'),'Simple Mode replaces correlation jargon with Nearby Context');
 check(ui.includes('navHistory')&&ui.includes('goBackState')&&ui.includes('restoreState')&&ui.includes('length>12'),'Back/Undo uses bounded map-state history');
 check(ui.includes('fullReset')&&ui.includes("setLayer('earthquakes',true)")&&ui.includes("setLayer('aircraft',true)")&&ui.includes("applyUiMode('simple',false)"),'Full Reset restores everyday defaults');
-check(ui.includes("id='resetAppBtn'")&&ui.includes('positionResetAppButton')&&ui.includes('window.visualViewport')&&ui.includes('resetButton.onclick=async'),'Reset App has a dedicated always-visible, viewport-aware action');
+check(ui.includes("id='resetAppBtn'")&&ui.includes('resetButton.onclick=async')&&css.includes('#app .reset-app-button')&&css.includes('right:12px')&&!ui.includes('positionResetAppButton'),'Reset App is anchored inside the globe rather than to stale visualViewport pixel coordinates');
 check(ui.includes("this.setLens('normal',false)")&&ui.includes("this.applyUiMode('simple',false)"),'map reset changes runtime view without overwriting saved lens/UI preferences');
 check(!ui.slice(ui.indexOf('app.fullReset='),ui.indexOf('app.renderWatchCenter=')).includes("saveCollection('views'")&&!ui.slice(ui.indexOf('app.fullReset='),ui.indexOf('app.renderWatchCenter=')).includes("resetSettings("),'Full Reset does not erase Saved Views, Watch Areas, Favorites or app settings');
 check(main.includes('installSblWatch(app)'),'SBL-02 Watch module is wired into app boot');

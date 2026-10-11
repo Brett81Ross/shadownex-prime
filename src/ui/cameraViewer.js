@@ -9,7 +9,7 @@ export function resolveCameraMedia(meta){
   const video=parse(raw);
   if(video){
     const host=video.hostname.toLowerCase(),path=video.pathname;
-    const ok=source==='OKTraffic / ODOT-OTA'&&host==='stream.oktraffic.org'&&/^\/delay-stream\/[\w-]+\.stream\/playlist\.m3u8$/.test(path)&&!video.search;
+    const ok=host==='stream.oktraffic.org'&&/^\/delay-stream\/[\w-]+\.stream\/playlist\.m3u8$/.test(path)&&!video.search;
     const iowa=source==='Iowa DOT'&&/^video\d*\.iowadot\.gov$/.test(host)&&path.endsWith('.m3u8');
     const caltrans=source==='Caltrans'&&(host==='dot.ca.gov'||host.endsWith('.dot.ca.gov'))&&path.endsWith('.m3u8');
     const london=source==='Transport for London'&&host==='s3-eu-west-1.amazonaws.com'&&path.startsWith('/jamcams.tfl.gov.uk/')&&path.endsWith('.mp4');

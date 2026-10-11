@@ -19,5 +19,6 @@ check(ui.includes('WHAT’S HAPPENING HERE?')&&ui.includes('Regional / Daily Bri
 check(ui.includes('locationNearBtn')&&ui.includes('navigator.geolocation.getCurrentPosition')&&ui.includes('LOCATION IS OPTIONAL'),'location-first entry is opt-in and explicit');
 check(ui.includes('WHY SHOWN:')&&ui.includes('applyImportanceVisuals'),'explainable cards and map visual hierarchy are implemented');
 check(css.includes('.situation-card.high')&&css.includes('.situation-fab'),'situation UI has primary and high-priority visual states');
+check(css.includes('dialog.location-start,')&&css.includes('dialog.situation-dialog{')&&css.includes('grid-template-columns:minmax(0,1fr)'),'onboarding and briefing dialogs have mobile viewport containment and zero-min grid sizing');
 check(main.includes('installSituationEnhancements(app)'),'situation enhancement module is installed before app initialization');
 console.log(`\nSituation QA: ${pass} passed, ${fail} failed`);process.exitCode=fail?1:0;

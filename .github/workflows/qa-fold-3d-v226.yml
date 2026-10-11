@@ -1,0 +1,29 @@
+name: ShadowNex v2.2.6 Fold Modal and 3D QA (no deploy)
+on:
+  push:
+    branches: [qa/shadownex-v2.2.6-viewport-3d-gate]
+permissions:
+  contents: read
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Complete Node regression and 3D mock gate
+        run: npm test
+      - name: Production static build
+        run: npm run build
+      - name: Browser-only dependency
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core
+      - name: Local server only (no preview deployment)
+        run: |
+          node scripts/dev.mjs > /tmp/snx-local.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/snx-local.log
+          exit 1
+      - name: Real Chromium Android/Fold dialog assertions
+        run: node scripts/qa-fold-v226.mjs

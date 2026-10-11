@@ -25,6 +25,15 @@ for(const size of sizes){
   const fit=x=>x.rect.left>=x.visual.left-1&&x.rect.right<=x.visual.left+x.visual.width+1&&x.close.left>=x.visual.left-1&&x.close.right<=x.visual.left+x.visual.width+1&&x.rect.top>=x.visual.top-1&&x.rect.bottom<=x.visual.top+x.visual.height+1&&x.scrollWidth<=x.clientWidth+2;
   if(!fit(more))throw Error('More modal outside visual viewport '+JSON.stringify(more));
   // This must be an actual click: should guide users to Settings when no ion token exists.
+  const hit=await page.evaluate(()=>{
+    const btn=document.getElementById('threeDWorldBtn'),dialog=document.getElementById('moreDialog');
+    btn.scrollIntoView({block:'center'});
+    const r=btn.getBoundingClientRect(),d=dialog.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+    const e=document.elementFromPoint(x,y);
+    return {button:{x:r.left,y:r.top,right:r.right,bottom:r.bottom},dialog:{left:d.left,right:d.right,top:d.top,bottom:d.bottom,clientHeight:dialog.clientHeight,scrollHeight:dialog.scrollHeight,scrollTop:dialog.scrollTop},hit:e?.id||e?.tagName,insideButton:!!e?.closest?.('#threeDWorldBtn'),visual:{width:visualViewport.width,height:visualViewport.height,offsetLeft:visualViewport.offsetLeft,offsetTop:visualViewport.offsetTop}};
+  });
+  console.log('3D_BUTTON_HIT',size.width,JSON.stringify(hit));
+  if(!hit.insideButton)throw Error('3D button pointer obstructed: '+JSON.stringify(hit));
   await page.locator('#threeDWorldBtn').click({timeout:7000});
   await page.waitForFunction(()=>document.getElementById('settingsDialog')?.open);
   await page.waitForFunction(()=>document.getElementById('settingsDialog')?.classList.contains('viewport-modal'));

@@ -15,6 +15,9 @@ for(const size of screens){
  try{
   await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded',timeout:30000});
   await page.waitForFunction(()=>!!window.__shadowNexPrime,{timeout:30000});
+  // Quick Start is a true modal and correctly intercepts background taps.
+  // Finish the onboarding overlay before testing the visible map control.
+  await page.evaluate(()=>document.querySelectorAll('dialog[open]').forEach(d=>d.close()));
   const before=await page.evaluate(async()=>{
    const app=window.__shadowNexPrime;
    const {saveCollection}=await import('/src/core/watchStore.js');

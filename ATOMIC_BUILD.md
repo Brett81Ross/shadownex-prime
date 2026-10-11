@@ -5,7 +5,8 @@
 - [x] Add in-app live player with native/HLS.js compatibility, auto-open, close/retry and honest unavailable states.
 - [x] Reposition Reset App into top header, preserving one-click nondestructive reset without overlaying map controls.
 - [x] Native browser selected-camera stream playback and HLS.js fallback playback on actual public OKTraffic video, CORS, close/reopen cleanup and Reset top-header placement PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38106409563.
-- [ ] Final Fold/unfold QA for top-header Reset (running separately); physical Galaxy Fold validation after owner-approved deployment.
+- [x] Fold 360px → 840px → 360px header Reset positioning, native HLS and HLS.js live playback, stream shutdown all PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38106476856.
+- [ ] Physical Galaxy Fold verification after owner-approved production release.
 - [ ] Separate user approval required for merge and single production deploy; do not deploy yet.
 
 

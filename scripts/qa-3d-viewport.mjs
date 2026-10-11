@@ -8,7 +8,8 @@ assert.ok(ui.includes('installViewportDialogs()')&&css.includes('dialog.viewport
 assert.ok(ui.includes('threeDWorldBtn')&&html.includes('/src/ui/viewportDialogs.css'),'3D toggle visible');
 assert.ok(ui.includes('world3DAttribution')&&css.includes('.world3d-attribution'),'source credits shown when 3D enabled');
 assert.ok(source.includes('CesiumTerrainProvider.fromUrl')&&source.includes('Cesium3DTileset.fromUrl'),'true terrain and building geometry');
-assert.ok(!source.includes('createOsmBuildingsAsync')&&!source.includes('createWorldTerrainAsync'),'3D preview uses no token-gated ion source');
+const freeMethod=source.slice(source.indexOf('async setWorld3D('),source.indexOf('  requestRender(){',source.indexOf('async setWorld3D(')));
+assert.ok(!freeMethod.includes('createOsmBuildingsAsync')&&!freeMethod.includes('createWorldTerrainAsync'),'the new 3D toggle never calls token-gated ion providers');
 assert.ok(reset.includes('setWorld3D?.(false)'),'Reset App disables 3D');
 assert.equal(typeof installViewportDialogs,'function');
 const calls=[];

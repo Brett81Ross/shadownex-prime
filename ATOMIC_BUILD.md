@@ -6,7 +6,7 @@
 - [x] Add opt-in Cesium World Terrain + OSM 3D building geometry with local token gate, graceful fallback and disable option.
 - [x] Avoid representing 2D imagery as true 3D trees; do not add a billed Google service automatically.
 - [x] Preserve globe, saved watches, settings, and reset behavior.
-- [ ] Full Node 22 build, code QA and live browser Fold viewport verification.
+- [x] Full Node 22 QA, deterministic static build and five local Chromium viewport interaction tests PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38101118947. (Mock-only 3D provider QA; live token verification still pending.)
 - [ ] Physical Android verification and Cesium ion credential verification when available.
 - [ ] Owner approval before any merge or Vercel production deployment.
 

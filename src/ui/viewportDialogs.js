@@ -7,6 +7,25 @@ export function installViewportDialogs(){
   const excluded=new Set(['locationStartDialog','situationDialog']);
   const layout=()=>{
     const v=window.visualViewport;
+    // Some Android browser and Fold configurations expose an inflated layout viewport
+    // (e.g. 720 CSS px for 360 visible px). Constrain the whole app surface to the
+    // visible viewport; otherwise focusing a control pans the document horizontally.
+    const screenWidth=Math.max(1,v?.width||window.innerWidth);
+    const screenHeight=Math.max(1,v?.height||window.innerHeight);
+    if(v&&Math.abs(window.innerWidth-screenWidth)>8&&Math.abs(v.scale-1)<0.01){
+      document.documentElement.style.width=screenWidth+'px';
+      document.body.style.width=screenWidth+'px';
+      root.style.width=screenWidth+'px';
+      root.style.height=screenHeight+'px';
+      root.style.position='fixed';
+      root.style.left='0';
+      root.style.top='0';
+      root.style.maxWidth=screenWidth+'px';
+      root.style.maxHeight=screenHeight+'px';
+      window.requestAnimationFrame(()=>{
+        try{window.__shadowNexPrime?.globe?.viewer?.resize()}catch{}
+      });
+    }
     const width=Math.max(1,v?.width||window.innerWidth);
     const height=Math.max(1,v?.height||window.innerHeight);
     const left=v?.offsetLeft||0,top=v?.offsetTop||0;

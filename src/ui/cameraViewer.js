@@ -38,7 +38,7 @@ export function installCameraViewer(app){
     this._cameraGeneration=(this._cameraGeneration||0)+1;
     clearTimeout(this._cameraWait);
     if(this._cameraHls){this._cameraHls.destroy();this._cameraHls=null;}
-    const v=this.$('liveCameraVideo');if(v){v.pause();v.removeAttribute('src');v.load();}
+    const v=this.$('liveCameraVideo');if(v){v.autoplay=false;v.onplaying=null;v.onerror=null;v.pause();v.removeAttribute('src');v.load();v.pause();}
   };
   app.openLiveCamera=async function(meta){
     this.ensureLiveCameraUi();this.stopLiveCamera();this._cameraMeta=meta;
@@ -46,7 +46,7 @@ export function installCameraViewer(app){
     this.$('liveCameraName').textContent=String(meta.name||'Oklahoma Traffic Camera');
     this.$('liveCameraDirection').textContent='OKTRAFFIC · '+String(meta.view||'LIVE CAMERA').toUpperCase();
     if(!d.open)d.showModal();
-    const generation=this._cameraGeneration,stream=validatedOklahomaHls(meta.streamUrl);
+    video.autoplay=true;const generation=this._cameraGeneration,stream=validatedOklahomaHls(meta.streamUrl);
     this.$('liveCameraRetry').disabled=!stream;
     status.textContent=stream?'Connecting to this camera’s video stream…':'No direct video published for this camera.';
     if(!stream)return;

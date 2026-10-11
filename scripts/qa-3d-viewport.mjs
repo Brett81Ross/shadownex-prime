@@ -1,0 +1,51 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {GlobeController} from '../src/globe/GlobeController.js';
+import {installViewportDialogs} from '../src/ui/viewportDialogs.js';
+const read=p=>readFile(new URL('../'+p,import.meta.url),'utf8');
+const [ui,css,html,source,reset]=await Promise.all(['src/ui/friendlyUiEnhancements.js','src/ui/viewportDialogs.css','index.html','src/globe/GlobeController.js','src/ui/sblWatch.js'].map(read));
+assert.ok(ui.includes('installViewportDialogs()')&&css.includes('dialog.viewport-modal'),'visual viewport covers remaining dialogs');
+assert.ok(ui.includes('threeDWorldBtn')&&html.includes('/src/ui/viewportDialogs.css'),'3D toggle visible');
+assert.ok(ui.includes('world3DAttribution')&&css.includes('.world3d-attribution'),'source credits shown when 3D enabled');
+assert.ok(source.includes('CesiumTerrainProvider.fromUrl')&&source.includes('Cesium3DTileset.fromUrl'),'true terrain and building geometry');
+const freeMethod=source.slice(source.indexOf('async setWorld3D('),source.indexOf('  requestRender(){',source.indexOf('async setWorld3D(')));
+assert.ok(!freeMethod.includes('createOsmBuildingsAsync')&&!freeMethod.includes('createWorldTerrainAsync'),'the new 3D toggle never calls token-gated ion providers');
+assert.ok(reset.includes('setWorld3D?.(false)'),'Reset App disables 3D');
+assert.equal(typeof installViewportDialogs,'function');
+const calls=[];
+const C={
+ CesiumTerrainProvider:{fromUrl:async(url)=>{calls.push(['terrain',url]);return {name:'free-terrain'}}},
+ Cesium3DTileset:{fromUrl:async(url)=>{calls.push(['buildings',url]);return {show:true}}},
+ EllipsoidTerrainProvider:class{constructor(){calls.push(['ellipsoid']);}}
+};
+globalThis.window={Cesium:C};
+const credit={classList:{add:()=>calls.push(['hide-credits']),remove:()=>calls.push(['show-credits'])}};
+globalThis.document={getElementById:()=>credit};
+const globe=Object.create(GlobeController.prototype);
+globe.world3DMode='off';
+globe.viewer={terrainProvider:null,scene:{globe:{maximumScreenSpaceError:1.35},primitives:{add:t=>{calls.push(['add']);return t;}}}};
+globe.settings={cesiumToken:''};globe.requestRender=()=>calls.push(['render']);
+let result=await globe.setWorld3D(true);
+assert.equal(result.ok,true,'no-token terrain and building activation works');
+assert.equal(result.buildings,true);
+assert.equal(globe.world3DMode,'on');
+assert.ok(calls.some(a=>a[0]==='terrain'&&a[1]==='https://terrain.reearth.land/cesium-mesh/ellipsoid'));
+assert.ok(calls.some(a=>a[0]==='buildings'&&a[1]==='https://buildings.reearth.land/tileset.json'));
+const loaded=calls.filter(a=>a[0]==='buildings').length;
+result=await globe.setWorld3D(false);assert.equal(result.ok,true);
+assert.equal(globe.world3DMode,'off');assert.equal(globe.world3DBuildings.show,false);
+assert.equal(globe.terrainStatus,'ELLIPSOID');
+assert.equal((await globe.setWorld3D(true)).ok,true);
+assert.equal(calls.filter(a=>a[0]==='buildings').length,loaded,'reuse tileset for reopening');
+await globe.setWorld3D(false);globe.world3DBuildings=null;
+C.Cesium3DTileset.fromUrl=async()=>{throw new Error('simulated 3D building outage')};
+result=await globe.setWorld3D(true);
+assert.equal(result.ok,true,'terrain still works if building tiles fail');
+assert.equal(result.buildings,false);
+assert.equal(globe.world3DMode,'terrain-only');
+await globe.setWorld3D(false);
+C.CesiumTerrainProvider.fromUrl=async()=>{throw new Error('simulated terrain outage')};
+result=await globe.setWorld3D(true);
+assert.equal(result.ok,false,'no flat fake 3D when terrain is offline');
+assert.equal(globe.world3DMode,'off');
+console.log('PASS: free 3D has no paid providers, correct attribution, reversible terrain/buildings and safe degraded fallbacks');

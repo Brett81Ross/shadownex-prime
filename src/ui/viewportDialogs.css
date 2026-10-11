@@ -1,0 +1,76 @@
+/* Visible viewport modal containment for Android/Fold WebView browser zoom. */
+dialog.viewport-modal{
+  position:fixed;
+  inset:auto;
+  right:auto;
+  bottom:auto;
+  transform:translate(-50%,-50%);
+  min-width:0;
+  margin:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  box-sizing:border-box;
+}
+dialog.viewport-modal > .modal-card{
+  box-sizing:border-box;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  grid-template-columns:minmax(0,1fr);
+}
+dialog.viewport-modal > .modal-card.compact{max-width:100%}
+dialog.viewport-modal .modal-head{min-width:0;gap:10px}
+dialog.viewport-modal .modal-head > div{min-width:0;overflow-wrap:anywhere}
+dialog.viewport-modal .modal-head > button{flex:0 0 auto}
+dialog.viewport-modal .more-grid,
+dialog.viewport-modal .earth-view-switch,
+dialog.viewport-modal .command-input-row,
+dialog.viewport-modal .modal-actions{min-width:0;max-width:100%}
+dialog.viewport-modal input,
+dialog.viewport-modal select,
+dialog.viewport-modal img,
+dialog.viewport-modal canvas{max-width:100%}
+dialog.viewport-modal .modal-card *{overflow-wrap:anywhere}
+.three-d-world-btn{
+  grid-column:1/-1;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid rgba(0,240,255,.33);
+  background:rgba(0,240,255,.08);
+  color:var(--cyan);
+  min-height:44px;
+  font:900 10px ui-monospace,monospace;
+}
+.three-d-world-btn:disabled{opacity:.65;cursor:wait}
+.three-d-world-note{grid-column:1/-1;color:var(--muted);font-size:9px;line-height:1.45}
+
+/* Display required third-party attribution only while the open-data 3D preview is on. */
+.world3d-attribution{
+  position:absolute;z-index:25;left:8px;bottom:76px;
+  width:min(340px,calc(100% - 16px));max-height:60px;overflow:auto;
+  padding:5px 7px;border-radius:6px;background:rgba(0,0,0,.78);
+  color:#d7f4f2;font:600 9px/1.3 ui-sans-serif,system-ui,sans-serif;
+  pointer-events:none;
+}
+
+/* v2.2.6 Fold transition regression: follow dynamic app dimensions, never the stale viewport. */
+#app{position:relative;min-width:0;max-width:100%;width:100%;height:100dvh}
+dialog.viewport-modal.watch-dialog .watch-card{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  max-height:none;
+  overflow-x:hidden;
+}
+dialog.viewport-modal.watch-dialog .watch-tabs{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+dialog.viewport-modal.watch-dialog .watch-create,
+dialog.viewport-modal.watch-dialog .watch-area-create{
+  grid-template-columns:minmax(0,1fr);
+}
+dialog.viewport-modal.watch-dialog .watch-create>*,
+dialog.viewport-modal.watch-dialog .watch-area-create>*{
+  min-width:0;max-width:100%;width:100%;
+}

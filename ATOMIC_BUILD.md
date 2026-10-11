@@ -1,5 +1,22 @@
 # ShadowNex Prime™ Atomic Build
 
+## ABL v2.2.6 — Galaxy Fold viewport + optional 3D (staging only)
+- [x] Contain More, Settings, Watch Center and remaining overlays in the *actual* visible viewport, with vertical scrolling.
+- [x] Preserve earlier location and briefing viewport corrections.
+- [x] Implement opt-in, zero-key Re:Earth quantized-mesh terrain plus Overture-based 3D building geometry, with attribution and terrain-only fallback.
+- [x] Avoid representing 2D imagery as true 3D trees; do not add a billed Google service automatically.
+- [x] Preserve globe, saved watches, settings, and reset behavior.
+- [x] Full Node 22 QA, deterministic static build and five local Chromium viewport interaction tests PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38101118947. (Mock-only 3D provider QA; live token verification still pending.)
+- [x] Correct stale root/globe dimensions on Fold orientation changes, attach Reset App to globe, and constrain Watch Center contents; real browser 360→840→360→412→720→412 without reloading PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38102671194. Earlier baseline run 38102535155 reproduced the failure.
+- [x] Token-free Re:Earth terrain/buildings streaming smoke-test passed in Chromium: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38102268514.
+- [x] Re:Earth terrain/buildings metadata endpoints, CORS, browser activation/disable on 360px Android-style Chromium PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38102268514.
+- [ ] Physical Galaxy Fold QA, close-range elevation/building geometry and performance at real geographic locations.
+- [ ] Respect provider notice: community building endpoint not for production-scale reliance. Find a compliant mirror/host if traffic grows.
+- [ ] Owner approval before any merge or Vercel production deployment.
+
+**Release boundary:** STAGING ONLY. No Vercel preview or production deployment.
+
+
 ## ABL v2.2.5 — Visible Reset App (isolated; not deployed)
 - [x] Reuse existing everyday `fullReset()` behavior without erasing watch collections or settings.
 - [x] Add a dedicated Reset App button with a 44px tap target and visible label.

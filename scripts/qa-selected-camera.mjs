@@ -44,6 +44,21 @@ try{
  const stopped=await page.evaluate(()=>({dialogOpen:document.getElementById('liveCameraDialog').open,hlsAlive:!!window.__shadowNexPrime._cameraHls,paused:document.getElementById('liveCameraVideo').paused,ready:document.getElementById('liveCameraVideo').readyState,hasSource:!!document.getElementById('liveCameraVideo').getAttribute('src'),network:document.getElementById('liveCameraVideo').networkState}));
  console.log('CAMERA_CLEANUP',JSON.stringify(stopped));
  if(stopped.dialogOpen||stopped.hlsAlive||stopped.hasSource||stopped.ready!==0)throw Error('Camera media network source did not release on close');
+ // Also force the HLS.js/MSE fallback used by Android browsers without native HLS support.
+ await page.evaluate(()=>{const v=document.getElementById('liveCameraVideo');v.canPlayType=()=>'';});
+ await page.evaluate(camera=>{
+   window.__shadowNexPrime.openLiveCamera({type:'CCTV',id:camera.id,name:camera.name,streamUrl:camera.streamUrl,view:camera.direction});
+ },camera);
+ await page.waitForFunction(()=>!!window.Hls&&!!window.__shadowNexPrime._cameraHls,null,{timeout:35000});
+ let fallbackPlaying=false;
+ try{await page.waitForFunction(()=>{
+   const v=document.getElementById('liveCameraVideo');return v&&!v.paused&&v.readyState>=2&&v.currentTime>0;
+ },null,{timeout:32000});fallbackPlaying=true}catch{}
+ const fallback=await page.evaluate(()=>({hlsLoaded:!!window.Hls,hlsInstance:!!window.__shadowNexPrime._cameraHls,status:document.getElementById('liveCameraStatus').textContent,ready:document.getElementById('liveCameraVideo').readyState,time:document.getElementById('liveCameraVideo').currentTime}));
+ console.log('OKTRAFFIC_HLSJS_FALLBACK',JSON.stringify({playing:fallbackPlaying,fallback,errors,streamResponses:streamResponses.slice(-12)}));
+ if(!fallbackPlaying)throw Error('HLS.js fallback failed to play selected Oklahoma traffic camera');
+ await page.locator('#liveCameraClose').click();
+ await page.waitForFunction(()=>!window.__shadowNexPrime._cameraHls,null,{timeout:6000});
  await context.close();
 }finally{await browser.close()}
 console.log('PASS: exact selected Oklahoma camera live video plays in Chromium, header Reset remains clear, close releases stream');

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.4 — Fold and mobile dialog containment (isolated candidate)
+- Restrict location-start and regional briefing dialogs to the current viewport and allow vertical scrolling.
+- Prevent inner grid tracks, cards, and headers from forcing modal content horizontally off-screen.
+- Preserve globe, feeds, branding, APK, and other dialogs unchanged.
+
+
 ## 2.2.3 — Startup module-linking hotfix
 - Export the missing fmtDistanceKm utility used by rich profiles and Watch Center; display miles.
 - Add an actual ES-module linking QA gate to catch missing imports/exports before deployment.

@@ -2,7 +2,7 @@ import {readFile} from 'node:fs/promises';
 import {importanceFor,buildSituation,inViewport,situationSummary} from '../src/core/situation.js';
 let pass=0,fail=0;const check=(ok,msg)=>{if(ok){console.log('✓',msg);pass++;}else{console.error('✗',msg);fail++;}};
 const read=p=>readFile(new URL(`../${p}`,import.meta.url),'utf8');
-const ui=await read('src/ui/situationEnhancements.js'),css=await read('src/ui/situation.css'),main=await read('src/main.js');
+const ui=await read('src/ui/situationEnhancements.js'),css=await read('src/ui/situation.css'),sbl=await read('src/ui/sblUi.js'),main=await read('src/main.js');
 const now=Date.now(),center={lat:35.4676,lon:-97.5164};
 const q={type:'EARTHQUAKE',name:'Test quake',magnitude:5.6,latitude:35.5,longitude:-97.6,time:now-120000,source:'USGS'};
 const routine={type:'AIRCRAFT',name:'TEST1',latitude:38,longitude:-100,updatedAt:now-30000,source:'OpenSky Network'};
@@ -19,5 +19,7 @@ check(ui.includes('WHAT’S HAPPENING HERE?')&&ui.includes('Regional / Daily Bri
 check(ui.includes('locationNearBtn')&&ui.includes('navigator.geolocation.getCurrentPosition')&&ui.includes('LOCATION IS OPTIONAL'),'location-first entry is opt-in and explicit');
 check(ui.includes('WHY SHOWN:')&&ui.includes('applyImportanceVisuals'),'explainable cards and map visual hierarchy are implemented');
 check(css.includes('.situation-card.high')&&css.includes('.situation-fab'),'situation UI has primary and high-priority visual states');
+check(css.includes('dialog.location-start,')&&css.includes('dialog.situation-dialog{')&&css.includes('grid-template-columns:minmax(0,1fr)'),'onboarding and briefing dialogs have mobile viewport containment and zero-min grid sizing');
+check(ui.includes('visualViewport')&&ui.includes('this.fitSituationDialog(d)')&&sbl.includes('this.fitSituationDialog(d)'),'location and current briefing both align to actual visible Android viewport');
 check(main.includes('installSituationEnhancements(app)'),'situation enhancement module is installed before app initialization');
 console.log(`\nSituation QA: ${pass} passed, ${fail} failed`);process.exitCode=fail?1:0;

@@ -1,5 +1,17 @@
 # ShadowNex Prime™ Atomic Build
 
+## ABL v2.2.5 — Visible Reset App (isolated; not deployed)
+- [x] Reuse existing everyday `fullReset()` behavior without erasing watch collections or settings.
+- [x] Add a dedicated Reset App button with a 44px tap target and visible label.
+- [x] Position the control inside Android/Fold visual viewport and update on resize/scroll.
+- [x] Reset temporary display mode/lens without persisting over saved settings.
+- [x] Add source-level regression checks.
+- [x] Full Node 22 automated QA, deterministic build and five real Chromium Android/Fold/desktop click-and-persistence checks passed. QA run: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38100147370.
+- [ ] Owner review and explicit separate approval before merge/production deployment.
+
+**Release boundary:** STAGING ONLY. Do not merge, create Vercel preview, or deploy without explicit approval.
+
+
 ## v2.2.1+ — Stability, clarity, globe reliability
 
 ### TOP PRIORITY — IMPLEMENTED IN STAGING

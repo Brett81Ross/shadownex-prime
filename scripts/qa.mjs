@@ -11,7 +11,7 @@ let pass=0,fail=0;
 const check=(ok,msg)=>{if(ok){console.log('✓',msg);pass++;}else{console.error('✗',msg);fail++;}};
 
 const pkg=JSON.parse(await readFile(new URL('../package.json',import.meta.url),'utf8'));
-check(pkg.version==='2.2.4','version is 2.2.4');
+check(pkg.version==='2.2.5','version is 2.2.5');
 check(pkg.engines?.node==='>=22 <23','Node engine targets 22.x');
 check(Object.keys(pkg.dependencies||{}).length===0&&Object.keys(pkg.devDependencies||{}).length===0,'no npm dependencies');
 

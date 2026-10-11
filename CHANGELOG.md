@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.5 — Visible non-destructive Reset App (atomic candidate, no deploy)
+- Add a dedicated 44px-tall Reset App control positioned inside the actual Android/Fold visual viewport without crowding primary navigation.
+- Reset the current globe, enabled layers, display lens, and controls to everyday defaults through the existing Full Reset routine.
+- Preserve on-device settings (including saved display preferences), Saved Views, Watch Areas, and Favorites; never run a factory wipe.
+- Add regression gates for the control, viewport placement, and non-destructive settings behavior.
+- Release staged only; no merge or deployment authorized.
+
+
 ## 2.2.4 — Fold and mobile dialog containment (isolated candidate)
 - Restrict location-start and regional briefing dialogs to the current viewport and allow vertical scrolling.
 - Prevent inner grid tracks, cards, and headers from forcing modal content horizontally off-screen.

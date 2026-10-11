@@ -11,7 +11,10 @@ check(ui.includes('favoriteSelected')&&ui.includes('last known position')&&ui.in
 check(ui.includes('NOW')&&ui.includes('15 MIN')&&ui.includes('1 HR')&&ui.includes('6 HR')&&ui.includes('24 HR')&&ui.includes('applyTimelineWindow'),'event-window ribbon filters loaded event entities');
 check(ui.includes('NEARBY CONTEXT')&&ui.includes('WITHIN 100 MILES')&&css.includes('.sbl-simple .correlation-box{display:none}'),'Simple Mode replaces correlation jargon with Nearby Context');
 check(ui.includes('navHistory')&&ui.includes('goBackState')&&ui.includes('restoreState')&&ui.includes('length>12'),'Back/Undo uses bounded map-state history');
-check(ui.includes('fullReset')&&ui.includes("setLayer('earthquakes',true)")&&ui.includes("setLayer('aircraft',true)")&&ui.includes("applyUiMode('simple')"),'Full Reset restores everyday defaults');
+check(ui.includes('fullReset')&&ui.includes("setLayer('earthquakes',true)")&&ui.includes("setLayer('aircraft',true)")&&ui.includes("applyUiMode('simple',false)"),'Full Reset restores everyday defaults');
+check(ui.includes("id='resetAppBtn'")&&ui.includes('positionResetAppButton')&&ui.includes('window.visualViewport')&&ui.includes('resetButton.onclick=async'),'Reset App has a dedicated always-visible, viewport-aware action');
+check(ui.includes("this.setLens('normal',false)")&&ui.includes("this.applyUiMode('simple',false)"),'map reset changes runtime view without overwriting saved lens/UI preferences');
+check(!ui.slice(ui.indexOf('app.fullReset='),ui.indexOf('app.renderWatchCenter=')).includes("saveCollection('views'")&&!ui.slice(ui.indexOf('app.fullReset='),ui.indexOf('app.renderWatchCenter=')).includes("resetSettings("),'Full Reset does not erase Saved Views, Watch Areas, Favorites or app settings');
 check(main.includes('installSblWatch(app)'),'SBL-02 Watch module is wired into app boot');
 check(abl.includes('SBL-02')&&abl.includes('STAGING ONLY'),'ABL records SBL-02 staging-only boundary');
 console.log(`\nSBL-02 QA: ${pass} passed, ${fail} failed`);process.exitCode=fail?1:0;

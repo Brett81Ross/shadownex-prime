@@ -7,7 +7,7 @@ export function normalizeWindyWebcam(cam){
  if(!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180||!cam?.webcamId)return null;
  const cleanUrl=s=>{try{const u=new URL(s);return u.protocol==='https:'&&!u.username&&!u.password?u.href:null}catch{return null}};
  const official=cleanUrl(cam.urls?.detail);
- if(!official||!new URL(official).hostname.endsWith('windy.com'))return null;
+ if(!official||!((h)=>h==='windy.com'||h.endsWith('.windy.com'))(new URL(official).hostname))return null;
  const player=typeof cam.player?.live==='string'?cam.player.live:cam.player?.day;
  const image=cam.images?.current?.preview||cam.images?.current?.icon||null;
  return {id:'WINDY-'+cam.webcamId,groupId:'WINDY-'+cam.webcamId,

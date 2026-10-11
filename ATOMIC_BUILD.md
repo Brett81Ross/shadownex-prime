@@ -2,7 +2,10 @@
 
 ## ABL v2.2.7 — Expanded US / international CCTV and no-overlap Reset (staging only)
 - [x] Additional no-key Iowa DOT statewide official camera source with real image/video URLs when available.
-- [ ] Direction switcher, media type handling, fullscreen, and provider parity tests.
+- [x] Direction switcher for shared camera positions, fullscreen, HLS video/short clips/still photos/Windy official embeds.
+- [x] Worldwide Windy Webcams API v3 discovery adapter with secure server-only free key (disabled when no key is configured), 50 nearby webcam limit / 250km and moving-globe refresh.
+- [ ] Verify global connector with a user-provided free Windy API key before describing its worldwide coverage as active.
+- [ ] Full Android/Fold browser QA and no-credential fallback.
 - [x] Open the exact selected OKTraffic camera HLS video, not the provider's general landing page.
 - [x] Add in-app live player with native/HLS.js compatibility, auto-open, close/retry and honest unavailable states.
 - [x] Reposition Reset App into top header, preserving one-click nondestructive reset without overlaying map controls.

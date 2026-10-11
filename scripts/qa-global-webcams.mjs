@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {normalizeWindyWebcam} from '../api/webcams.js';
+import {resolveCameraMedia} from '../src/ui/cameraViewer.js';
+const source={webcamId:123456,status:'active',title:'Scenic camera',location:{latitude:48.2,longitude:16.36,country:'Austria'},images:{current:{preview:'https://images-webcams.windy.com/test.jpeg'}},urls:{detail:'https://www.windy.com/webcams/123456'},player:{live:'https://embed.windy.com/webcams/123456/live'}};
+const sample=normalizeWindyWebcam(source);
+assert.ok(sample&&sample.id==='WINDY-123456'&&sample.lat===48.2&&sample.lon===16.36);
+assert.equal(sample.source,'Windy Webcams');assert.equal(sample.mediaKind,'provider-embed');
+assert.equal(resolveCameraMedia(sample).kind,'embed');
+assert.equal(normalizeWindyWebcam({...source,location:{latitude:NaN,longitude:1}}),null);
+assert.equal(normalizeWindyWebcam({...source,urls:{detail:'https://malicious.example/'}}),null);
+assert.equal(resolveCameraMedia({...sample,playerUrl:'https://evil.example/webcam'}).kind,'snapshot');
+assert.equal(resolveCameraMedia({...sample,playerUrl:'http://embed.windy.com/webcam'}).kind,'snapshot');
+console.log('PASS: global v3 camera normalization, provider iframe allowlist, photo fallback and official Windy source links');

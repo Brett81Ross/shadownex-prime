@@ -14,6 +14,7 @@ const options=cameraDirections({id:'OK-1',groupId:'P1',source:'OKTraffic / ODOT-
 assert.equal(options.length,2);assert.deepEqual(options.map(x=>x.view),['North','South']);
 assert.ok(api.includes('loadIowa')&&api.includes('Traffic_Cameras_View/FeatureServer'),'official Iowa statewide provider available');
 assert.ok(layer.includes('catalogPoints')&&layer.includes('groupId:c.groupId'),'all provider directions available');
+assert.ok(layer.includes("'/api/webcams?lat='")&&layer.includes('camera.moveEnd.addEventListener'),'global optional webcam discovery follows map center');
 assert.ok(api.includes('loadTfl')&&api.includes('loadCaltrans')&&api.includes('loadMaryland')&&api.includes('loadSeattle')&&api.includes('loadAustin')&&api.includes('loadOklahoma'),'existing providers preserved');
 assert.ok(abl.includes('this.openLiveCamera(meta)')&&app.includes('this.openLiveCamera(meta)')&&brief.includes('this.openLiveCamera(meta)'));
 assert.ok(main.includes('installCameraViewer(app)'));

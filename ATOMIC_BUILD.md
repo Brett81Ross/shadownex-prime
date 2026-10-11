@@ -6,7 +6,7 @@
 - [x] Position the control inside Android/Fold visual viewport and update on resize/scroll.
 - [x] Reset temporary display mode/lens without persisting over saved settings.
 - [x] Add source-level regression checks.
-- [ ] Full Node 22 automated QA, deterministic build and real mobile browser checks.
+- [x] Full Node 22 automated QA, deterministic build and five real Chromium Android/Fold/desktop click-and-persistence checks passed. QA run: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38100147370.
 - [ ] Owner review and explicit separate approval before merge/production deployment.
 
 **Release boundary:** STAGING ONLY. Do not merge, create Vercel preview, or deploy without explicit approval.

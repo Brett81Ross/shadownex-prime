@@ -26,14 +26,6 @@ export function installSblWatch(app){
       catch(error){console.error('ShadowNex Reset App failed',error);this.toast('Reset could not finish. Please retry.');}
       finally{resetButton.disabled=false;resetButton.removeAttribute('aria-busy');resetButton.textContent='↻ RESET APP';}
     };
-    this.positionResetAppButton();
-    if(!this._resetViewportBound){
-      const place=()=>this.positionResetAppButton();
-      window.visualViewport?.addEventListener('resize',place);
-      window.visualViewport?.addEventListener('scroll',place);
-      window.addEventListener('resize',place);
-      this._resetViewportBound=true;
-    }
   };
 
   app.init=async function(){
@@ -54,17 +46,6 @@ export function installSblWatch(app){
     if(!this.$('watchDialog'))host.insertAdjacentHTML('beforeend',`<dialog id='watchDialog' class='modal glass watch-dialog'><div class='modal-card watch-card'><div class='modal-head'><div><b>Watch Center</b><small>SAVED VIEWS · WATCH AREAS · FAVORITES · RECENT ACTIVITY</small></div><button id='watchCloseBtn' class='icon-btn' type='button'>✕</button></div><div class='watch-tabs'><button data-watch-tab='views' class='active'>VIEWS</button><button data-watch-tab='areas'>AREAS</button><button data-watch-tab='favorites'>FAVORITES</button><button data-watch-tab='activity'>ACTIVITY</button></div><section id='watchTabViews' class='watch-tab active'><div class='watch-create'><input id='saveViewName' placeholder='Name this view (optional)' maxlength='40'><button id='saveViewBtn' type='button'>SAVE CURRENT VIEW</button></div><div id='savedViewsList' class='watch-list'></div></section><section id='watchTabAreas' class='watch-tab'><div class='watch-create watch-area-create'><input id='watchAreaName' placeholder='Name this area (optional)' maxlength='40'><select id='watchRadius'><option value='16.0934'>10 mi radius</option><option value='40.2336'>25 mi radius</option><option value='80.4672' selected>50 mi radius</option><option value='160.934'>100 mi radius</option><option value='402.336'>250 mi radius</option></select><button id='addWatchBtn' type='button'>WATCH CURRENT AREA</button></div><div class='watch-note'>Watch Areas scan contacts/events already loaded in this open app. They are not background monitoring and do not run while ShadowNex is closed.</div><div id='watchAreasList' class='watch-list'></div></section><section id='watchTabFavorites' class='watch-tab'><button id='favoriteSelectedBtn' class='watch-primary' type='button'>☆ FAVORITE SELECTED SUBJECT</button><div id='favoritesList' class='watch-list'></div></section><section id='watchTabActivity' class='watch-tab'><div class='timeline-ribbon'><span>EVENT WINDOW</span><button data-window-hours='0.0833'>NOW</button><button data-window-hours='0.25'>15 MIN</button><button data-window-hours='1'>1 HR</button><button data-window-hours='6'>6 HR</button><button data-window-hours='24' class='active'>24 HR</button></div><button id='clearActivityBtn' class='ghost-btn' type='button'>CLEAR RECENT ACTIVITY</button><div id='activityList' class='watch-list'></div></section></div></dialog>`);
     const more=this.$('moreDialog')?.querySelector('.more-grid');
     if(more&&!this.$('moreLayersBtn'))more.insertAdjacentHTML('afterbegin',`<button id='moreLayersBtn' class='preset-card' type='button'><strong>Layers & Sources</strong><small>Open the full feed list.</small></button><button id='moreBackBtn' class='preset-card' type='button'><strong>Back / Undo View</strong><small>Return to the previous map state.</small></button><button id='moreResetBtn' class='preset-card' type='button'><strong>Full Reset</strong><small>Return ShadowNex to safe everyday defaults.</small></button>`);
-  };
-
-  // Android's visual viewport can be narrower than the page layout viewport.
-  // Keep this dedicated control visible without squeezing a sixth navigation tab.
-  app.positionResetAppButton=function(){
-    const button=this.$?.('resetAppBtn');if(!button)return;
-    const view=window.visualViewport;
-    const left=view?.offsetLeft||0,top=view?.offsetTop||0;
-    const width=view?.width||window.innerWidth,height=view?.height||window.innerHeight;
-    button.style.left=Math.round(left+width-12)+'px';
-    button.style.top=Math.round(top+Math.max(76,height-164))+'px';
   };
 
   app.openWatchCenter=function(tab='views'){this.renderWatchCenter();this.showWatchTab(tab);const d=this.$('watchDialog');if(!d.open)d.showModal();};

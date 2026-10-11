@@ -1,0 +1,29 @@
+name: ShadowNex v2.2.5 Reset App QA (no deploy)
+on:
+  push:
+    branches: [qa/shadownex-v2.2.5-reset-gate]
+permissions:
+  contents: read
+jobs:
+  reset:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: All existing regression suites (including module graph)
+        run: npm test
+      - name: Static deterministic build
+        run: npm run build
+      - name: Test-only Chromium dependency
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core
+      - name: Local application server (never Vercel)
+        run: |
+          node scripts/dev.mjs > /tmp/snx-reset-dev.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/snx-reset-dev.log
+          exit 1
+      - name: Verify visible Reset App with saved data intact
+        run: node scripts/qa-visible-reset.mjs

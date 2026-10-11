@@ -7,7 +7,7 @@ const sizes=[{width:360,height:740},{width:840,height:620},{width:360,height:740
 try{
  const ctx=await browser.newContext({viewport:sizes[0],isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (Linux; Android 16; SM-F936U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36'});
  const page=await ctx.newPage();const errors=[];page.on('pageerror',x=>errors.push(String(x)));
- await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded',timeout:35000});
+ await page.goto('https://shadownex-prime.vercel.app/',{waitUntil:'domcontentloaded',timeout:35000});
  await page.waitForFunction(()=>!!window.__shadowNexPrime,null,{timeout:35000});
  await page.evaluate(()=>document.querySelectorAll('dialog[open]').forEach(d=>d.close()));
  let failed=0;

@@ -1,0 +1,53 @@
+name: ShadowNex ABL 8 $0 National + Global Gate
+on:
+  push:
+    branches: [qa/shadownex-v227-wsdot-windy-final]
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: {node-version: '22'}
+      - name: Entire existing regression suite
+        run: npm test
+      - name: Production static build (no deploy)
+        run: npm run build
+      - name: Verify public WSDOT statewide ArcGIS cameras, no key
+        run: |
+          set -euo pipefail
+          curl -fsSL --max-time 30 'https://data.wsdot.wa.gov/arcgis/rest/services/TravelInformation/TravelInfoCamerasWeather/FeatureServer/0/query?where=1%3D1&outFields=*&resultRecordCount=3&outSR=4326&f=geojson' -o /tmp/wsdot.json
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const d=JSON.parse(fs.readFileSync('/tmp/wsdot.json','utf8'));
+          if(!d.features?.some(x=>x.properties?.ImageURL&&x.geometry?.coordinates?.length===2))throw Error('WSDOT official camera feed not returning locations/images');
+          console.log('PASS: WSDOT open statewide CCTV still image/coords verified');
+          NODE
+      - name: Verify official Iowa open camera feed
+        run: |
+          curl -fsSL --max-time 30 'https://services.arcgis.com/8lRhdTsQyJpO52F1/arcgis/rest/services/Traffic_Cameras_View/FeatureServer/0/query?where=1%3D1&outFields=*&resultRecordCount=12&outSR=4326&f=geojson' -o /tmp/iowa.json
+          node --input-type=module -e "import fs from 'node:fs';const d=JSON.parse(fs.readFileSync('/tmp/iowa.json'));if(!d.features?.some(x=>x.properties?.ImageURL))throw Error('Official Iowa no-key camera metadata not returned');console.log('PASS: Iowa open CCTV metadata verified')"
+      - name: Windy V3 no-key safe fallback (never charge)
+        run: |
+          node --input-type=module - <<'NODE'
+          import handler from './api/webcams.js';
+          delete process.env.WINDY_WEBCAMS_API_KEY;
+          let status=0,body;
+          await handler({method:'GET',query:{lat:'35',lon:'-97'}},{status(n){status=n;return this},json(v){body=v;return v}});
+          if(status!==200||body.configured!==false||body.points.length)throw Error('Unexpected no-key Windy API behavior');
+          console.log('PASS: Windy Webcams server-only key gate disables upstream when no key');
+          NODE
+      - name: Temporary Chromium driver (CI only)
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core
+      - name: Local dev server (no Vercel preview)
+        run: |
+          node scripts/dev.mjs > /tmp/shadownex-abl8.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/shadownex-abl8.log
+          exit 1
+      - name: Verify selected Oklahoma live HLS, Android Fold, and media teardown
+        run: node scripts/qa-selected-camera.mjs
+      - name: Verify direction fullscreen clip/still and fallback interactions
+        run: node scripts/qa-camera-controls.mjs

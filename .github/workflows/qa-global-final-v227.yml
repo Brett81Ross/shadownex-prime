@@ -39,3 +39,5 @@ jobs:
           exit 1
       - name: Real Oklahoma camera native and HLS.js stream with Fold resize checks
         run: node scripts/qa-selected-camera.mjs
+      - name: Global camera direction, fullscreen and fallback UI
+        run: node scripts/qa-camera-controls.mjs

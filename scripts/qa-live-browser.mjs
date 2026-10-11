@@ -33,6 +33,8 @@ for(const mode of ['desktop','android-webview-like']){
    webglAvailable:(()=>{try{const c=document.createElement('canvas');return !!(c.getContext('webgl2')||c.getContext('webgl'));}catch(e){return String(e)}})()
   }));
   console.log('BOOT_DIAG',mode,JSON.stringify(state));
+  if(!state.appBooted || state.splashStillVisible || !state.cesiumLoaded)throw new Error('Production browser startup failed: '+JSON.stringify(state));
+  if(errs.some(e=>e.startsWith('PAGEERROR ')))throw new Error('Production had JavaScript page errors: '+JSON.stringify(errs));
  }catch(e){errs.push('NAVIGATION '+String(e?.stack||e));}
  console.log('BOOT_ERRORS',mode,JSON.stringify(errs.slice(0,40)));
  await context.close();

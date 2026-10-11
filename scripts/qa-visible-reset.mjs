@@ -13,7 +13,7 @@ for(const size of screens){
  const page=await context.newPage(),errors=[];
  page.on('pageerror',err=>errors.push(String(err)));
  try{
-  await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded',timeout:30000});
+  await page.goto('https://shadownex-prime.vercel.app/',{waitUntil:'domcontentloaded',timeout:30000});
   await page.waitForFunction(()=>!!window.__shadowNexPrime,{timeout:30000});
   // Quick Start is a true modal and correctly intercepts background taps.
   // Finish the onboarding overlay before testing the visible map control.

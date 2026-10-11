@@ -12,7 +12,7 @@ for(const v of sizes){
  const errors=[];
  page.on('pageerror',err=>errors.push(err.message));
  try{
-  await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded',timeout:30000});
+  await page.goto('https://shadownex-prime.vercel.app/',{waitUntil:'domcontentloaded',timeout:30000});
   await page.waitForFunction(()=>!!window.__shadowNexPrime,null,{timeout:40000});
   const result=await page.evaluate(()=>{
    const app=window.__shadowNexPrime;

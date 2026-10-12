@@ -1,0 +1,32 @@
+name: ShadowNex v2.2.7 Windy Free-Tier Compliance (no deploy)
+on:
+  push:
+    branches: [qa/shadownex-v227-windy-compliance]
+permissions:
+  contents: read
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Full regression suite
+        run: npm test
+      - name: Deterministic build
+        run: npm run build
+      - name: No-key API integration fail-safe (do not contact Windy)
+        run: |
+          node --input-type=module -e "import api from './api/webcams.js';delete process.env.WINDY_WEBCAMS_API_KEY;globalThis.fetch=()=>{throw Error('Windy was called without a key')};let response;await api({method:'GET',query:{lat:35,lon:-97}},{status(code){this.code=code;return this},json(data){response=data;return data}});if(response.configured!==false||response.points.length!==0)throw Error('No-key state failure');console.log('PASS: key missing — zero paid/provider calls, zero public webcam points');"
+      - name: Browser dependency for QA runner only
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core
+      - name: Local QA server (never Vercel)
+        run: |
+          node scripts/dev.mjs > /tmp/shadownex-windy-local.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/shadownex-windy-local.log
+          exit 1
+      - name: Windy free-tier image, credit, link, embed and Fold QA
+        run: node scripts/qa-windy-compliance.mjs

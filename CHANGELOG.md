@@ -6,6 +6,7 @@
 - Generalized source handling: HLS live streams, TfL recorded short clips, camera snapshots and official Windy webcam embeds, with truthful media labels.
 - Added direction selector, fullscreen and official-source controls; preserved existing USA/UK providers.
 - Optional worldwide Windy webcam lookup around any globe location; requires a free owner-provided API key stored server-side, and is disabled until configured. Do not imply full worldwide coverage or permanent image access.
+- Windy free Webcams API v3 setup documented; added provider attribution/link and natural-size image protection. No key currently configured; global discovery remains disabled until the owner connects one.
 - No Vercel deployment or merge.
 
 

@@ -69,11 +69,11 @@ export function installCameraViewer(app){
   const dialog=document.createElement('dialog');dialog.id='liveCameraDialog';dialog.className='modal glass live-camera-dialog';
   dialog.innerHTML=`<div class="modal-card camera-card">
   <div class="modal-head"><div><b id="liveCameraName">Public Camera</b><small id="liveCameraDirection">OFFICIAL PUBLIC SOURCE</small></div><button id="liveCameraClose" type="button" class="icon-btn" aria-label="Close camera">✕</button></div>
-  <div class="camera-media"><video id="liveCameraVideo" controls autoplay muted playsinline preload="none" aria-label="Selected camera video"></video><img id="liveCameraImage" alt="Latest camera image" hidden/><iframe id="liveCameraEmbed" title="Official webcam player" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation" allow="autoplay; fullscreen" hidden></iframe></div>
+  <div class="camera-media"><video id="liveCameraVideo" controls autoplay muted playsinline preload="none" aria-label="Selected camera video"></video><a id="liveCameraImageLink" target="_blank" rel="noopener noreferrer" aria-label="View camera image on the official provider page" hidden><img id="liveCameraImage" alt="Latest camera image" hidden/></a><iframe id="liveCameraEmbed" title="Official webcam player" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation" allow="autoplay; fullscreen" hidden></iframe></div>
   <div id="liveCameraStatus" role="status" aria-live="polite">Selecting camera…</div>
   <div id="liveCameraDirections" role="group" aria-label="Available camera directions" class="camera-directions" hidden></div>
   <div class="camera-actions"><button id="liveCameraFullscreen" type="button" class="hud-btn">FULLSCREEN</button><button id="liveCameraRetry" type="button" class="hud-btn">RETRY CAMERA</button><a id="liveCameraSource" class="hud-btn" target="_blank" rel="noopener noreferrer" hidden>OFFICIAL SOURCE</a></div>
-  <small id="liveCameraAttribution" class="camera-note">Public camera, provider availability varies. Live video is not guaranteed. No recording.</small></div>`;
+  <small id="liveCameraAttribution" class="camera-note">Public camera, provider availability varies. Live video is not guaranteed. No recording.</small><small id="liveCameraWindyCredit" class="camera-note windy-credit" hidden>Webcams provided by <a href="https://www.windy.com/" target="_blank" rel="noopener noreferrer">windy.com</a> — <a href="https://www.windy.com/webcams/add" target="_blank" rel="noopener noreferrer">add a webcam</a></small></div>`;
   document.getElementById('app').append(dialog);
   this.$('liveCameraClose').onclick=()=>{this.stopLiveCamera();dialog.close()};
   this.$('liveCameraRetry').onclick=()=>this._cameraMeta&&this.openLiveCamera(this._cameraMeta);
@@ -112,9 +112,14 @@ export function installCameraViewer(app){
    button.className=option.id===meta.id?'selected':'';button.disabled=option.id===meta.id;
    button.onclick=()=>this.openLiveCamera(option);directions.append(button);
   }
+  this.$('liveCameraWindyCredit').hidden=meta.source!=='Windy Webcams';
   const official=this.$('liveCameraSource');let source=null;
   try{const u=new URL(String(meta.url||''));if(u.protocol==='https:'&&u.hostname&&!u.username&&!u.password)source=u.href}catch{}
   official.hidden=!source;if(source)official.href=source;else official.removeAttribute('href');
+  const imageLink=this.$('liveCameraImageLink');
+  imageLink.hidden=media?.kind!=='snapshot';
+  if(source)imageLink.href=source;else imageLink.removeAttribute('href');
+  img.dataset.provider=meta.source==='Windy Webcams'?'windy':'';
   this.$('liveCameraRetry').disabled=!media;
   this.$('liveCameraFullscreen').disabled=!media;
   this.$('liveCameraAttribution').textContent=(meta.source==='Windy Webcams'?'Webcams provided by Windy.com · Open official source for webcam details.':String(meta.source||'Public source'))+' · '+(media?.kind==='hls'?'Live video may be delayed or offline.':media?.kind==='clip'?'Recent recorded clip. Not continuous live video.':media?.kind==='snapshot'?'Latest published image. Not continuous live video.':media?.kind==='embed'?'Official webcam embed; timelapse or live as provided.':'No embeddable feed available.')+' No recording.';

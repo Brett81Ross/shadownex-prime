@@ -5,7 +5,11 @@
 - [x] Washington State DOT statewide official camera coordinates/images (roughly 5-minute updated snapshots), independent of Seattle DOT, no key.
 - [x] Direction switcher for shared camera positions, fullscreen, HLS video/short clips/still photos/Windy official embeds.
 - [x] Worldwide Windy Webcams API v3 discovery adapter with secure server-only free key (disabled when no key is configured), 50 nearby webcam limit / 250km and moving-globe refresh.
-- [ ] Verify global connector with a user-provided free Windy API key before describing its worldwide coverage as active.
+- [x] Check official Windy Webcams free API, sign-up and published terms. No key currently configured in ShadowNex Prime's Vercel project (read-only check).
+- [x] Add required clickable Windy attribution and webcam-image provider links; prevent enlarging Windy preview images.
+- [x] Add the server-only key configuration instructions under `docs/WINDY_WEBCAMS_SETUP.md`.
+- [ ] Obtain owner's free Windy Webcams API v3 key and add it to the ShadowNex Prime Vercel Production environment only, after owner provides it.
+- [ ] Authenticate and verify global connector with the user's free key (not possible with the key missing); keep worldwide feeds inactive until then.
 - [x] Full Node 22 QA, deterministic build, Iowa published media metadata, global no-key safety, Android 360px native+HLS.js playback and Fold transition QA PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38148775574.
 - [x] Real Chromium camera direction button selects the correct HLS URL; fullscreen command, no-video provider official-link fallback, Iowa still display and TfL recorded-clip labeling PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38149082436.
 - [x] Open the exact selected OKTraffic camera HLS video, not the provider's general landing page.

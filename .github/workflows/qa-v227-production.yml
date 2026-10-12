@@ -1,0 +1,23 @@
+name: ShadowNex v2.2.7 PRODUCTION Browser Smoke (QA only)
+on:
+  push:
+    branches: [qa/shadownex-v227-production-smoke]
+permissions:
+  contents: read
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Verify merged release code regression tests
+        run: npm test
+      - name: Verify merged release build
+        run: npm run build
+      - name: Install QA-only browser dependency
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core
+      - name: Test actual production URL with Android Chromium
+        run: node scripts/qa-v227-production.mjs

@@ -10,7 +10,7 @@
 5. Run the existing release approval process, then one production deployment after the entire Atomic Build List is ready. Updating an environment variable alone does not update an already running deployment.
 6. Confirm `/api/webcams?lat=35.4676&lon=-97.5164` reports `configured:true` and public webcam points, then test another part of the globe. No token or API key should ever appear in the browser response.
 
-**Release gate:** Windy global cameras are OFF if no key is configured. Existing US and UK agency cameras should continue independently.
+**Key status (2026-10-11):** The owner saved the key. Read-only Vercel metadata confirms `WINDY_WEBCAMS_API_KEY` in the existing ShadowNex project as Production-only and Sensitive. The value has not been inspected or revealed. Authenticated function execution is still unverified until the separately approved v2.2.7 production deployment.\n\n**Release gate:** Windy global cameras are OFF if no key is configured. Existing US and UK agency cameras should continue independently.
 
 **Important provider terms:** Windy's Free Webcams API is free, but webcams must be visible in the free portion of the app; attribution and links to Windy are required. Supplied preview images must not be enlarged. Windy API v3 free image links expire (their documentation says about 10 minutes). The server cache is kept below that at 2 minutes. Do not redistribute the API or scrape/bulk-download cameras. Respect any embedded provider advertising.
 

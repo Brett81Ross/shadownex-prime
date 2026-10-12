@@ -1,0 +1,19 @@
+name: ShadowNex v2.2.7 Live Global Smoke (QA only)
+on:
+  push:
+    branches: [qa/shadownex-v227-live-global-smoke]
+permissions:
+  contents: read
+jobs:
+  production-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Temporary QA-only browser dependency
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright-core
+      - name: Read-only production smoke test (no deployment)
+        run: node scripts/qa-live-worldwide-v227.mjs

@@ -9,8 +9,9 @@
 - [x] Add required clickable Windy attribution and webcam-image provider links; prevent enlarging Windy preview images.
 - [x] Add the server-only key configuration instructions under `docs/WINDY_WEBCAMS_SETUP.md`.
 - [x] Full Node 22 regression/build, Windy attribution/image sizing, official link, safe iframe, 360px Fold modal, and absent-key handler PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38197964091.
-- [ ] Obtain owner's free Windy Webcams API v3 key and add it to the ShadowNex Prime Vercel Production environment only, after owner provides it.
-- [ ] Authenticate and verify global connector with the user's free key (not possible with the key missing); keep worldwide feeds inactive until then.
+- [x] Owner generated free Windy Webcams API key; verified `WINDY_WEBCAMS_API_KEY` exists as a **Sensitive**, **Production-only** variable in the original ShadowNex Prime Vercel project (2026-10-11). Value not read, decrypted, or displayed.
+- [ ] AFTER explicitly approved one production deployment, verify authenticated `GET /api/webcams?lat=48.2082&lon=16.3738` returns `configured:true`, does not return `status:DEGRADED`, and delivers attributed provider webcams; also check OKC and another global location. Do not expose or log the key.
+- [ ] Check physical Galaxy Fold and free-tier operational behavior after deploy; no Vercel preview deployment.
 - [x] Full Node 22 QA, deterministic build, Iowa published media metadata, global no-key safety, Android 360px native+HLS.js playback and Fold transition QA PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38148775574.
 - [x] Real Chromium camera direction button selects the correct HLS URL; fullscreen command, no-video provider official-link fallback, Iowa still display and TfL recorded-clip labeling PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38149082436.
 - [x] Open the exact selected OKTraffic camera HLS video, not the provider's general landing page.

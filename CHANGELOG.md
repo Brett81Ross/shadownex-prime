@@ -1,5 +1,23 @@
 # Changelog
 
+## v2.2.7 expanded ABL #8 — camera coverage foundation
+- Added official Iowa DOT statewide cameras with published still images and video addresses where present.
+- Added official Washington State DOT statewide camera locations and approximately five-minute updated image URLs; separate from the existing Seattle city feed, no key required.
+- Generalized source handling: HLS live streams, TfL recorded short clips, camera snapshots and official Windy webcam embeds, with truthful media labels.
+- Added direction selector, fullscreen and official-source controls; preserved existing USA/UK providers.
+- Optional worldwide Windy webcam lookup around any globe location; requires a free owner-provided API key stored server-side, and is disabled until configured. Do not imply full worldwide coverage or permanent image access.
+- Windy free Webcams API v3 setup documented; added provider attribution/link and natural-size image protection. No key currently configured; global discovery remains disabled until the owner connects one.
+- No Vercel deployment or merge.
+
+
+## 2.2.7 — In-app Oklahoma selected-camera live video and Reset placement (staged)
+- On selection of an OKTraffic camera, open the specific public HLS live feed in an in-app player; no generic site redirect.
+- Playback uses native HLS when available or pinned Apache-2.0 hls.js on Android, with a second CDN fallback, muted autoplay, retry/close controls, honest offline states and teardown.
+- Keep other source links as before. Only allow validated HTTPS OKTraffic camera streams in the player.
+- Relocate visible Reset App into the top header so it cannot cover bottom navigation, popups or map controls.
+- No merge, preview or production deployment.
+
+
 ## 2.2.6 — Galaxy Fold modal containment and optional true 3D (staging candidate)
 - Fix app shell retaining stale pixel width/height after Fold resize; restore normal responsive layout, resize Cesium canvas, anchor Reset App to globe and contain Watch Center save actions.
 - Extend visualViewport positioning beyond the welcome and situation dialogs to More, Settings, Watch Center and other overlays.

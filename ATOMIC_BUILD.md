@@ -1,5 +1,28 @@
 # ShadowNex Prime™ Atomic Build
 
+## ABL v2.2.7 — Expanded US / international CCTV and no-overlap Reset (staging only)
+- [x] Additional no-key Iowa DOT statewide official camera source with real image/video URLs when available.
+- [x] Washington State DOT statewide official camera coordinates/images (roughly 5-minute updated snapshots), independent of Seattle DOT, no key.
+- [x] Direction switcher for shared camera positions, fullscreen, HLS video/short clips/still photos/Windy official embeds.
+- [x] Worldwide Windy Webcams API v3 discovery adapter with secure server-only free key (disabled when no key is configured), 50 nearby webcam limit / 250km and moving-globe refresh.
+- [x] Check official Windy Webcams free API, sign-up and published terms. No key currently configured in ShadowNex Prime's Vercel project (read-only check).
+- [x] Add required clickable Windy attribution and webcam-image provider links; prevent enlarging Windy preview images.
+- [x] Add the server-only key configuration instructions under `docs/WINDY_WEBCAMS_SETUP.md`.
+- [x] Full Node 22 regression/build, Windy attribution/image sizing, official link, safe iframe, 360px Fold modal, and absent-key handler PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38197964091.
+- [x] Owner generated free Windy Webcams API key; verified `WINDY_WEBCAMS_API_KEY` exists as a **Sensitive**, **Production-only** variable in the original ShadowNex Prime Vercel project (2026-10-11). Value not read, decrypted, or displayed.
+- [ ] AFTER explicitly approved one production deployment, verify authenticated `GET /api/webcams?lat=48.2082&lon=16.3738` returns `configured:true`, does not return `status:DEGRADED`, and delivers attributed provider webcams; also check OKC and another global location. Do not expose or log the key.
+- [ ] Check physical Galaxy Fold and free-tier operational behavior after deploy; no Vercel preview deployment.
+- [x] Full Node 22 QA, deterministic build, Iowa published media metadata, global no-key safety, Android 360px native+HLS.js playback and Fold transition QA PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38148775574.
+- [x] Real Chromium camera direction button selects the correct HLS URL; fullscreen command, no-video provider official-link fallback, Iowa still display and TfL recorded-clip labeling PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38149082436.
+- [x] Open the exact selected OKTraffic camera HLS video, not the provider's general landing page.
+- [x] Add in-app live player with native/HLS.js compatibility, auto-open, close/retry and honest unavailable states.
+- [x] Reposition Reset App into top header, preserving one-click nondestructive reset without overlaying map controls.
+- [x] Native browser selected-camera stream playback and HLS.js fallback playback on actual public OKTraffic video, CORS, close/reopen cleanup and Reset top-header placement PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38106409563.
+- [x] Fold 360px → 840px → 360px header Reset positioning, native HLS and HLS.js live playback, stream shutdown all PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38106476856.
+- [ ] Physical Galaxy Fold verification after owner-approved production release.
+- [ ] Separate user approval required for merge and single production deploy; do not deploy yet.
+
+
 ## ABL v2.2.6 — Galaxy Fold viewport + optional 3D (staging only)
 - [x] Contain More, Settings, Watch Center and remaining overlays in the *actual* visible viewport, with vertical scrolling.
 - [x] Preserve earlier location and briefing viewport corrections.

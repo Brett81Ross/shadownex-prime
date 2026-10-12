@@ -8,6 +8,7 @@
 - [x] Check official Windy Webcams free API, sign-up and published terms. No key currently configured in ShadowNex Prime's Vercel project (read-only check).
 - [x] Add required clickable Windy attribution and webcam-image provider links; prevent enlarging Windy preview images.
 - [x] Add the server-only key configuration instructions under `docs/WINDY_WEBCAMS_SETUP.md`.
+- [x] Full Node 22 regression/build, Windy attribution/image sizing, official link, safe iframe, 360px Fold modal, and absent-key handler PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38197964091.
 - [ ] Obtain owner's free Windy Webcams API v3 key and add it to the ShadowNex Prime Vercel Production environment only, after owner provides it.
 - [ ] Authenticate and verify global connector with the user's free key (not possible with the key missing); keep worldwide feeds inactive until then.
 - [x] Full Node 22 QA, deterministic build, Iowa published media metadata, global no-key safety, Android 360px native+HLS.js playback and Fold transition QA PASS: https://github.com/Brett81Ross/shadownex-prime/actions/runs/38148775574.

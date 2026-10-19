@@ -36,7 +36,13 @@ export function installViewportDialogs(){
     const rect=root.getBoundingClientRect();
     if(viewer&&(root.__snxLastW!==rect.width||root.__snxLastH!==rect.height)){
       root.__snxLastW=rect.width;root.__snxLastH=rect.height;
-      window.requestAnimationFrame(()=>{try{viewer.resize();viewer.scene.requestRender();}catch{}});
+      if(!root.__snxResizePending){
+        root.__snxResizePending=true;
+        window.requestAnimationFrame(()=>{
+          root.__snxResizePending=false;
+          try{viewer.resize();viewer.scene.requestRender();}catch{}
+        });
+      }
     }
     const width=Math.max(1,v?.width||window.innerWidth);
     const height=Math.max(1,v?.height||window.innerHeight);

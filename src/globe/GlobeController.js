@@ -63,6 +63,7 @@ export class GlobeController extends EventTarget {
       this.viewer.terrainProvider=new C.EllipsoidTerrainProvider();
       this.viewer.scene.globe.maximumScreenSpaceError=1.35;
       this.world3DMode='off';this.terrainStatus='ELLIPSOID';
+      if(this.compactDevice)this.viewer.resolutionScale=.82;
       credit?.classList.add('hidden');this.requestRender();
       return {ok:true,enabled:false};
     }
@@ -78,6 +79,8 @@ export class GlobeController extends EventTarget {
       if(epoch!==this._world3DEpoch)return {ok:false,reason:'3D activation was cancelled.'};
       this.world3DTerrain=terrain;
       this.viewer.terrainProvider=terrain;
+      // Fold: draw CSS-pixel-sharp 3D contacts without full device-pixel-ratio GPU cost.
+      if(this.compactDevice)this.viewer.resolutionScale=1;
       this.terrainStatus='COMMUNITY TERRAIN';
       // Balance mountain detail against tile churn and Fold GPU memory.
       this.viewer.scene.globe.maximumScreenSpaceError=this.compactDevice?3.0:2.0;
@@ -85,7 +88,7 @@ export class GlobeController extends EventTarget {
       credit?.classList.remove('hidden');this.requestRender();
     }catch(error){
       console.warn('[free 3d terrain]',error);
-      if(epoch===this._world3DEpoch){this.world3DMode='off';credit?.classList.add('hidden');}
+      if(epoch===this._world3DEpoch){this.world3DMode='off';if(this.compactDevice)this.viewer.resolutionScale=.82;credit?.classList.add('hidden');}
       return {ok:false,reason:'Free terrain service unavailable. Original map remains available.'};
     }
     try{

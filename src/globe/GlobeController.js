@@ -2,10 +2,11 @@ import { cameraState, rectangleDegrees } from '../core/geo.js';
 import { AnnotationController } from './AnnotationController.js';
 import { SceneDirector } from './SceneDirector.js';
 export class GlobeController extends EventTarget {
-  constructor(container,settings){super();this.container=container;this.settings=settings;this.viewer=null;this.selected=null;this.tracking=false;this.cockpit=false;this.annotation=null;this.sceneDirector=null;this.followTimer=null;this.baseMapLayer=null;this.baseMapProvider=null;this.baseMapStatus='LOADING';this.baseMapName='Keyless Earth';this.baseMapErrors=0;this.terrainStatus='ELLIPSOID';this.selectionMarker=null;this.baseMapMode='satellite';this.world3DMode='off';this.world3DBuildings=null;}
+  constructor(container,settings){super();this.container=container;this.settings=settings;this.viewer=null;this.selected=null;this.tracking=false;this.cockpit=false;this.annotation=null;this.sceneDirector=null;this.followTimer=null;this.baseMapLayer=null;this.baseMapProvider=null;this.baseMapStatus='LOADING';this.baseMapName='Keyless Earth';this.baseMapErrors=0;this.terrainStatus='ELLIPSOID';this.selectionMarker=null;this.baseMapMode='satellite';this.world3DMode='off';this.world3DBuildings=null;this.world3DTerrain=null;this.compactDevice=false;}
   async init(){
     if(!window.Cesium)throw new Error('Cesium runtime did not load.');
     const C=window.Cesium,compact=matchMedia('(max-width: 900px)').matches||navigator.maxTouchPoints>0;
+    this.compactDevice=compact;
     if(this.settings.cesiumToken)C.Ion.defaultAccessToken=this.settings.cesiumToken;
     this.viewer=new C.Viewer(this.container,{animation:false,timeline:false,baseLayer:false,baseLayerPicker:false,geocoder:false,homeButton:false,sceneModePicker:false,navigationHelpButton:false,fullscreenButton:false,infoBox:false,selectionIndicator:false,shouldAnimate:false,requestRenderMode:true,maximumRenderTimeChange:1});
     this.viewer.scene.globe.show=true;this.viewer.scene.globe.baseColor=C.Color.fromCssColorString('#0d3242');this.viewer.scene.globe.depthTestAgainstTerrain=true;this.viewer.scene.globe.enableLighting=false;this.viewer.scene.globe.showGroundAtmosphere=true;this.viewer.scene.fxaa=true;this.viewer.scene.requestRenderMode=true;this.viewer.scene.maximumRenderTimeChange=1;if(this.viewer.scene.skyAtmosphere)this.viewer.scene.skyAtmosphere.show=true;
@@ -78,7 +79,8 @@ export class GlobeController extends EventTarget {
       this.world3DTerrain=terrain;
       this.viewer.terrainProvider=terrain;
       this.terrainStatus='COMMUNITY TERRAIN';
-      this.viewer.scene.globe.maximumScreenSpaceError=2.5;
+      // Balance mountain detail against tile churn and Fold GPU memory.
+      this.viewer.scene.globe.maximumScreenSpaceError=this.compactDevice?3.0:2.0;
       this.world3DMode='terrain-only';
       credit?.classList.remove('hidden');this.requestRender();
     }catch(error){
@@ -92,9 +94,12 @@ export class GlobeController extends EventTarget {
           'https://buildings.reearth.land/tileset.json'
         ),'3D buildings');
         if(epoch!==this._world3DEpoch)return {ok:false,reason:'3D activation was cancelled.'};
-        tileset.maximumScreenSpaceError=32;
+        // Larger error on touch/Fold devices reduces costly building tile refinement.
+        tileset.maximumScreenSpaceError=this.compactDevice?40:24;
+        tileset.dynamicScreenSpaceError=true;
         this.world3DBuildings=this.viewer.scene.primitives.add(tileset);
       }else this.world3DBuildings.show=true;
+      this.world3DBuildings.maximumScreenSpaceError=this.compactDevice?40:24;
       this.world3DMode='on';this.requestRender();
       return {ok:true,enabled:true,buildings:true};
     }catch(error){

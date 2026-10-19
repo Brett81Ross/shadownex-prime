@@ -7,6 +7,7 @@ const [ui,css,html,source,reset]=await Promise.all(['src/ui/friendlyUiEnhancemen
 assert.ok(ui.includes('installViewportDialogs()')&&css.includes('dialog.viewport-modal'),'visual viewport covers remaining dialogs');
 assert.ok(ui.includes('threeDWorldBtn')&&html.includes('/src/ui/viewportDialogs.css'),'3D toggle visible');
 assert.ok(ui.includes('world3DAttribution')&&css.includes('.world3d-attribution'),'source credits shown when 3D enabled');
+assert.match(css,/\.world3d-attribution\s*\{[^}]*pointer-events:auto/s,'clipped 3D credits remain scrollable on mobile');
 assert.ok(source.includes('CesiumTerrainProvider.fromUrl')&&source.includes('Cesium3DTileset.fromUrl'),'true terrain and building geometry');
 const freeMethod=source.slice(source.indexOf('async setWorld3D('),source.indexOf('  requestRender(){',source.indexOf('async setWorld3D(')));
 assert.ok(!freeMethod.includes('createOsmBuildingsAsync')&&!freeMethod.includes('createWorldTerrainAsync'),'the new 3D toggle never calls token-gated ion providers');

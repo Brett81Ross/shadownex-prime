@@ -12,6 +12,9 @@ const freeMethod=source.slice(source.indexOf('async setWorld3D('),source.indexOf
 assert.ok(!freeMethod.includes('createOsmBuildingsAsync')&&!freeMethod.includes('createWorldTerrainAsync'),'the new 3D toggle never calls token-gated ion providers');
 assert.ok(reset.includes('setWorld3D?.(false)'),'Reset App disables 3D');
 assert.equal(typeof installViewportDialogs,'function');
+const viewport=await read('src/ui/viewportDialogs.js');
+assert.ok(viewport.includes('__snxResizePending')&&viewport.includes('root.__snxResizePending=false'),'Fold Cesium resize is coalesced into a single animation frame');
+assert.ok(viewport.includes("root.style.removeProperty(prop)"),'Fold releases temporary viewport clamps');
 const calls=[];
 const C={
  CesiumTerrainProvider:{fromUrl:async(url)=>{calls.push(['terrain',url]);return {name:'free-terrain'}}},

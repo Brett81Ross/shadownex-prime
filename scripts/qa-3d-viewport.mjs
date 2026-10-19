@@ -18,6 +18,13 @@ assert.ok(perfSource.includes("this.globe.world3DMode!=='off'")&&perfSource.incl
 const aircraftSource=await read('src/layers/AircraftLayer.js');
 assert.ok(aircraftSource.includes('!this.app.compact||alt<350000'),'Fold callsigns reappear at close zoom');
 assert.ok(aircraftSource.includes('!this.app.lowPower&&(!this.app.compact||alt<350000)'),'low-power keeps contact labels suppressed');
+const symbolSource=await read('src/layers/markerIcons.js');
+assert.ok(symbolSource.includes('encodeURIComponent(svg)')&&symbolSource.includes('cache.set(cacheKey,marker)'),'sharp cached SVG symbols');
+for(const [layer,icon] of [['AircraftLayer','aircraft'],['CctvLayer','camera'],['SatelliteLayer','satellite'],['EarthquakeLayer','quake'],['FireLayer','fire'],['LaunchLayer','launch'],['VesselLayer','vessel']]){
+ const layerSource=await read('src/layers/'+layer+'.js');
+ assert.ok(layerSource.includes("from './markerIcons.js'")&&layerSource.includes("mapMarker("),'map icon helper connected for '+layer);
+ assert.ok(layerSource.includes("'"+icon+"'"),'distinct symbol for '+layer);
+}
 const viewport=await read('src/ui/viewportDialogs.js');
 assert.ok(viewport.includes('__snxResizePending')&&viewport.includes('root.__snxResizePending=false'),'Fold Cesium resize is coalesced into a single animation frame');
 assert.ok(viewport.includes("root.style.removeProperty(prop)"),'Fold releases temporary viewport clamps');

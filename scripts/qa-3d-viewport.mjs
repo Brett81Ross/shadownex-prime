@@ -37,6 +37,7 @@ assert.equal(globe.world3DMode,'off');assert.equal(globe.world3DBuildings.show,f
 assert.equal(globe.terrainStatus,'ELLIPSOID');
 assert.equal((await globe.setWorld3D(true)).ok,true);
 assert.equal(calls.filter(a=>a[0]==='buildings').length,loaded,'reuse tileset for reopening');
+assert.equal(calls.filter(a=>a[0]==='terrain').length,1,'reuse community terrain on 3D reopen without another network request');
 await globe.setWorld3D(false);globe.world3DBuildings=null;
 C.Cesium3DTileset.fromUrl=async()=>{throw new Error('simulated 3D building outage')};
 result=await globe.setWorld3D(true);

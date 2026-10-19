@@ -70,11 +70,12 @@ export class GlobeController extends EventTarget {
       Promise.resolve(task).then(value=>{clearTimeout(timer);resolve(value);},error=>{clearTimeout(timer);reject(error);});
     });
     try{
-      const terrain=await withTimeout(C.CesiumTerrainProvider.fromUrl(
+      const terrain=this.world3DTerrain||await withTimeout(C.CesiumTerrainProvider.fromUrl(
         'https://terrain.reearth.land/cesium-mesh/ellipsoid',
         {requestVertexNormals:false,requestWaterMask:false}
       ),'3D terrain');
       if(epoch!==this._world3DEpoch)return {ok:false,reason:'3D activation was cancelled.'};
+      this.world3DTerrain=terrain;
       this.viewer.terrainProvider=terrain;
       this.terrainStatus='COMMUNITY TERRAIN';
       this.viewer.scene.globe.maximumScreenSpaceError=2.5;

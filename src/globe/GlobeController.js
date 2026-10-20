@@ -88,7 +88,7 @@ export class GlobeController extends EventTarget {
     const near=Number.isFinite(height)&&height>0&&height<150000;
     const source=near?this.availableHighDetailSources()[0]:null;
     if(!source){
-      if(existing)existing.show=false;
+      this.setRegionalBuildingVisibility(false);
       return {ok:true,visible:false};
     }
     if(existing&&this._highDetailSourceId===source.id){

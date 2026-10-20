@@ -92,7 +92,13 @@ export class GlobeController extends EventTarget {
     this._highDetailLoading=source.id;
     let tileset;
     try{
-      tileset=await window.Cesium.Cesium3DTileset.fromUrl(source.tilesetUrl);
+      const load=window.Cesium.Cesium3DTileset.fromUrl(source.tilesetUrl);
+      let expired=false,timer;
+      tileset=await Promise.race([
+        Promise.resolve(load).then(value=>{if(expired){try{value.destroy?.();}catch{}return null;}return value;}),
+        new Promise((_,reject)=>{timer=setTimeout(()=>{expired=true;reject(new Error('Regional 3D loading timed out'));},14000);})
+      ]).finally(()=>clearTimeout(timer));
+      if(!tileset)return {ok:false,reason:'Regional 3D loading cancelled'};
       if(epoch!==this._world3DEpoch||this.world3DMode==='off'){
         try{tileset.destroy?.();}catch{}return {ok:false,reason:'3D mode changed'};
       }

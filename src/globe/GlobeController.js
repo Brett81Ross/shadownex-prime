@@ -141,6 +141,7 @@ export class GlobeController extends EventTarget {
     const {meta,entity}=hits[index];
     if(meta.type==='CLUSTER'){this._markerTap=null;const alt=Math.max(650000,(this.state().alt||6000000)*.42);this.flyTo(Number(meta.longitude),Number(meta.latitude),alt);return;}
     this.select(meta,entity);
+    if(hits.length>1&&this.selectionMarker){const C=window.Cesium;this.selectionMarker.label={text:(index+1)+' / '+hits.length,font:'bold 12px monospace',fillColor:C.Color.WHITE,showBackground:true,backgroundColor:new C.Color(0,0,0,.9),pixelOffset:new C.Cartesian2(0,-25),disableDepthTestDistance:Number.POSITIVE_INFINITY};this.requestRender();}
   }
   select(meta,entity){this.selected={meta,entity};this.setSelectionMarker(entity);this.dispatchEvent(new CustomEvent('select',{detail:meta}));this.requestRender();}
   clearSelection(){this.selected=null;this.tracking=false;this.cockpit=false;this.stopFollowLoop();if(this.selectionMarker){try{this.viewer.entities.remove(this.selectionMarker)}catch{}this.selectionMarker=null;}try{this.viewer.camera.lookAtTransform(window.Cesium.Matrix4.IDENTITY)}catch{}this.dispatchFollow();this.dispatchEvent(new CustomEvent('select',{detail:null}));this.requestRender();}

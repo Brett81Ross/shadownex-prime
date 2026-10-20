@@ -91,6 +91,8 @@ const loaded=calls.filter(a=>a[0]==='buildings').length;
 result=await globe.setWorld3D(false);assert.equal(result.ok,true);
 assert.equal(globe.world3DMode,'off');assert.equal(globe.world3DBuildings.show,false);
 assert.equal(globe.terrainStatus,'ELLIPSOID');
+assert.ok(source.includes('this._preWorld3DTerrain'),'3D mode saves original terrain provider');
+assert.ok(source.includes('this._preWorld3DTerrainStatus'),'3D mode preserves original terrain status');
 assert.equal((await globe.setWorld3D(true)).ok,true);
 assert.equal(calls.filter(a=>a[0]==='buildings').length,loaded,'reuse tileset for reopening');
 assert.equal(calls.filter(a=>a[0]==='terrain').length,1,'reuse community terrain on 3D reopen without another network request');

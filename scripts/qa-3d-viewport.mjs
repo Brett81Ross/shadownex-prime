@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {GlobeController} from '../src/globe/GlobeController.js';
 import {CctvLayer} from '../src/layers/CctvLayer.js';
+import { WORLD_3D_BASE, APPROVED_HIGH_DETAIL_OVERLAYS, matchingDetailSources } from '../src/globe/world3dSources.js';
 import {installViewportDialogs} from '../src/ui/viewportDialogs.js';
 const read=p=>readFile(new URL('../'+p,import.meta.url),'utf8');
 const [ui,css,html,source,reset]=await Promise.all(['src/ui/friendlyUiEnhancements.js','src/ui/viewportDialogs.css','index.html','src/globe/GlobeController.js','src/ui/sblWatch.js'].map(read));
@@ -14,6 +15,14 @@ const freeMethod=source.slice(source.indexOf('async setWorld3D('),source.indexOf
 assert.ok(!freeMethod.includes('createOsmBuildingsAsync')&&!freeMethod.includes('createWorldTerrainAsync'),'the new 3D toggle never calls token-gated ion providers');
 assert.ok(reset.includes('setWorld3D?.(false)'),'Reset App disables 3D');
 assert.equal(typeof installViewportDialogs,'function');
+assert.equal(WORLD_3D_BASE.quality,'global-building-extrusions','baseline never mislabels extrusions as scanned geometry');
+assert.equal(APPROVED_HIGH_DETAIL_OVERLAYS.length,0,'do not activate unverified photogrammetry data');
+assert.deepEqual(matchingDetailSources(-97.5,35.5),[],'global fallback remains when no detail tiles approved');
+const verified={approved:true,licenseReviewed:true,tilesetUrl:'https://example.org/tileset.json',bounds:[-99,34,-96,37]};
+assert.equal(matchingDetailSources(-97,35,[verified]).length,1,'licensed regional overlay matches its geographic coverage');
+assert.equal(matchingDetailSources(10,35,[verified]).length,0,'no false coverage claims outside geographic bounds');
+assert.equal(matchingDetailSources(-97,35,[{...verified,licenseReviewed:false}]).length,0,'unreviewed licensing blocks overlay');
+
 const perfSource=await read('src/ui/ablEnhancements.js');
 assert.ok(perfSource.includes('applyWorld3DPerformance?.(this.lowPower)'),'low-power transitions synchronize 3D quality');
 const aircraftSource=await read('src/layers/AircraftLayer.js');

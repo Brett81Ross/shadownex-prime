@@ -133,4 +133,8 @@ collisionGlobe.viewer.entities.values=[air,cam];collisionGlobe.state=()=>({alt:1
 collisionGlobe.updateMarkerCollisions();
 assert.equal(air.billboard.show,true,'selected contact always wins screen-space collision');
 assert.equal(cam.billboard.show,false,'other contact is still suppressed');
+// Cesium LabelGraphics often omits the show property; restore its default-visible state.
+cam.label.show=undefined;collisionGlobe.selected={entity:fire};collisionGlobe.viewer.entities.values=[cam,fire];collisionGlobe.updateMarkerCollisions();
+collisionGlobe.state=()=>({alt:10000});collisionGlobe.updateMarkerCollisions();
+assert.equal(cam.label.show,true,'implicit Cesium label visibility restored after collision');
 console.log('PASS: free 3D has no paid providers, correct attribution, reversible terrain/buildings and safe degraded fallbacks');

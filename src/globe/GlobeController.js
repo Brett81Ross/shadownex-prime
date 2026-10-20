@@ -124,7 +124,7 @@ export class GlobeController extends EventTarget {
     // Restore only values that this display-only pass previously suppressed.
     for(const item of this._collisionSuppressed||[]){
       if(item.entity?.billboard)item.entity.billboard.show=item.billboardShow;
-      if(item.entity?.label&&item.labelShow!==undefined)item.entity.label.show=item.labelShow;
+      if(item.entity?.label)item.entity.label.show=item.labelShow===undefined?true:item.labelShow;
     }
     this._collisionSuppressed=[];
     if(!scene?.cartesianToCanvasCoordinates||!scene.canvas||!viewer.entities?.values)return;

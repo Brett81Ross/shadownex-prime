@@ -76,9 +76,9 @@ export class GlobeController extends EventTarget {
     const credit=document.getElementById('world3DAttribution');
     if(!enabled){
       if(this.world3DBuildings)this.world3DBuildings.show=false;
-      this.viewer.terrainProvider=new C.EllipsoidTerrainProvider();
+      this.viewer.terrainProvider=this._preWorld3DTerrain||new C.EllipsoidTerrainProvider();
       this.viewer.scene.globe.maximumScreenSpaceError=1.35;
-      this.world3DMode='off';this.terrainStatus='ELLIPSOID';
+      this.world3DMode='off';this.terrainStatus=this._preWorld3DTerrainStatus||'ELLIPSOID';
       this.applyWorld3DPerformance();
       credit?.classList.add('hidden');this.requestRender();
       return {ok:true,enabled:false};
@@ -94,6 +94,7 @@ export class GlobeController extends EventTarget {
         {requestVertexNormals:false,requestWaterMask:false}
       ),'3D terrain');
       if(epoch!==this._world3DEpoch)return {ok:false,reason:'3D activation was cancelled.'};
+      if(this.world3DMode==='off'){this._preWorld3DTerrain=this.viewer.terrainProvider;this._preWorld3DTerrainStatus=this.terrainStatus;}
       this.world3DTerrain=terrain;
       this.viewer.terrainProvider=terrain;
       // Fold: draw CSS-pixel-sharp 3D contacts without full device-pixel-ratio GPU cost.
@@ -104,7 +105,7 @@ export class GlobeController extends EventTarget {
       credit?.classList.remove('hidden');this.requestRender();
     }catch(error){
       console.warn('[free 3d terrain]',error);
-      if(epoch===this._world3DEpoch){this.world3DMode='off';this.applyWorld3DPerformance();credit?.classList.add('hidden');}
+      if(epoch===this._world3DEpoch){this.viewer.terrainProvider=this._preWorld3DTerrain||new C.EllipsoidTerrainProvider();this.terrainStatus=this._preWorld3DTerrainStatus||'ELLIPSOID';this.world3DMode='off';this.applyWorld3DPerformance();credit?.classList.add('hidden');}
       return {ok:false,reason:'Free terrain service unavailable. Original map remains available.'};
     }
     try{

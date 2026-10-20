@@ -1,4 +1,5 @@
 import { cameraState, rectangleDegrees } from '../core/geo.js';
+import { WORLD_3D_BASE, matchingDetailSources } from './world3dSources.js';
 import { AnnotationController } from './AnnotationController.js';
 import { SceneDirector } from './SceneDirector.js';
 export class GlobeController extends EventTarget {
@@ -51,7 +52,8 @@ export class GlobeController extends EventTarget {
       provider.errorEvent?.addEventListener?.(()=>{this.baseMapErrors++;if(this.baseMapErrors===3){this.baseMapStatus='FALLBACK';this.baseMapName='Fallback Earth';this.dispatchEvent(new CustomEvent('stability',{detail:{state:'warning',message:'Earth imagery is having trouble loading. ShadowNex is keeping a visible fallback globe underneath live contacts.'}}));this.requestRender();}});
     }catch(e){this.baseMapStatus='FALLBACK';this.baseMapName='Fallback Earth';console.warn('[basemap]',e);this.dispatchEvent(new CustomEvent('stability',{detail:{state:'warning',message:'Earth imagery could not load. ShadowNex is showing a visible fallback globe instead of a blank field.'}}));}
   }
-  baseMapInfo(){return {status:this.baseMapStatus,name:this.baseMapName,mode:this.baseMapMode,terrain:this.terrainStatus};}
+  baseMapInfo(){return {status:this.baseMapStatus,name:this.baseMapName,mode:this.baseMapMode,terrain:this.terrainStatus,buildingGeometry:this.world3DMode==='on'?WORLD_3D_BASE.quality:'none',highDetailSources:this.world3DMode==='off'?0:this.availableHighDetailSources().length};}
+  availableHighDetailSources(){const point=this.focusCoordinates?.();return point?matchingDetailSources(point.lon,point.lat):[];}
   // $0 Community 3D preview: public open-data services, no ion token or paid API.
   // Upstream hosts are best-effort; this remains opt-in and OFF by default.
   // Centralize Fold terrain, building and resolution budgets across 3D toggles and recovery.
@@ -90,7 +92,7 @@ export class GlobeController extends EventTarget {
     });
     try{
       const terrain=this.world3DTerrain||await withTimeout(C.CesiumTerrainProvider.fromUrl(
-        'https://terrain.reearth.land/cesium-mesh/ellipsoid',
+        WORLD_3D_BASE.terrain,
         {requestVertexNormals:false,requestWaterMask:false}
       ),'3D terrain');
       if(epoch!==this._world3DEpoch)return {ok:false,reason:'3D activation was cancelled.'};
@@ -111,7 +113,7 @@ export class GlobeController extends EventTarget {
     try{
       if(!this.world3DBuildings){
         const tileset=await withTimeout(C.Cesium3DTileset.fromUrl(
-          'https://buildings.reearth.land/tileset.json'
+          WORLD_3D_BASE.buildings
         ),'3D buildings',tile=>{try{tile.destroy?.();}catch{}});
         if(epoch!==this._world3DEpoch){try{tileset.destroy?.();}catch{}return {ok:false,reason:'3D activation was cancelled.'};}
         // Cesium 3D Tiles v1.132: limit CPU/GPU tile cache on memory-constrained Fold.

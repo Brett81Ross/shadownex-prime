@@ -67,6 +67,16 @@ globe.cameraMoving=false;
 globe.applyWorld3DPerformance(false);
 assert.equal(globe.viewer.scene.globe.maximumScreenSpaceError,3,'settled Fold terrain returns normal detail');
 assert.equal(globe.world3DBuildings.maximumScreenSpaceError,40,'settled Fold buildings return normal detail');
+globe.viewer.camera={positionCartographic:{height:65000}};
+globe.applyWorld3DPerformance(false);
+assert.equal(globe.viewer.scene.globe.maximumScreenSpaceError,2.2,'settled close Fold terrain refines mountains');
+assert.equal(globe.world3DBuildings.maximumScreenSpaceError,28,'settled close Fold buildings refine geometry');
+globe.cameraMoving=true;globe.applyWorld3DPerformance(false);
+assert.equal(globe.viewer.scene.globe.maximumScreenSpaceError,4,'camera movement has priority over close-range detail');
+globe.applyWorld3DPerformance(true);
+assert.equal(globe.world3DBuildings.maximumScreenSpaceError,64,'low-power has priority over close-range buildings');
+globe.cameraMoving=false;globe.viewer.camera=null;globe.applyWorld3DPerformance(false);
+
 globe.cameraMoving=true;
 globe.applyWorld3DPerformance(true);
 assert.equal(globe.viewer.scene.globe.maximumScreenSpaceError,5,'low-power takes precedence during camera movement');

@@ -187,4 +187,16 @@ assert.equal(cam.billboard.show,false,'other contact is still suppressed');
 cam.label.show=undefined;collisionGlobe.selected={entity:fire};collisionGlobe.viewer.entities.values=[cam,fire];collisionGlobe.updateMarkerCollisions();
 collisionGlobe.state=()=>({alt:10000});collisionGlobe.updateMarkerCollisions();
 assert.equal(cam.label.show,true,'implicit Cesium label visibility restored after collision');
+// Region-vs-global building precedence is reversible and fail-safe.
+const overlap=Object.create(GlobeController.prototype);
+overlap.world3DMode='on';overlap.world3DBuildings={show:true};
+overlap._highDetailTileset={show:false};overlap.requestRender=()=>{};
+overlap.setRegionalBuildingVisibility(true);
+assert.equal(overlap.world3DBuildings.show,false,'no duplicate global extrusions under regional LOD2');
+assert.equal(overlap._highDetailTileset.show,true,'regional detail visible');
+overlap.setRegionalBuildingVisibility(false);
+assert.equal(overlap.world3DBuildings.show,true,'global fallback restores outside supported area');
+assert.equal(overlap._highDetailTileset.show,false,'regional detail hidden outside coverage');
+overlap.world3DMode='off';overlap.setRegionalBuildingVisibility(false);
+assert.equal(overlap.world3DBuildings.show,false,'no global building rendering when 3D disabled');
 console.log('PASS: free 3D has no paid providers, correct attribution, reversible terrain/buildings and safe degraded fallbacks');

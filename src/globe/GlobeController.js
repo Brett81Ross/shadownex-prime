@@ -20,7 +20,7 @@ export class GlobeController extends EventTarget {
     handler.setInputAction(m=>this.onClick(m.position),C.ScreenSpaceEventType.LEFT_CLICK);
     handler.setInputAction(()=>this.annotation?.finish(),C.ScreenSpaceEventType.RIGHT_CLICK);
     this.viewer.camera.moveStart.addEventListener(()=>{this.cameraMoving=true;this.applyWorld3DPerformance();});
-    this.viewer.camera.moveEnd.addEventListener(()=>{this.cameraMoving=false;this.applyWorld3DPerformance();this.dispatchEvent(new CustomEvent('camera',{detail:cameraState(this.viewer)}));this.scheduleMarkerCollision();this.requestRender();});
+    this.viewer.camera.moveEnd.addEventListener(()=>{this.cameraMoving=false;this.applyWorld3DPerformance();this.syncHighDetail3D().catch(()=>{});this.dispatchEvent(new CustomEvent('camera',{detail:cameraState(this.viewer)}));this.scheduleMarkerCollision();this.requestRender();});
     this.viewer.scene.preRender.addEventListener(()=>this.updateFollow());
     const canvas=this.viewer.scene.canvas;
     canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();this.dispatchEvent(new CustomEvent('stability',{detail:{state:'lost',message:'Graphics context paused. Tap reload if the map does not recover.'}}));});
@@ -71,6 +71,55 @@ export class GlobeController extends EventTarget {
     }
     this.requestRender();
   }
+  async syncHighDetail3D(){
+    const existing=this._highDetailTileset;
+    if(this.world3DMode==='off'){
+      if(existing)existing.show=false;
+      return {ok:true,visible:false};
+    }
+    const height=Number(this.viewer?.camera?.positionCartographic?.height);
+    const near=Number.isFinite(height)&&height>0&&height<150000;
+    const source=near?this.availableHighDetailSources()[0]:null;
+    if(!source){
+      if(existing)existing.show=false;
+      return {ok:true,visible:false};
+    }
+    if(existing&&this._highDetailSourceId===source.id){
+      existing.show=true;this.requestRender();return {ok:true,visible:true,cached:true};
+    }
+    if(this._highDetailLoading===source.id)return {ok:false,reason:'High-detail tiles loading'};
+    const epoch=this._world3DEpoch;
+    this._highDetailLoading=source.id;
+    let tileset;
+    try{
+      tileset=await window.Cesium.Cesium3DTileset.fromUrl(source.tilesetUrl);
+      if(epoch!==this._world3DEpoch||this.world3DMode==='off'){
+        try{tileset.destroy?.();}catch{}return {ok:false,reason:'3D mode changed'};
+      }
+      const valid=Number(this.viewer?.camera?.positionCartographic?.height)<150000
+        &&this.availableHighDetailSources().some(x=>x.id===source.id);
+      if(!valid){try{tileset.destroy?.();}catch{}return {ok:false,reason:'Camera left coverage'};
+      }
+      if('cacheBytes' in tileset)tileset.cacheBytes=this.compactDevice?48*1024*1024:128*1024*1024;
+      if('maximumCacheOverflowBytes' in tileset)tileset.maximumCacheOverflowBytes=this.compactDevice?24*1024*1024:64*1024*1024;
+      tileset.maximumScreenSpaceError=this.compactDevice?28:18;
+      tileset.dynamicScreenSpaceError=true;
+      if(existing&&existing!==tileset){try{this.viewer.scene.primitives.remove(existing);}catch{}}
+      this._highDetailTileset=this.viewer.scene.primitives.add(tileset);
+      this._highDetailSourceId=source.id;
+      this._highDetailTileset.show=true;
+      const credits=document.getElementById('world3DAttribution');
+      if(credits&&!credits.textContent.includes('Project PLATEAU'))credits.append(document.createTextNode(' · '+source.attribution));
+      this.requestRender();
+      return {ok:true,visible:true};
+    }catch(error){
+      console.warn('[regional high-detail 3D]',error);
+      // Global baseline is never hidden when a regional provider fails.
+      return {ok:false,reason:'Regional detail temporarily unavailable'};
+    }finally{
+      if(this._highDetailLoading===source.id)this._highDetailLoading=null;
+    }
+  }
   async setWorld3D(enabled){
     const C=window.Cesium;
     if(!this.viewer||!C)return {ok:false,reason:'3D viewer unavailable.'};
@@ -78,6 +127,7 @@ export class GlobeController extends EventTarget {
     const credit=document.getElementById('world3DAttribution');
     if(!enabled){
       if(this.world3DBuildings)this.world3DBuildings.show=false;
+      if(this._highDetailTileset)this._highDetailTileset.show=false;
       this.viewer.terrainProvider=this._preWorld3DTerrain||new C.EllipsoidTerrainProvider();
       this.viewer.scene.globe.maximumScreenSpaceError=1.35;
       this.world3DMode='off';this.terrainStatus=this._preWorld3DTerrainStatus||'ELLIPSOID';
@@ -124,7 +174,7 @@ export class GlobeController extends EventTarget {
         tileset.dynamicScreenSpaceError=true;
         this.world3DBuildings=this.viewer.scene.primitives.add(tileset);
       }else this.world3DBuildings.show=true;
-      this.world3DMode='on';this.applyWorld3DPerformance();this.requestRender();
+      this.world3DMode='on';this.applyWorld3DPerformance();this.syncHighDetail3D().catch(()=>{});this.requestRender();
       return {ok:true,enabled:true,buildings:true};
     }catch(error){
       console.warn('[free 3d buildings]',error);

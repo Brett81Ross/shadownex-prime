@@ -2,7 +2,7 @@ import { cameraState, rectangleDegrees } from '../core/geo.js';
 import { AnnotationController } from './AnnotationController.js';
 import { SceneDirector } from './SceneDirector.js';
 export class GlobeController extends EventTarget {
-  constructor(container,settings){super();this.container=container;this.settings=settings;this.viewer=null;this.selected=null;this.tracking=false;this.cockpit=false;this.annotation=null;this.sceneDirector=null;this.followTimer=null;this.baseMapLayer=null;this.baseMapProvider=null;this.baseMapStatus='LOADING';this.baseMapName='Keyless Earth';this.baseMapErrors=0;this.terrainStatus='ELLIPSOID';this.selectionMarker=null;this.baseMapMode='satellite';this.world3DMode='off';this.world3DBuildings=null;this.world3DTerrain=null;this.compactDevice=false;}
+  constructor(container,settings){super();this.container=container;this.settings=settings;this.viewer=null;this.selected=null;this.tracking=false;this.cockpit=false;this.annotation=null;this.sceneDirector=null;this.followTimer=null;this.baseMapLayer=null;this.baseMapProvider=null;this.baseMapStatus='LOADING';this.baseMapName='Keyless Earth';this.baseMapErrors=0;this.terrainStatus='ELLIPSOID';this.selectionMarker=null;this.baseMapMode='satellite';this.world3DMode='off';this.world3DBuildings=null;this.world3DTerrain=null;this.compactDevice=false;this._collisionSuppressed=[];this._collisionTimer=null;}
   async init(){
     if(!window.Cesium)throw new Error('Cesium runtime did not load.');
     const C=window.Cesium,compact=matchMedia('(max-width: 900px)').matches||navigator.maxTouchPoints>0;
@@ -18,7 +18,7 @@ export class GlobeController extends EventTarget {
     const handler=new C.ScreenSpaceEventHandler(this.viewer.scene.canvas);
     handler.setInputAction(m=>this.onClick(m.position),C.ScreenSpaceEventType.LEFT_CLICK);
     handler.setInputAction(()=>this.annotation?.finish(),C.ScreenSpaceEventType.RIGHT_CLICK);
-    this.viewer.camera.moveEnd.addEventListener(()=>{this.dispatchEvent(new CustomEvent('camera',{detail:cameraState(this.viewer)}));this.requestRender();});
+    this.viewer.camera.moveEnd.addEventListener(()=>{this.dispatchEvent(new CustomEvent('camera',{detail:cameraState(this.viewer)}));this.scheduleMarkerCollision();this.requestRender();});
     this.viewer.scene.preRender.addEventListener(()=>this.updateFollow());
     const canvas=this.viewer.scene.canvas;
     canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();this.dispatchEvent(new CustomEvent('stability',{detail:{state:'lost',message:'Graphics context paused. Tap reload if the map does not recover.'}}));});
@@ -115,6 +115,57 @@ export class GlobeController extends EventTarget {
   requestRender(){try{this.viewer?.scene?.requestRender()}catch{}}
   // A short repeated tap cycles real contacts that share the same screen pixels.
   // Keep source entities/coordinates unchanged; do not turn a selected halo into a hit.
+  scheduleMarkerCollision(){
+    clearTimeout(this._collisionTimer);
+    this._collisionTimer=setTimeout(()=>this.updateMarkerCollisions(),120);
+  }
+  updateMarkerCollisions(){
+    const viewer=this.viewer,scene=viewer?.scene;
+    // Restore only values that this display-only pass previously suppressed.
+    for(const item of this._collisionSuppressed||[]){
+      if(item.entity?.billboard)item.entity.billboard.show=item.billboardShow;
+      if(item.entity?.label&&item.labelShow!==undefined)item.entity.label.show=item.labelShow;
+    }
+    this._collisionSuppressed=[];
+    if(!scene?.cartesianToCanvasCoordinates||!scene.canvas||!viewer.entities?.values)return;
+    if((Number(this.state()?.alt)||0)<80000)return;
+    const visible=x=>x?.getValue?x.getValue(viewer.clock?.currentTime):x;
+    const candidates=[],all=viewer.entities.values;
+    for(const entity of all.slice(0,3000)){
+      if(!entity?.billboard||entity.show===false||entity===this.selectionMarker)continue;
+      if(visible(entity.billboard.show)===false)continue;
+      const meta=entity.properties?.snxMeta?.getValue?.(viewer.clock?.currentTime)??entity.snxMeta;
+      if(!meta?.type)continue;
+      const pos=visible(entity.position);
+      if(!pos)continue;
+      let xy;try{xy=scene.cartesianToCanvasCoordinates(pos)}catch{continue;}
+      if(!xy||!Number.isFinite(xy.x)||!Number.isFinite(xy.y)||xy.x<0||xy.y<0||xy.x>scene.canvas.clientWidth||xy.y>scene.canvas.clientHeight)continue;
+      const priority=entity===this.selected?.entity?1000:meta.type==='CLUSTER'?150:meta.type==='FIRE'?100:meta.type==='EARTHQUAKE'?90:meta.type==='CCTV'?80:meta.type==='AIRCRAFT'?70:50;
+      candidates.push({entity,meta,xy,priority});
+    }
+    candidates.sort((a,b)=>b.priority-a.priority);
+    const cell=36,buckets=new Map(),occupied=[];
+    for(const item of candidates){
+      const {xy,entity}=item,gx=Math.floor(xy.x/cell),gy=Math.floor(xy.y/cell);
+      let collision=false;
+      for(let x=gx-1;x<=gx+1&&!collision;x++)for(let y=gy-1;y<=gy+1;y++){
+        for(const other of buckets.get(x+':'+y)||[]){
+          if(Math.hypot(xy.x-other.x,xy.y-other.y)<30){collision=true;break;}
+        }
+        if(collision)break;
+      }
+      if(collision){
+        const billboardShow=visible(entity.billboard.show);
+        const labelShow=entity.label?visible(entity.label.show):undefined;
+        entity.billboard.show=false;
+        if(entity.label)entity.label.show=false;
+        this._collisionSuppressed.push({entity,meta,xy,billboardShow,labelShow});
+      }else{
+        const key=gx+':'+gy,points=buckets.get(key)||[];points.push(xy);buckets.set(key,points);occupied.push(item);
+      }
+    }
+    this.requestRender();
+  }
   markerHits(position){
     const scene=this.viewer.scene;
     const hits=typeof scene.drillPick==='function'?scene.drillPick(position,16):[scene.pick(position)];
@@ -126,6 +177,12 @@ export class GlobeController extends EventTarget {
       if(!meta?.type)continue;
       if(seen.has(entity))continue;
       seen.add(entity);found.push({entity,meta});
+    }
+    // A suppressed symbol is still tappable at its original projected location.
+    for(const item of this._collisionSuppressed||[]){
+      if(Math.hypot(position.x-item.xy.x,position.y-item.xy.y)>20)continue;
+      if(item.entity===this.selectionMarker||seen.has(item.entity))continue;
+      seen.add(item.entity);found.push({entity:item.entity,meta:item.meta});
     }
     return found;
   }

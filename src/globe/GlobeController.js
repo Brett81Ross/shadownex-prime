@@ -61,9 +61,11 @@ export class GlobeController extends EventTarget {
     const on=this.world3DMode!=='off';
     this.viewer.resolutionScale=this.performanceLowPower?(this.compactDevice?.6:.82):(on?1:(this.compactDevice?.82:1));
     const moving=on&&!!this.cameraMoving;
-    this.viewer.scene.globe.maximumScreenSpaceError=on?(this.performanceLowPower?(this.compactDevice?5:3.5):moving?(this.compactDevice?4:2.8):(this.compactDevice?3:2)):1.35;
+    const height=Number(this.viewer.camera?.positionCartographic?.height);
+    const close=on&&!moving&&!this.performanceLowPower&&Number.isFinite(height)&&height>0&&height<200000;
+    this.viewer.scene.globe.maximumScreenSpaceError=on?(this.performanceLowPower?(this.compactDevice?5:3.5):moving?(this.compactDevice?4:2.8):close?(this.compactDevice?2.2:1.6):(this.compactDevice?3:2)):1.35;
     if(this.world3DBuildings){
-      this.world3DBuildings.maximumScreenSpaceError=this.performanceLowPower?(this.compactDevice?64:40):moving?(this.compactDevice?56:32):(this.compactDevice?40:24);
+      this.world3DBuildings.maximumScreenSpaceError=this.performanceLowPower?(this.compactDevice?64:40):moving?(this.compactDevice?56:32):close?(this.compactDevice?28:18):(this.compactDevice?40:24);
     }
     this.requestRender();
   }

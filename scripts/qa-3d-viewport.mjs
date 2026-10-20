@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {GlobeController} from '../src/globe/GlobeController.js';
+import {CctvLayer} from '../src/layers/CctvLayer.js';
 import {installViewportDialogs} from '../src/ui/viewportDialogs.js';
 const read=p=>readFile(new URL('../'+p,import.meta.url),'utf8');
 const [ui,css,html,source,reset]=await Promise.all(['src/ui/friendlyUiEnhancements.js','src/ui/viewportDialogs.css','index.html','src/globe/GlobeController.js','src/ui/sblWatch.js'].map(read));
@@ -92,4 +93,27 @@ clickGlobe.viewer.scene.drillPick=()=>[];clickGlobe.selected={meta:{type:'AIRCRA
 clickGlobe.viewer.scene.drillPick=()=>[picked('cluster','CLUSTER')];clickGlobe.onClick({x:20,y:40});assert.equal(fly.length,1,'cluster tap retains fly-to behavior');
 let annotations=0;clickGlobe.annotation={isArmed:()=>true,handleClick:()=>annotations++};clickGlobe.viewer.scene.drillPick=()=>{throw Error('should not pick while drawing')};
 clickGlobe.onClick({x:20,y:40});assert.equal(annotations,1);
+// Camera display clustering must not mutate source metadata or lose contacts.
+const added=[],removed=[];let cameraAltitude=1000000;
+const cameraViewer={entities:{add:x=>{const entity={...x,show:true};added.push(entity);return entity;},remove:e=>removed.push(e)}};
+const cameraApp={compact:true,lowPower:false,globe:{viewer:cameraViewer,state:()=>({alt:cameraAltitude}),requestRender:()=>{}},registry:{define:()=>{}}};
+const cameras=Object.create(CctvLayer.prototype);
+cameras.app=cameraApp;cameras.enabled=true;cameras.cameraClusters=[];
+cameras.cameraEntities=[
+ {show:true,properties:{snxMeta:{getValue:()=>({type:'CCTV',id:'c1',latitude:35,longitude:-97})}}},
+ {show:true,properties:{snxMeta:{getValue:()=>({type:'CCTV',id:'c2',latitude:35.0001,longitude:-97.0001})}}},
+ {show:true,properties:{snxMeta:{getValue:()=>({type:'CCTV',id:'c3',latitude:35.0002,longitude:-97.0002})}}}
+];
+C.Cartesian3={fromDegrees:(lon,lat,alt)=>({lon,lat,alt})};
+C.Cartesian2=class{constructor(x,y){this.x=x;this.y=y;}};
+C.Color=class{constructor(){}};C.Color.WHITE={};
+cameras.updateCameraClusters();
+assert.equal(cameras.cameraClusters.length,1,'dense nearby cameras form one display cluster');
+assert.equal(cameras.cameraClusters[0].properties.snxMeta.count,3,'camera cluster reports original source count');
+assert.ok(cameras.cameraEntities.every(e=>e.show===false),'cluster hides individual visuals, not metadata');
+assert.equal(cameras.cameraEntities[0].properties.snxMeta.getValue().id,'c1','camera source identity unchanged');
+cameraAltitude=150000;cameras.updateCameraClusters();
+assert.equal(cameras.cameraClusters.length,0,'camera markers expand at close zoom');
+assert.ok(cameras.cameraEntities.every(e=>e.show===true),'all camera markers restored');
+assert.equal(removed.length,1,'old cluster is disposed');
 console.log('PASS: free 3D has no paid providers, correct attribution, reversible terrain/buildings and safe degraded fallbacks');

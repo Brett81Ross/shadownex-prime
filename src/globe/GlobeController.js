@@ -113,7 +113,35 @@ export class GlobeController extends EventTarget {
     }
   }
   requestRender(){try{this.viewer?.scene?.requestRender()}catch{}}
-  onClick(position){if(this.annotation?.isArmed()){this.annotation.handleClick(position);return;}const picked=this.viewer.scene.pick(position);const meta=picked?.id?.properties?.snxMeta?.getValue?.()??picked?.id?.snxMeta??picked?.primitive?.snxMeta;if(meta?.type==='CLUSTER'){const alt=Math.max(650000,(this.state().alt||6000000)*.42);this.flyTo(Number(meta.longitude),Number(meta.latitude),alt);return;}if(meta)this.select(meta,picked.id||picked.primitive);else if(this.selected)this.clearSelection();}
+  // A short repeated tap cycles real contacts that share the same screen pixels.
+  // Keep source entities/coordinates unchanged; do not turn a selected halo into a hit.
+  markerHits(position){
+    const scene=this.viewer.scene;
+    const hits=typeof scene.drillPick==='function'?scene.drillPick(position,16):[scene.pick(position)];
+    const found=[],seen=new Set();
+    for(const hit of hits||[]){
+      const entity=hit?.id||hit?.primitive;
+      if(!entity||entity===this.selectionMarker)continue;
+      const meta=entity.properties?.snxMeta?.getValue?.()??entity.snxMeta;
+      if(!meta?.type)continue;
+      if(seen.has(entity))continue;
+      seen.add(entity);found.push({entity,meta});
+    }
+    return found;
+  }
+  onClick(position){
+    if(this.annotation?.isArmed()){this.annotation.handleClick(position);return;}
+    const hits=this.markerHits(position);
+    if(!hits.length){this._markerTap=null;if(this.selected)this.clearSelection();return;}
+    const now=Date.now(),previous=this._markerTap;
+    const sameSpot=previous&&now-previous.at<1800&&Math.hypot(position.x-previous.x,position.y-previous.y)<=20;
+    const sameContacts=sameSpot&&hits.length===previous.entities.length&&hits.every((hit,i)=>hit.entity===previous.entities[i]);
+    const index=sameContacts?(previous.index+1)%hits.length:0;
+    this._markerTap={x:position.x,y:position.y,at:now,index,entities:hits.map(hit=>hit.entity)};
+    const {meta,entity}=hits[index];
+    if(meta.type==='CLUSTER'){this._markerTap=null;const alt=Math.max(650000,(this.state().alt||6000000)*.42);this.flyTo(Number(meta.longitude),Number(meta.latitude),alt);return;}
+    this.select(meta,entity);
+  }
   select(meta,entity){this.selected={meta,entity};this.setSelectionMarker(entity);this.dispatchEvent(new CustomEvent('select',{detail:meta}));this.requestRender();}
   clearSelection(){this.selected=null;this.tracking=false;this.cockpit=false;this.stopFollowLoop();if(this.selectionMarker){try{this.viewer.entities.remove(this.selectionMarker)}catch{}this.selectionMarker=null;}try{this.viewer.camera.lookAtTransform(window.Cesium.Matrix4.IDENTITY)}catch{}this.dispatchFollow();this.dispatchEvent(new CustomEvent('select',{detail:null}));this.requestRender();}
   setSelectionMarker(entity){const C=window.Cesium;if(this.selectionMarker){try{this.viewer.entities.remove(this.selectionMarker)}catch{}this.selectionMarker=null;}const position=entity?.position;if(!position)return;this.selectionMarker=this.viewer.entities.add({position,point:{pixelSize:20,color:C.Color.TRANSPARENT,outlineColor:C.Color.WHITE,outlineWidth:2,disableDepthTestDistance:Number.POSITIVE_INFINITY}});}

@@ -83,9 +83,10 @@ export class GlobeController extends EventTarget {
       credit?.classList.add('hidden');this.requestRender();
       return {ok:true,enabled:false};
     }
-    const withTimeout=(task,label)=>new Promise((resolve,reject)=>{
-      const timer=setTimeout(()=>reject(new Error(label+' timed out')),18000);
-      Promise.resolve(task).then(value=>{clearTimeout(timer);resolve(value);},error=>{clearTimeout(timer);reject(error);});
+    const withTimeout=(task,label,onLate)=>new Promise((resolve,reject)=>{
+      let expired=false;
+      const timer=setTimeout(()=>{expired=true;reject(new Error(label+' timed out'));},18000);
+      Promise.resolve(task).then(value=>{clearTimeout(timer);if(expired){onLate?.(value);return;}resolve(value);},error=>{clearTimeout(timer);if(!expired)reject(error);});
     });
     try{
       const terrain=this.world3DTerrain||await withTimeout(C.CesiumTerrainProvider.fromUrl(
@@ -110,8 +111,11 @@ export class GlobeController extends EventTarget {
       if(!this.world3DBuildings){
         const tileset=await withTimeout(C.Cesium3DTileset.fromUrl(
           'https://buildings.reearth.land/tileset.json'
-        ),'3D buildings');
-        if(epoch!==this._world3DEpoch)return {ok:false,reason:'3D activation was cancelled.'};
+        ),'3D buildings',tile=>{try{tile.destroy?.();}catch{}});
+        if(epoch!==this._world3DEpoch){try{tileset.destroy?.();}catch{}return {ok:false,reason:'3D activation was cancelled.'};}
+        // Cesium 3D Tiles v1.132: limit CPU/GPU tile cache on memory-constrained Fold.
+        if('cacheBytes' in tileset)tileset.cacheBytes=this.compactDevice?96*1024*1024:256*1024*1024;
+        if('maximumCacheOverflowBytes' in tileset)tileset.maximumCacheOverflowBytes=this.compactDevice?48*1024*1024:128*1024*1024;
         // Larger error on touch/Fold devices reduces costly building tile refinement.
         tileset.maximumScreenSpaceError=this.compactDevice?40:24;
         tileset.dynamicScreenSpaceError=true;
@@ -122,7 +126,7 @@ export class GlobeController extends EventTarget {
     }catch(error){
       console.warn('[free 3d buildings]',error);
       if(epoch!==this._world3DEpoch)return {ok:false,reason:'3D activation was cancelled.'};
-      this.world3DMode='terrain-only';this.requestRender();
+      this.world3DMode='terrain-only';this.applyWorld3DPerformance();
       return {ok:true,enabled:true,buildings:false,reason:'3D terrain is available; community buildings are temporarily unavailable.'};
     }
   }

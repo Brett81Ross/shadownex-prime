@@ -36,3 +36,22 @@ Current provider documentation:
 
 ## Next owner approval
 Approve only the following future **single controlled action** after the blockers are explicitly resolved: create one separate authentication-protected QA project and one nonproduction preview from the pinned PR #9 commit, with zero purchases/paid services, then verify access from the Fold. The owner has **not** yet granted that activation approval.
+
+## Follow-up account-level read audit — 2026-10-20 (no changes applied)
+- Re-read live `shadownex-prime` project: `nodeVersion=24.x`, `ssoProtection.enabled=true` (`all_except_custom_domains`), password protection off, trusted IP protection off. Existing project and production untouched.
+- Team member list contains **one confirmed OWNER**. This establishes a plausible authorized Vercel login path; Galaxy Z Fold browser sign-in is **not yet tested**, and a *new separate QA project* must have protection explicitly verified before a URL is used.
+- Queried `GET /v1/billing/charges` for October 2026 and received **404 `costs_not_found`**; no account-specific consumption or remaining deployment/storage headroom could be established. Do not interpret the error as no spend or as free capacity.
+- Vercel docs say Hobby supports Vercel Authentication with **Standard Protection**, not paid password protection. Avoid authentication bypass/shareable links and verify unauthenticated denial as well as owner acceptance. Reference: https://vercel.com/docs/deployment-protection and https://vercel.com/docs/deployment-protection/methods-to-protect-deployments/vercel-authentication
+- Vercel Node runtimes support **22.x**. For an isolated QA project, explicitly select `22.x` (and preserve `package.json.engines.node=">=22 <23"`); do **not** update the existing production project. Reference: https://vercel.com/docs/functions/runtimes/node-js/node-js-versions
+- Official Hobby limits include up to **200 projects**, **100 deployments/day**, **one concurrent build**, **100 MB static uploads**. Those are tier maximums and *not* current remaining capacity. Reference: https://vercel.com/docs/limits
+- Hobby eligibility: confirm this specific preview is personal/noncommercial testing under Vercel's applicable fair-use terms before using Hobby. Do not infer eligibility merely from a low request volume or draft status. Reference: https://vercel.com/docs/plans/hobby
+
+### Final execution hold points
+1. Check the **live Vercel Usage dashboard** and confirm remaining free deployment/build/storage/function allowance; provide a recorded snapshot or numbers. Charges API unavailable is not sufficient.
+2. Verify this specific PR #9 test use is allowed on Hobby; if business/commercial QA, stop and select a separately authorized eligible service/path.
+3. Confirm the Fold uses the **same Vercel owner account** and can reach its sign-in flow. No shareable bypass link.
+4. Obtain separate approval for **one new isolated QA project**, Vercel Authentication Standard Protection enforced and checked, Node 22, pinned Git SHA, no production environment variables, no production aliases, safe read-only/fixture APIs, no PWA/install cross-contamination, no auto deployments.
+5. Build in a guarded sequence where protection is verified **before** exposing any test URL; stop on a protection failure, paid upgrade prompt, quota shortfall, or unexpectedly public URL. Request **a second explicit deployment authorization** if the owner only approves project setup.
+6. Tear down QA project after acceptance; do not touch production and do not run GitHub Actions.
+
+**Current disposition: NOT APPROVED FOR ACTIVATION. This document updates planning evidence only.**

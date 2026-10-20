@@ -16,7 +16,10 @@ assert.ok(!freeMethod.includes('createOsmBuildingsAsync')&&!freeMethod.includes(
 assert.ok(reset.includes('setWorld3D?.(false)'),'Reset App disables 3D');
 assert.equal(typeof installViewportDialogs,'function');
 assert.equal(WORLD_3D_BASE.quality,'global-building-extrusions','baseline never mislabels extrusions as scanned geometry');
-assert.equal(APPROVED_HIGH_DETAIL_OVERLAYS.length,0,'do not activate unverified photogrammetry data');
+assert.equal(APPROVED_HIGH_DETAIL_OVERLAYS.length,1,'first official PLATEAU LOD2 source registered');
+assert.ok(APPROVED_HIGH_DETAIL_OVERLAYS[0].attribution.includes('PLATEAU'),'source attribution retained');
+assert.equal(matchingDetailSources(139.76,35.68).length,1,'Chiyoda LOD2 available in conservative activation envelope');
+assert.equal(matchingDetailSources(-97,35).length,0,'worldwide fallback outside regional coverage');
 assert.deepEqual(matchingDetailSources(-97.5,35.5),[],'global fallback remains when no detail tiles approved');
 const verified={approved:true,licenseReviewed:true,tilesetUrl:'https://example.org/tileset.json',bounds:[-99,34,-96,37]};
 assert.equal(matchingDetailSources(-97,35,[verified]).length,1,'licensed regional overlay matches its geographic coverage');

@@ -53,6 +53,18 @@ export class GlobeController extends EventTarget {
   baseMapInfo(){return {status:this.baseMapStatus,name:this.baseMapName,mode:this.baseMapMode,terrain:this.terrainStatus};}
   // $0 Community 3D preview: public open-data services, no ion token or paid API.
   // Upstream hosts are best-effort; this remains opt-in and OFF by default.
+  // Centralize Fold terrain, building and resolution budgets across 3D toggles and recovery.
+  applyWorld3DPerformance(lowPower=this.performanceLowPower||false){
+    this.performanceLowPower=!!lowPower;
+    if(!this.viewer)return;
+    const on=this.world3DMode!=='off';
+    this.viewer.resolutionScale=this.performanceLowPower?(this.compactDevice?.6:.82):(on?1:(this.compactDevice?.82:1));
+    this.viewer.scene.globe.maximumScreenSpaceError=on?(this.performanceLowPower?(this.compactDevice?5:3.5):(this.compactDevice?3:2)):1.35;
+    if(this.world3DBuildings){
+      this.world3DBuildings.maximumScreenSpaceError=this.performanceLowPower?(this.compactDevice?64:40):(this.compactDevice?40:24);
+    }
+    this.requestRender();
+  }
   async setWorld3D(enabled){
     const C=window.Cesium;
     if(!this.viewer||!C)return {ok:false,reason:'3D viewer unavailable.'};
@@ -63,7 +75,7 @@ export class GlobeController extends EventTarget {
       this.viewer.terrainProvider=new C.EllipsoidTerrainProvider();
       this.viewer.scene.globe.maximumScreenSpaceError=1.35;
       this.world3DMode='off';this.terrainStatus='ELLIPSOID';
-      if(this.compactDevice)this.viewer.resolutionScale=.82;
+      this.applyWorld3DPerformance();
       credit?.classList.add('hidden');this.requestRender();
       return {ok:true,enabled:false};
     }
@@ -80,15 +92,14 @@ export class GlobeController extends EventTarget {
       this.world3DTerrain=terrain;
       this.viewer.terrainProvider=terrain;
       // Fold: draw CSS-pixel-sharp 3D contacts without full device-pixel-ratio GPU cost.
-      if(this.compactDevice)this.viewer.resolutionScale=1;
       this.terrainStatus='COMMUNITY TERRAIN';
       // Balance mountain detail against tile churn and Fold GPU memory.
-      this.viewer.scene.globe.maximumScreenSpaceError=this.compactDevice?3.0:2.0;
       this.world3DMode='terrain-only';
+      this.applyWorld3DPerformance();
       credit?.classList.remove('hidden');this.requestRender();
     }catch(error){
       console.warn('[free 3d terrain]',error);
-      if(epoch===this._world3DEpoch){this.world3DMode='off';if(this.compactDevice)this.viewer.resolutionScale=.82;credit?.classList.add('hidden');}
+      if(epoch===this._world3DEpoch){this.world3DMode='off';this.applyWorld3DPerformance();credit?.classList.add('hidden');}
       return {ok:false,reason:'Free terrain service unavailable. Original map remains available.'};
     }
     try{
@@ -102,8 +113,7 @@ export class GlobeController extends EventTarget {
         tileset.dynamicScreenSpaceError=true;
         this.world3DBuildings=this.viewer.scene.primitives.add(tileset);
       }else this.world3DBuildings.show=true;
-      this.world3DBuildings.maximumScreenSpaceError=this.compactDevice?40:24;
-      this.world3DMode='on';this.requestRender();
+      this.world3DMode='on';this.applyWorld3DPerformance();this.requestRender();
       return {ok:true,enabled:true,buildings:true};
     }catch(error){
       console.warn('[free 3d buildings]',error);

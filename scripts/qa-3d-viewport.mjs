@@ -15,7 +15,7 @@ assert.ok(!freeMethod.includes('createOsmBuildingsAsync')&&!freeMethod.includes(
 assert.ok(reset.includes('setWorld3D?.(false)'),'Reset App disables 3D');
 assert.equal(typeof installViewportDialogs,'function');
 const perfSource=await read('src/ui/ablEnhancements.js');
-assert.ok(perfSource.includes("this.globe.world3DMode!=='off'")&&perfSource.includes('inFree3D?1:'),'normal performance recovery preserves sharp 3D resolution');
+assert.ok(perfSource.includes('applyWorld3DPerformance?.(this.lowPower)'),'low-power transitions synchronize 3D quality');
 const aircraftSource=await read('src/layers/AircraftLayer.js');
 assert.ok(aircraftSource.includes('!this.app.compact||alt<350000'),'Fold callsigns reappear at close zoom');
 assert.ok(aircraftSource.includes('!this.app.lowPower&&(!this.app.compact||alt<350000)'),'low-power keeps contact labels suppressed');
@@ -51,6 +51,15 @@ assert.ok(calls.some(a=>a[0]==='buildings'&&a[1]==='https://buildings.reearth.la
 assert.equal(globe.viewer.scene.globe.maximumScreenSpaceError,2.0,'desktop has closer mountain detail');
 assert.equal(globe.world3DBuildings.maximumScreenSpaceError,24,'desktop buildings use medium detail');
 assert.equal(globe.world3DBuildings.dynamicScreenSpaceError,true,'building traversal adapts with distance');
+globe.compactDevice=true;
+globe.applyWorld3DPerformance(true);
+assert.equal(globe.viewer.resolutionScale,.6,'Fold low-power reduces GPU pixel budget');
+assert.equal(globe.viewer.scene.globe.maximumScreenSpaceError,5,'Fold low-power relaxes terrain refinement');
+assert.equal(globe.world3DBuildings.maximumScreenSpaceError,64,'Fold low-power relaxes building refinement');
+globe.applyWorld3DPerformance(false);
+assert.equal(globe.viewer.resolutionScale,1,'normal 3D restores crisp Fold resolution');
+assert.equal(globe.world3DBuildings.maximumScreenSpaceError,40,'normal Fold building detail restored');
+globe.compactDevice=false;
 const loaded=calls.filter(a=>a[0]==='buildings').length;
 result=await globe.setWorld3D(false);assert.equal(result.ok,true);
 assert.equal(globe.world3DMode,'off');assert.equal(globe.world3DBuildings.show,false);

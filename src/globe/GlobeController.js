@@ -71,10 +71,17 @@ export class GlobeController extends EventTarget {
     }
     this.requestRender();
   }
+  setRegionalBuildingVisibility(visible){
+    if(this._highDetailTileset)this._highDetailTileset.show=!!visible;
+    // Never render both overlapping building datasets together. The global
+    // extrusions return whenever the regional detail isn't actually visible.
+    if(this.world3DBuildings)this.world3DBuildings.show=this.world3DMode!=='off'&&!visible;
+    this.requestRender();
+  }
   async syncHighDetail3D(){
     const existing=this._highDetailTileset;
     if(this.world3DMode==='off'){
-      if(existing)existing.show=false;
+      this.setRegionalBuildingVisibility(false);
       return {ok:true,visible:false};
     }
     const height=Number(this.viewer?.camera?.positionCartographic?.height);
@@ -85,7 +92,7 @@ export class GlobeController extends EventTarget {
       return {ok:true,visible:false};
     }
     if(existing&&this._highDetailSourceId===source.id){
-      existing.show=true;this.requestRender();return {ok:true,visible:true,cached:true};
+      this.setRegionalBuildingVisibility(true);return {ok:true,visible:true,cached:true};
     }
     if(this._highDetailLoading===source.id)return {ok:false,reason:'High-detail tiles loading'};
     const epoch=this._world3DEpoch;
@@ -113,14 +120,14 @@ export class GlobeController extends EventTarget {
       if(existing&&existing!==tileset){try{this.viewer.scene.primitives.remove(existing);}catch{}}
       this._highDetailTileset=this.viewer.scene.primitives.add(tileset);
       this._highDetailSourceId=source.id;
-      this._highDetailTileset.show=true;
+      this.setRegionalBuildingVisibility(true);
       const credits=document.getElementById('world3DAttribution');
       if(credits&&!credits.textContent.includes('Project PLATEAU'))credits.append(document.createTextNode(' · '+source.attribution));
       this.requestRender();
       return {ok:true,visible:true};
     }catch(error){
       console.warn('[regional high-detail 3D]',error);
-      // Global baseline is never hidden when a regional provider fails.
+      this.setRegionalBuildingVisibility(false);
       return {ok:false,reason:'Regional detail temporarily unavailable'};
     }finally{
       if(this._highDetailLoading===source.id)this._highDetailLoading=null;
@@ -133,7 +140,7 @@ export class GlobeController extends EventTarget {
     const credit=document.getElementById('world3DAttribution');
     if(!enabled){
       if(this.world3DBuildings)this.world3DBuildings.show=false;
-      if(this._highDetailTileset)this._highDetailTileset.show=false;
+      this.setRegionalBuildingVisibility(false);
       this.viewer.terrainProvider=this._preWorld3DTerrain||new C.EllipsoidTerrainProvider();
       this.viewer.scene.globe.maximumScreenSpaceError=1.35;
       this.world3DMode='off';this.terrainStatus=this._preWorld3DTerrainStatus||'ELLIPSOID';
@@ -180,7 +187,7 @@ export class GlobeController extends EventTarget {
         tileset.dynamicScreenSpaceError=true;
         this.world3DBuildings=this.viewer.scene.primitives.add(tileset);
       }else this.world3DBuildings.show=true;
-      this.world3DMode='on';this.applyWorld3DPerformance();this.syncHighDetail3D().catch(()=>{});this.requestRender();
+      this.world3DMode='on';this.applyWorld3DPerformance();this.syncHighDetail3D().catch(()=>this.setRegionalBuildingVisibility(false));this.requestRender();
       return {ok:true,enabled:true,buildings:true};
     }catch(error){
       console.warn('[free 3d buildings]',error);

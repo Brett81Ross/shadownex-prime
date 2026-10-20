@@ -18,7 +18,8 @@ export class GlobeController extends EventTarget {
     const handler=new C.ScreenSpaceEventHandler(this.viewer.scene.canvas);
     handler.setInputAction(m=>this.onClick(m.position),C.ScreenSpaceEventType.LEFT_CLICK);
     handler.setInputAction(()=>this.annotation?.finish(),C.ScreenSpaceEventType.RIGHT_CLICK);
-    this.viewer.camera.moveEnd.addEventListener(()=>{this.dispatchEvent(new CustomEvent('camera',{detail:cameraState(this.viewer)}));this.scheduleMarkerCollision();this.requestRender();});
+    this.viewer.camera.moveStart.addEventListener(()=>{this.cameraMoving=true;this.applyWorld3DPerformance();});
+    this.viewer.camera.moveEnd.addEventListener(()=>{this.cameraMoving=false;this.applyWorld3DPerformance();this.dispatchEvent(new CustomEvent('camera',{detail:cameraState(this.viewer)}));this.scheduleMarkerCollision();this.requestRender();});
     this.viewer.scene.preRender.addEventListener(()=>this.updateFollow());
     const canvas=this.viewer.scene.canvas;
     canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();this.dispatchEvent(new CustomEvent('stability',{detail:{state:'lost',message:'Graphics context paused. Tap reload if the map does not recover.'}}));});
@@ -59,9 +60,10 @@ export class GlobeController extends EventTarget {
     if(!this.viewer)return;
     const on=this.world3DMode!=='off';
     this.viewer.resolutionScale=this.performanceLowPower?(this.compactDevice?.6:.82):(on?1:(this.compactDevice?.82:1));
-    this.viewer.scene.globe.maximumScreenSpaceError=on?(this.performanceLowPower?(this.compactDevice?5:3.5):(this.compactDevice?3:2)):1.35;
+    const moving=on&&!!this.cameraMoving;
+    this.viewer.scene.globe.maximumScreenSpaceError=on?(this.performanceLowPower?(this.compactDevice?5:3.5):moving?(this.compactDevice?4:2.8):(this.compactDevice?3:2)):1.35;
     if(this.world3DBuildings){
-      this.world3DBuildings.maximumScreenSpaceError=this.performanceLowPower?(this.compactDevice?64:40):(this.compactDevice?40:24);
+      this.world3DBuildings.maximumScreenSpaceError=this.performanceLowPower?(this.compactDevice?64:40):moving?(this.compactDevice?56:32):(this.compactDevice?40:24);
     }
     this.requestRender();
   }

@@ -139,11 +139,11 @@ export class GlobeController extends EventTarget {
     const epoch=this._world3DEpoch=(this._world3DEpoch||0)+1;
     const credit=document.getElementById('world3DAttribution');
     if(!enabled){
-      if(this.world3DBuildings)this.world3DBuildings.show=false;
+      this.world3DMode='off';
       this.setRegionalBuildingVisibility(false);
       this.viewer.terrainProvider=this._preWorld3DTerrain||new C.EllipsoidTerrainProvider();
       this.viewer.scene.globe.maximumScreenSpaceError=1.35;
-      this.world3DMode='off';this.terrainStatus=this._preWorld3DTerrainStatus||'ELLIPSOID';
+      this.terrainStatus=this._preWorld3DTerrainStatus||'ELLIPSOID';
       this.applyWorld3DPerformance();
       credit?.classList.add('hidden');this.requestRender();
       return {ok:true,enabled:false};

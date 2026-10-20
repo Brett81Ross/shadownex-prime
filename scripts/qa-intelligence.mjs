@@ -5,7 +5,7 @@ check(intel.includes('ensureIntelligenceUi')&&intel.includes("search.id='searchB
 check(intel.includes('/api/boundary?q=')&&intel.includes('searchActiveContacts'),'search handles places and active live contacts');
 check(intel.includes('data-preset="emergency"')&&intel.includes('data-preset="aviation"')&&intel.includes('data-preset="space"'),'guided mission presets are present');
 check(intel.includes('startRecoveryWatchdog')&&intel.includes('recoverLayer')&&intel.includes('300000'),'automatic recovery watchdog has cooldown and targeted recovery');
-check(air.includes('clusterEntities')&&air.includes("type:'CLUSTER'")&&globe.includes("meta?.type==='CLUSTER'"),'smart aircraft clustering and cluster drill-down are implemented');
+check(air.includes('clusterEntities')&&air.includes("type:'CLUSTER'")&&(globe.includes("meta?.type==='CLUSTER'")||globe.includes("meta.type==='CLUSTER'")),'smart aircraft clustering and cluster drill-down are implemented');
 check(intel.includes('confidenceInfo')&&intel.includes('MILITARY-LIKELY IS HEURISTIC')&&css.includes('.provenance-strip'),'confidence/provenance UI labels live, estimated, reported, and heuristic data');
 check(main.includes('installIntelligenceEnhancements(app)'),'intelligence enhancement module is installed before app initialization');
 console.log(`\nIntelligence QA: ${pass} passed, ${fail} failed`);process.exitCode=fail?1:0;

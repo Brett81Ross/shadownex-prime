@@ -13,3 +13,9 @@
 .brief-title-row{display:flex;align-items:center;justify-content:space-between;gap:8px}.brief-state{border:1px solid currentColor;border-radius:999px;padding:5px 7px;font:900 7px ui-monospace,monospace}.brief-source-grid{margin-top:8px}.brief-source-row{display:flex;justify-content:space-between;gap:8px}.brief-source-row b{text-align:right;font-size:8px}
 @media(max-width:900px){.simple-hub{top:74px;grid-template-columns:1fr auto;width:calc(100vw - 16px);padding:7px}.simple-modes{grid-column:1/-1;order:3}.simple-search{grid-column:1}.brief-source-grid{grid-template-columns:1fr}}
 @media(max-width:620px){.simple-hub{top:68px}.simple-search{grid-template-columns:1fr}.simple-search button{display:none}.simple-modes button{padding:8px 7px}.imagery-meta-grid{grid-template-columns:1fr}.sbl-simple #scopePanel{bottom:70px;max-height:50vh}}
+/* ABL #9: preserve every quick-mode control but reclaim Fold landscape space. */
+@media(max-width:900px) and (max-height:700px){
+ .simple-hub{top:65px;padding:5px;gap:4px}
+ .simple-search input{padding:7px 9px}
+ .simple-modes button{padding:6px 7px}
+}

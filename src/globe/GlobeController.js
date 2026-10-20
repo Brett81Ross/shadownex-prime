@@ -1,11 +1,13 @@
 import { cameraState, rectangleDegrees } from '../core/geo.js';
+import { WORLD_3D_BASE, matchingDetailSources } from './world3dSources.js';
 import { AnnotationController } from './AnnotationController.js';
 import { SceneDirector } from './SceneDirector.js';
 export class GlobeController extends EventTarget {
-  constructor(container,settings){super();this.container=container;this.settings=settings;this.viewer=null;this.selected=null;this.tracking=false;this.cockpit=false;this.annotation=null;this.sceneDirector=null;this.followTimer=null;this.baseMapLayer=null;this.baseMapProvider=null;this.baseMapStatus='LOADING';this.baseMapName='Keyless Earth';this.baseMapErrors=0;this.terrainStatus='ELLIPSOID';this.selectionMarker=null;this.baseMapMode='satellite';this.world3DMode='off';this.world3DBuildings=null;}
+  constructor(container,settings){super();this.container=container;this.settings=settings;this.viewer=null;this.selected=null;this.tracking=false;this.cockpit=false;this.annotation=null;this.sceneDirector=null;this.followTimer=null;this.baseMapLayer=null;this.baseMapProvider=null;this.baseMapStatus='LOADING';this.baseMapName='Keyless Earth';this.baseMapErrors=0;this.terrainStatus='ELLIPSOID';this.selectionMarker=null;this.baseMapMode='satellite';this.world3DMode='off';this.world3DBuildings=null;this.world3DTerrain=null;this.compactDevice=false;this._collisionSuppressed=[];this._collisionTimer=null;}
   async init(){
     if(!window.Cesium)throw new Error('Cesium runtime did not load.');
     const C=window.Cesium,compact=matchMedia('(max-width: 900px)').matches||navigator.maxTouchPoints>0;
+    this.compactDevice=compact;
     if(this.settings.cesiumToken)C.Ion.defaultAccessToken=this.settings.cesiumToken;
     this.viewer=new C.Viewer(this.container,{animation:false,timeline:false,baseLayer:false,baseLayerPicker:false,geocoder:false,homeButton:false,sceneModePicker:false,navigationHelpButton:false,fullscreenButton:false,infoBox:false,selectionIndicator:false,shouldAnimate:false,requestRenderMode:true,maximumRenderTimeChange:1});
     this.viewer.scene.globe.show=true;this.viewer.scene.globe.baseColor=C.Color.fromCssColorString('#0d3242');this.viewer.scene.globe.depthTestAgainstTerrain=true;this.viewer.scene.globe.enableLighting=false;this.viewer.scene.globe.showGroundAtmosphere=true;this.viewer.scene.fxaa=true;this.viewer.scene.requestRenderMode=true;this.viewer.scene.maximumRenderTimeChange=1;if(this.viewer.scene.skyAtmosphere)this.viewer.scene.skyAtmosphere.show=true;
@@ -17,7 +19,8 @@ export class GlobeController extends EventTarget {
     const handler=new C.ScreenSpaceEventHandler(this.viewer.scene.canvas);
     handler.setInputAction(m=>this.onClick(m.position),C.ScreenSpaceEventType.LEFT_CLICK);
     handler.setInputAction(()=>this.annotation?.finish(),C.ScreenSpaceEventType.RIGHT_CLICK);
-    this.viewer.camera.moveEnd.addEventListener(()=>{this.dispatchEvent(new CustomEvent('camera',{detail:cameraState(this.viewer)}));this.requestRender();});
+    this.viewer.camera.moveStart.addEventListener(()=>{this.cameraMoving=true;this.applyWorld3DPerformance();});
+    this.viewer.camera.moveEnd.addEventListener(()=>{this.cameraMoving=false;this.applyWorld3DPerformance();this.syncHighDetail3D().catch(()=>{});this.dispatchEvent(new CustomEvent('camera',{detail:cameraState(this.viewer)}));this.scheduleMarkerCollision();this.requestRender();});
     this.viewer.scene.preRender.addEventListener(()=>this.updateFollow());
     const canvas=this.viewer.scene.canvas;
     canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();this.dispatchEvent(new CustomEvent('stability',{detail:{state:'lost',message:'Graphics context paused. Tap reload if the map does not recover.'}}));});
@@ -49,62 +52,238 @@ export class GlobeController extends EventTarget {
       provider.errorEvent?.addEventListener?.(()=>{this.baseMapErrors++;if(this.baseMapErrors===3){this.baseMapStatus='FALLBACK';this.baseMapName='Fallback Earth';this.dispatchEvent(new CustomEvent('stability',{detail:{state:'warning',message:'Earth imagery is having trouble loading. ShadowNex is keeping a visible fallback globe underneath live contacts.'}}));this.requestRender();}});
     }catch(e){this.baseMapStatus='FALLBACK';this.baseMapName='Fallback Earth';console.warn('[basemap]',e);this.dispatchEvent(new CustomEvent('stability',{detail:{state:'warning',message:'Earth imagery could not load. ShadowNex is showing a visible fallback globe instead of a blank field.'}}));}
   }
-  baseMapInfo(){return {status:this.baseMapStatus,name:this.baseMapName,mode:this.baseMapMode,terrain:this.terrainStatus};}
+  baseMapInfo(){return {status:this.baseMapStatus,name:this.baseMapName,mode:this.baseMapMode,terrain:this.terrainStatus,buildingGeometry:this.world3DMode==='on'?WORLD_3D_BASE.quality:'none',highDetailSources:this.world3DMode==='off'?0:this.availableHighDetailSources().length};}
+  availableHighDetailSources(){const point=this.focusCoordinates?.();return point?matchingDetailSources(point.lon,point.lat):[];}
   // $0 Community 3D preview: public open-data services, no ion token or paid API.
   // Upstream hosts are best-effort; this remains opt-in and OFF by default.
+  // Centralize Fold terrain, building and resolution budgets across 3D toggles and recovery.
+  applyWorld3DPerformance(lowPower=this.performanceLowPower||false){
+    this.performanceLowPower=!!lowPower;
+    if(!this.viewer)return;
+    const on=this.world3DMode!=='off';
+    this.viewer.resolutionScale=this.performanceLowPower?(this.compactDevice?.6:.82):(on?1:(this.compactDevice?.82:1));
+    const moving=on&&!!this.cameraMoving;
+    const height=Number(this.viewer.camera?.positionCartographic?.height);
+    const close=on&&!moving&&!this.performanceLowPower&&Number.isFinite(height)&&height>0&&height<200000;
+    this.viewer.scene.globe.maximumScreenSpaceError=on?(this.performanceLowPower?(this.compactDevice?5:3.5):moving?(this.compactDevice?4:2.8):close?(this.compactDevice?2.2:1.6):(this.compactDevice?3:2)):1.35;
+    if(this.world3DBuildings){
+      this.world3DBuildings.maximumScreenSpaceError=this.performanceLowPower?(this.compactDevice?64:40):moving?(this.compactDevice?56:32):close?(this.compactDevice?28:18):(this.compactDevice?40:24);
+    }
+    this.requestRender();
+  }
+  setRegionalBuildingVisibility(visible){
+    if(this._highDetailTileset)this._highDetailTileset.show=!!visible;
+    // Never render both overlapping building datasets together. The global
+    // extrusions return whenever the regional detail isn't actually visible.
+    if(this.world3DBuildings)this.world3DBuildings.show=this.world3DMode!=='off'&&!visible;
+    this.requestRender();
+  }
+  async syncHighDetail3D(){
+    const existing=this._highDetailTileset;
+    if(this.world3DMode==='off'){
+      this.setRegionalBuildingVisibility(false);
+      return {ok:true,visible:false};
+    }
+    const height=Number(this.viewer?.camera?.positionCartographic?.height);
+    const near=Number.isFinite(height)&&height>0&&height<150000;
+    const source=near?this.availableHighDetailSources()[0]:null;
+    if(!source){
+      this.setRegionalBuildingVisibility(false);
+      return {ok:true,visible:false};
+    }
+    if(existing&&this._highDetailSourceId===source.id){
+      this.setRegionalBuildingVisibility(true);return {ok:true,visible:true,cached:true};
+    }
+    if(this._highDetailLoading===source.id)return {ok:false,reason:'High-detail tiles loading'};
+    const epoch=this._world3DEpoch;
+    this._highDetailLoading=source.id;
+    let tileset;
+    try{
+      const load=window.Cesium.Cesium3DTileset.fromUrl(source.tilesetUrl);
+      let expired=false,timer;
+      tileset=await Promise.race([
+        Promise.resolve(load).then(value=>{if(expired){try{value.destroy?.();}catch{}return null;}return value;}),
+        new Promise((_,reject)=>{timer=setTimeout(()=>{expired=true;reject(new Error('Regional 3D loading timed out'));},14000);})
+      ]).finally(()=>clearTimeout(timer));
+      if(!tileset)return {ok:false,reason:'Regional 3D loading cancelled'};
+      if(epoch!==this._world3DEpoch||this.world3DMode==='off'){
+        try{tileset.destroy?.();}catch{}return {ok:false,reason:'3D mode changed'};
+      }
+      const valid=Number(this.viewer?.camera?.positionCartographic?.height)<150000
+        &&this.availableHighDetailSources().some(x=>x.id===source.id);
+      if(!valid){try{tileset.destroy?.();}catch{}return {ok:false,reason:'Camera left coverage'};
+      }
+      if('cacheBytes' in tileset)tileset.cacheBytes=this.compactDevice?48*1024*1024:128*1024*1024;
+      if('maximumCacheOverflowBytes' in tileset)tileset.maximumCacheOverflowBytes=this.compactDevice?24*1024*1024:64*1024*1024;
+      tileset.maximumScreenSpaceError=this.compactDevice?28:18;
+      tileset.dynamicScreenSpaceError=true;
+      if(existing&&existing!==tileset){try{this.viewer.scene.primitives.remove(existing);}catch{}}
+      this._highDetailTileset=this.viewer.scene.primitives.add(tileset);
+      this._highDetailSourceId=source.id;
+      this.setRegionalBuildingVisibility(true);
+      const credits=document.getElementById('world3DAttribution');
+      if(credits&&!credits.textContent.includes('Project PLATEAU'))credits.append(document.createTextNode(' · '+source.attribution));
+      this.requestRender();
+      return {ok:true,visible:true};
+    }catch(error){
+      console.warn('[regional high-detail 3D]',error);
+      this.setRegionalBuildingVisibility(false);
+      return {ok:false,reason:'Regional detail temporarily unavailable'};
+    }finally{
+      if(this._highDetailLoading===source.id)this._highDetailLoading=null;
+    }
+  }
   async setWorld3D(enabled){
     const C=window.Cesium;
     if(!this.viewer||!C)return {ok:false,reason:'3D viewer unavailable.'};
     const epoch=this._world3DEpoch=(this._world3DEpoch||0)+1;
     const credit=document.getElementById('world3DAttribution');
     if(!enabled){
-      if(this.world3DBuildings)this.world3DBuildings.show=false;
-      this.viewer.terrainProvider=new C.EllipsoidTerrainProvider();
+      this.world3DMode='off';
+      this.setRegionalBuildingVisibility(false);
+      this.viewer.terrainProvider=this._preWorld3DTerrain||new C.EllipsoidTerrainProvider();
       this.viewer.scene.globe.maximumScreenSpaceError=1.35;
-      this.world3DMode='off';this.terrainStatus='ELLIPSOID';
+      this.terrainStatus=this._preWorld3DTerrainStatus||'ELLIPSOID';
+      this.applyWorld3DPerformance();
       credit?.classList.add('hidden');this.requestRender();
       return {ok:true,enabled:false};
     }
-    const withTimeout=(task,label)=>new Promise((resolve,reject)=>{
-      const timer=setTimeout(()=>reject(new Error(label+' timed out')),18000);
-      Promise.resolve(task).then(value=>{clearTimeout(timer);resolve(value);},error=>{clearTimeout(timer);reject(error);});
+    const withTimeout=(task,label,onLate)=>new Promise((resolve,reject)=>{
+      let expired=false;
+      const timer=setTimeout(()=>{expired=true;reject(new Error(label+' timed out'));},18000);
+      Promise.resolve(task).then(value=>{clearTimeout(timer);if(expired){onLate?.(value);return;}resolve(value);},error=>{clearTimeout(timer);if(!expired)reject(error);});
     });
     try{
-      const terrain=await withTimeout(C.CesiumTerrainProvider.fromUrl(
-        'https://terrain.reearth.land/cesium-mesh/ellipsoid',
+      const terrain=this.world3DTerrain||await withTimeout(C.CesiumTerrainProvider.fromUrl(
+        WORLD_3D_BASE.terrain,
         {requestVertexNormals:false,requestWaterMask:false}
       ),'3D terrain');
       if(epoch!==this._world3DEpoch)return {ok:false,reason:'3D activation was cancelled.'};
+      if(this.world3DMode==='off'){this._preWorld3DTerrain=this.viewer.terrainProvider;this._preWorld3DTerrainStatus=this.terrainStatus;}
+      this.world3DTerrain=terrain;
       this.viewer.terrainProvider=terrain;
+      // Fold: draw CSS-pixel-sharp 3D contacts without full device-pixel-ratio GPU cost.
       this.terrainStatus='COMMUNITY TERRAIN';
-      this.viewer.scene.globe.maximumScreenSpaceError=2.5;
+      // Balance mountain detail against tile churn and Fold GPU memory.
       this.world3DMode='terrain-only';
+      this.applyWorld3DPerformance();
       credit?.classList.remove('hidden');this.requestRender();
     }catch(error){
       console.warn('[free 3d terrain]',error);
-      if(epoch===this._world3DEpoch){this.world3DMode='off';credit?.classList.add('hidden');}
+      if(epoch===this._world3DEpoch){this.viewer.terrainProvider=this._preWorld3DTerrain||new C.EllipsoidTerrainProvider();this.terrainStatus=this._preWorld3DTerrainStatus||'ELLIPSOID';this.world3DMode='off';this.applyWorld3DPerformance();credit?.classList.add('hidden');}
       return {ok:false,reason:'Free terrain service unavailable. Original map remains available.'};
     }
     try{
       if(!this.world3DBuildings){
         const tileset=await withTimeout(C.Cesium3DTileset.fromUrl(
-          'https://buildings.reearth.land/tileset.json'
-        ),'3D buildings');
-        if(epoch!==this._world3DEpoch)return {ok:false,reason:'3D activation was cancelled.'};
-        tileset.maximumScreenSpaceError=32;
+          WORLD_3D_BASE.buildings
+        ),'3D buildings',tile=>{try{tile.destroy?.();}catch{}});
+        if(epoch!==this._world3DEpoch){try{tileset.destroy?.();}catch{}return {ok:false,reason:'3D activation was cancelled.'};}
+        // Cesium 3D Tiles v1.132: limit CPU/GPU tile cache on memory-constrained Fold.
+        if('cacheBytes' in tileset)tileset.cacheBytes=this.compactDevice?96*1024*1024:256*1024*1024;
+        if('maximumCacheOverflowBytes' in tileset)tileset.maximumCacheOverflowBytes=this.compactDevice?48*1024*1024:128*1024*1024;
+        // Larger error on touch/Fold devices reduces costly building tile refinement.
+        tileset.maximumScreenSpaceError=this.compactDevice?40:24;
+        tileset.dynamicScreenSpaceError=true;
         this.world3DBuildings=this.viewer.scene.primitives.add(tileset);
       }else this.world3DBuildings.show=true;
-      this.world3DMode='on';this.requestRender();
+      this.world3DMode='on';this.applyWorld3DPerformance();this.syncHighDetail3D().catch(()=>this.setRegionalBuildingVisibility(false));this.requestRender();
       return {ok:true,enabled:true,buildings:true};
     }catch(error){
       console.warn('[free 3d buildings]',error);
       if(epoch!==this._world3DEpoch)return {ok:false,reason:'3D activation was cancelled.'};
-      this.world3DMode='terrain-only';this.requestRender();
+      this.world3DMode='terrain-only';this.applyWorld3DPerformance();
       return {ok:true,enabled:true,buildings:false,reason:'3D terrain is available; community buildings are temporarily unavailable.'};
     }
   }
   requestRender(){try{this.viewer?.scene?.requestRender()}catch{}}
-  onClick(position){if(this.annotation?.isArmed()){this.annotation.handleClick(position);return;}const picked=this.viewer.scene.pick(position);const meta=picked?.id?.properties?.snxMeta?.getValue?.()??picked?.id?.snxMeta??picked?.primitive?.snxMeta;if(meta?.type==='CLUSTER'){const alt=Math.max(650000,(this.state().alt||6000000)*.42);this.flyTo(Number(meta.longitude),Number(meta.latitude),alt);return;}if(meta)this.select(meta,picked.id||picked.primitive);else if(this.selected)this.clearSelection();}
+  // A short repeated tap cycles real contacts that share the same screen pixels.
+  // Keep source entities/coordinates unchanged; do not turn a selected halo into a hit.
+  scheduleMarkerCollision(){
+    clearTimeout(this._collisionTimer);
+    this._collisionTimer=setTimeout(()=>this.updateMarkerCollisions(),120);
+  }
+  updateMarkerCollisions(){
+    const viewer=this.viewer,scene=viewer?.scene;
+    // Restore only values that this display-only pass previously suppressed.
+    for(const item of this._collisionSuppressed||[]){
+      if(item.entity?.billboard)item.entity.billboard.show=item.billboardShow;
+      if(item.entity?.label)item.entity.label.show=item.labelShow===undefined?true:item.labelShow;
+    }
+    this._collisionSuppressed=[];
+    if(!scene?.cartesianToCanvasCoordinates||!scene.canvas||!viewer.entities?.values)return;
+    if((Number(this.state()?.alt)||0)<80000)return;
+    const visible=x=>x?.getValue?x.getValue(viewer.clock?.currentTime):x;
+    const candidates=[],all=viewer.entities.values;
+    for(const entity of all.slice(0,3000)){
+      if(!entity?.billboard||entity.show===false||entity===this.selectionMarker)continue;
+      if(visible(entity.billboard.show)===false)continue;
+      const meta=entity.properties?.snxMeta?.getValue?.(viewer.clock?.currentTime)??entity.snxMeta;
+      if(!meta?.type)continue;
+      const pos=visible(entity.position);
+      if(!pos)continue;
+      let xy;try{xy=scene.cartesianToCanvasCoordinates(pos)}catch{continue;}
+      if(!xy||!Number.isFinite(xy.x)||!Number.isFinite(xy.y)||xy.x<0||xy.y<0||xy.x>scene.canvas.clientWidth||xy.y>scene.canvas.clientHeight)continue;
+      const priority=entity===this.selected?.entity?1000:meta.type==='CLUSTER'?150:meta.type==='FIRE'?100:meta.type==='EARTHQUAKE'?90:meta.type==='CCTV'?80:meta.type==='AIRCRAFT'?70:50;
+      candidates.push({entity,meta,xy,priority});
+    }
+    candidates.sort((a,b)=>b.priority-a.priority);
+    const cell=36,buckets=new Map(),occupied=[];
+    for(const item of candidates){
+      const {xy,entity}=item,gx=Math.floor(xy.x/cell),gy=Math.floor(xy.y/cell);
+      let collision=false;
+      for(let x=gx-1;x<=gx+1&&!collision;x++)for(let y=gy-1;y<=gy+1;y++){
+        for(const other of buckets.get(x+':'+y)||[]){
+          if(Math.hypot(xy.x-other.x,xy.y-other.y)<30){collision=true;break;}
+        }
+        if(collision)break;
+      }
+      if(collision){
+        const billboardShow=visible(entity.billboard.show);
+        const labelShow=entity.label?visible(entity.label.show):undefined;
+        entity.billboard.show=false;
+        if(entity.label)entity.label.show=false;
+        this._collisionSuppressed.push({entity,meta:item.meta,xy,billboardShow,labelShow});
+      }else{
+        const key=gx+':'+gy,points=buckets.get(key)||[];points.push(xy);buckets.set(key,points);occupied.push(item);
+      }
+    }
+    this.requestRender();
+  }
+  markerHits(position){
+    const scene=this.viewer.scene;
+    const hits=typeof scene.drillPick==='function'?scene.drillPick(position,16):[scene.pick(position)];
+    const found=[],seen=new Set();
+    for(const hit of hits||[]){
+      const entity=hit?.id||hit?.primitive;
+      if(!entity||entity===this.selectionMarker)continue;
+      const meta=entity.properties?.snxMeta?.getValue?.()??entity.snxMeta;
+      if(!meta?.type)continue;
+      if(seen.has(entity))continue;
+      seen.add(entity);found.push({entity,meta});
+    }
+    // A suppressed symbol is still tappable at its original projected location.
+    for(const item of this._collisionSuppressed||[]){
+      if(Math.hypot(position.x-item.xy.x,position.y-item.xy.y)>20)continue;
+      if(item.entity===this.selectionMarker||seen.has(item.entity))continue;
+      seen.add(item.entity);found.push({entity:item.entity,meta:item.meta});
+    }
+    return found;
+  }
+  onClick(position){
+    if(this.annotation?.isArmed()){this.annotation.handleClick(position);return;}
+    const hits=this.markerHits(position);
+    if(!hits.length){this._markerTap=null;if(this.selected)this.clearSelection();return;}
+    const now=Date.now(),previous=this._markerTap;
+    const sameSpot=previous&&now-previous.at<1800&&Math.hypot(position.x-previous.x,position.y-previous.y)<=20;
+    const sameContacts=sameSpot&&hits.length===previous.entities.length&&hits.every((hit,i)=>hit.entity===previous.entities[i]);
+    const index=sameContacts?(previous.index+1)%hits.length:0;
+    this._markerTap={x:position.x,y:position.y,at:now,index,entities:hits.map(hit=>hit.entity)};
+    const {meta,entity}=hits[index];
+    if(meta.type==='CLUSTER'){this._markerTap=null;const alt=Math.max(650000,(this.state().alt||6000000)*.42);this.flyTo(Number(meta.longitude),Number(meta.latitude),alt);return;}
+    this.select(meta,entity);
+    if(hits.length>1&&this.selectionMarker){const C=window.Cesium;this.selectionMarker.label={text:(index+1)+' / '+hits.length,font:'bold 12px monospace',fillColor:C.Color.WHITE,showBackground:true,backgroundColor:new C.Color(0,0,0,.9),pixelOffset:new C.Cartesian2(0,-25),disableDepthTestDistance:Number.POSITIVE_INFINITY};this.requestRender();}
+  }
   select(meta,entity){this.selected={meta,entity};this.setSelectionMarker(entity);this.dispatchEvent(new CustomEvent('select',{detail:meta}));this.requestRender();}
   clearSelection(){this.selected=null;this.tracking=false;this.cockpit=false;this.stopFollowLoop();if(this.selectionMarker){try{this.viewer.entities.remove(this.selectionMarker)}catch{}this.selectionMarker=null;}try{this.viewer.camera.lookAtTransform(window.Cesium.Matrix4.IDENTITY)}catch{}this.dispatchFollow();this.dispatchEvent(new CustomEvent('select',{detail:null}));this.requestRender();}
   setSelectionMarker(entity){const C=window.Cesium;if(this.selectionMarker){try{this.viewer.entities.remove(this.selectionMarker)}catch{}this.selectionMarker=null;}const position=entity?.position;if(!position)return;this.selectionMarker=this.viewer.entities.add({position,point:{pixelSize:20,color:C.Color.TRANSPARENT,outlineColor:C.Color.WHITE,outlineWidth:2,disableDepthTestDistance:Number.POSITIVE_INFINITY}});}

@@ -51,6 +51,10 @@ assert.ok(calls.some(a=>a[0]==='buildings'&&a[1]==='https://buildings.reearth.la
 assert.equal(globe.viewer.scene.globe.maximumScreenSpaceError,2.0,'desktop has closer mountain detail');
 assert.equal(globe.world3DBuildings.maximumScreenSpaceError,24,'desktop buildings use medium detail');
 assert.equal(globe.world3DBuildings.dynamicScreenSpaceError,true,'building traversal adapts with distance');
+assert.equal(globe.world3DBuildings.maximumScreenSpaceError,24,'initial desktop tileset refinement');
+const tileMemory=await read('src/globe/GlobeController.js');
+assert.ok(tileMemory.includes('maximumCacheOverflowBytes')&&tileMemory.includes('cacheBytes'),'3D building cache bounded where supported');
+
 globe.compactDevice=true;
 globe.applyWorld3DPerformance(true);
 assert.equal(globe.viewer.resolutionScale,.6,'Fold low-power reduces GPU pixel budget');

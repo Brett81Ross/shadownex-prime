@@ -25,6 +25,7 @@ export class BaseLayer {
     finally{
       this.refreshing=false;
       this.app.globe?.requestRender?.();
+      this.app.globe?.scheduleMarkerCollision?.();
       this.schedule(gen,nextDelay);
     }
   }

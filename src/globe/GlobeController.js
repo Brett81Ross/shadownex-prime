@@ -159,7 +159,7 @@ export class GlobeController extends EventTarget {
         const labelShow=entity.label?visible(entity.label.show):undefined;
         entity.billboard.show=false;
         if(entity.label)entity.label.show=false;
-        this._collisionSuppressed.push({entity,meta,xy,billboardShow,labelShow});
+        this._collisionSuppressed.push({entity,meta:item.meta,xy,billboardShow,labelShow});
       }else{
         const key=gx+':'+gy,points=buckets.get(key)||[];points.push(xy);buckets.set(key,points);occupied.push(item);
       }
